@@ -37,6 +37,17 @@
             ]
         }
     ],
+    "headers": [
+        "src/api/webserverHandler.hpp",
+        "src/data/config/project_config.hpp",
+        "src/data/StateManager/StateManager.hpp",
+        "src/data/utilities/enuminheritance.hpp",
+        "src/data/utilities/makeunique.hpp",
+        "src/data/utilities/Observer.hpp",
+        "src/mDNS/MDNSManager.hpp",
+        "src/ota/OTA.hpp",
+        "src/wifihandler/wifiHandler.hpp"
+    ],
     "version": "0.0.1",
     "frameworks": "arduino",
     "platforms": "espressif32"
