@@ -43,6 +43,8 @@ All other dependencies _should_ be installed automatically. If not, please make 
 
 For basic usage please see the [examples](/NetworkManager/examples) folder.
 
+To use the provided wifi manager html page you need to move the `wifimanager.html` file into a `data` folder in the root of your `pio` project.
+
 To extend any of the enums please use the `data/utilities/enuminheritance.hpp` file.
 
 To extend any of the config sections, simply create a namespace with the same name as the config struct is in and add your own `struct` to it. For example, to extend the `DeviceConfig_t` `struct`, you would do the following:
