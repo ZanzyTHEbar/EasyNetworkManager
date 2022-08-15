@@ -18,7 +18,7 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 #include "mbedtls/md.h"
-#include "network/WifiHandler/WifiHandler.hpp"
+#include "wifihandler/wifiHandler.hpp"
 
 class APIServer
 {
