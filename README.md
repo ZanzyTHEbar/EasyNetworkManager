@@ -69,6 +69,21 @@ This library is intended to be modified and extended. If you find any bugs, plea
 
 If you have any questions, please ask in the [discussions](https://github.com/ZanzyTHEbar/EasyNetworkManager/discussions).
 
+## Extras
+
+oh - to see any of the `log` statements - you need to add this:
+
+```ini
+build_flags = 
+  -DCORE_DEBUG_LEVEL=4
+```
+
+If you want to build in debug mode add this (it's not a build flag):
+
+```ini
+build_type = debug
+```
+
 ## License
 
 This library is licensed under the MIT License.
