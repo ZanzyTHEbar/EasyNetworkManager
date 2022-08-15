@@ -14,17 +14,15 @@
     },
     "dependencies": [
         {
-            "owner": "me-no-dev",
             "name": "ESPAsyncWebServer",
-            "version": "^",
+            "version": "https://github.com/me-no-dev/ESPAsyncWebServer.git",
             "platforms": [
                 "espressif32"
             ]
         },
         {
-            "owner": "me-no-dev",
             "name": "AsyncTCP",
-            "version": "^",
+            "version": "https://github.com/me-no-dev/AsyncTCP.git",
             "platforms": [
                 "espressif32"
             ]
