@@ -2,7 +2,7 @@
 #define OTA_HPP
 #include <ArduinoOTA.h>
 #include <HTTPClient.h>
-#include "data/Config/project_config.hpp"
+#include "data/config/project_config.hpp"
 
 class OTA
 {
