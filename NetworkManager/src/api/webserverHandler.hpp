@@ -17,6 +17,7 @@
 
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
+#include <SPIFFS.h>
 #include "mbedtls/md.h"
 #include "wifihandler/wifiHandler.hpp"
 #include "wifihandler/utilities/utilities.hpp"
@@ -35,6 +36,7 @@ private:
     static bool pass_write;
     static bool channel_write;
     std::string api_url;
+    std::string wifimanager_url;
 
 private:
     void command_handler(AsyncWebServerRequest *request);
@@ -83,8 +85,9 @@ private:
     WifiConfig wifiConfig;
 
 public:
-    APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url);
+    APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url, std::string wifimanager_url);
     void begin();
+    void setupServer();
     void startAPIServer();
     void triggerWifiConfigWrite();
     void findParam(AsyncWebServerRequest *request, const char *param, String &value);
@@ -95,6 +98,9 @@ public:
     public:
         API_Utilities();
         void notFound(AsyncWebServerRequest *request);
+        String readFile(fs::FS &fs, std::string path);
+        void writeFile(fs::FS &fs, std::string path, std::string message);
+        bool initSPIFFS();
         std::string shaEncoder(std::string data);
         std::unordered_map<WebRequestMethodComposite, std::string> _networkMethodsMap = {
             {HTTP_GET, "GET"},

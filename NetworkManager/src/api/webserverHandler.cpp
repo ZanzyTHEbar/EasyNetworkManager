@@ -18,16 +18,25 @@ bool APIServer::channel_write = false;
 //!                                     API Server
 //*********************************************************************************************
 
-APIServer::APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url) : network(network),
-																					server(new AsyncWebServer(CONTROL_PORT)),
-																					api_url(api_url) {}
+APIServer::APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url, std::string wifimanager_url) : network(network),
+																												 server(new AsyncWebServer(CONTROL_PORT)),
+																												 api_url(api_url),
+																												 wifimanager_url(wifimanager_url) {}
 
-void APIServer::startAPIServer()
+void APIServer::begin()
 {
-	begin();
+	this->setupServer();
 	//! i have changed this to use lambdas instead of std::bind to avoid the overhead. Lambdas are always more preferable.
 	server->on("/", HTTP_GET, [&](AsyncWebServerRequest *request)
 			   { request->send(200); });
+
+	if (api_utilities.initSPIFFS())
+	{
+		server->on(wifimanager_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest *request)
+				   { request->send(SPIFFS, "/wifimanager.html", MIMETYPE_HTML); });
+
+		server->serveStatic(wifimanager_url.c_str(), SPIFFS, "/");
+	}
 
 	// preflight cors check
 	server->on("/", HTTP_OPTIONS, [&](AsyncWebServerRequest *request)
@@ -58,7 +67,7 @@ void APIServer::findParam(AsyncWebServerRequest *request, const char *param, Str
 	}
 }
 
-void APIServer::begin()
+void APIServer::setupServer()
 {
 	command_map_wifi_conf.emplace("ssid", [this](const char *value) -> void
 								  { setSSID(value); });
@@ -259,6 +268,57 @@ void APIServer::API_Utilities::notFound(AsyncWebServerRequest *request)
 
 	log_i(" http://%s%s/\n", request->host().c_str(), request->url().c_str());
 	request->send(404, "text/plain", "Not found.");
+}
+
+// Initialize SPIFFS
+bool APIServer::API_Utilities::initSPIFFS()
+{
+	bool init_spiffs = SPIFFS.begin(false);
+	log_e("[SPIFFS]: SPIFFS Initialized: %s", init_spiffs ? "true" : "false");
+	return init_spiffs;
+}
+
+// Read File from SPIFFS
+String APIServer::API_Utilities::readFile(fs::FS &fs, std::string path)
+{
+	log_i("Reading file: %s\r\n", path.c_str());
+
+	File file = fs.open(path.c_str());
+	if (!file || file.isDirectory())
+	{
+		log_e("[INFO]: Failed to open file for reading");
+		return String();
+	}
+
+	String fileContent;
+	while (file.available())
+	{
+		fileContent = file.readStringUntil('\n');
+		break;
+	}
+	return fileContent;
+}
+
+// Write file to SPIFFS
+void APIServer::API_Utilities::writeFile(fs::FS &fs, std::string path, std::string message)
+{
+	log_i("[Writing File]: Writing file: %s\r\n", path);
+	Network_Utilities::my_delay(0.1L);
+
+	File file = fs.open(path.c_str(), FILE_WRITE);
+	if (!file)
+	{
+		log_i("[Writing File]: failed to open file for writing");
+		return;
+	}
+	if (file.print(message.c_str()))
+	{
+		log_i("[Writing File]: file written");
+	}
+	else
+	{
+		log_i("[Writing File]: file write failed");
+	}
 }
 
 APIServer::API_Utilities api_utilities;
