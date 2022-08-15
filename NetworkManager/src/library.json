@@ -12,12 +12,31 @@
         "type": "git",
         "url": "https://github.com/ZanzyTHEbar/EasyNetworkManager.git"
     },
-    "dependencies": {
-        "ESP Async WebServer": "^",
-        "AsyncTCP": "^",
-        "EasyPreferencesLib": "^",
-        "SPIFFS": "^"
-    },
+    "dependencies": [
+        {
+            "owner": "me-no-dev",
+            "name": "ESPAsyncWebServer",
+            "version": "^",
+            "platforms": [
+                "espressif32"
+            ]
+        },
+        {
+            "owner": "me-no-dev",
+            "name": "AsyncTCP",
+            "version": "^",
+            "platforms": [
+                "espressif32"
+            ]
+        },
+        {
+            "name": "EasyPreferencesLibrary",
+            "version": "https://github.com/ZanzyTHEbar/EasyPreferencesLibrary.git",
+            "platforms": [
+                "espressif32"
+            ]
+        }
+    ],
     "version": "0.0.1",
     "frameworks": "arduino",
     "platforms": "espressif32"
