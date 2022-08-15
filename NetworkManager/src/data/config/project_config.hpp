@@ -8,16 +8,8 @@
 
 #include "data/utilities/Observer.hpp"
 
-class ProjectConfig : public Config, public ISubject
+namespace Project_Config
 {
-public:
-    ProjectConfig();
-    virtual ~ProjectConfig();
-    void load();
-    void save();
-    void reset();
-    void initConfig();
-
     struct DeviceConfig_t
     {
         std::string name;
@@ -29,14 +21,6 @@ public:
         String data_json_string;
         String config_json_string;
         String settings_json_string;
-    };
-
-    struct CameraConfig_t
-    {
-        uint8_t vflip;
-        uint8_t framesize;
-        uint8_t href;
-        uint8_t quality;
     };
 
     struct WiFiConfig_t
@@ -54,28 +38,37 @@ public:
         uint8_t channel;
     };
 
-    struct TrackerConfig_t
+    struct ProjectConfig_t
     {
         DeviceConfig_t device;
-        CameraConfig_t camera;
         std::vector<WiFiConfig_t> networks;
         AP_WiFiConfig_t ap_network;
     };
+}
 
-    DeviceConfig_t *getDeviceConfig() { return &this->config.device; }
-    CameraConfig_t *getCameraConfig() { return &this->config.camera; }
-    std::vector<WiFiConfig_t> *getWifiConfigs() { return &this->config.networks; }
-    AP_WiFiConfig_t *getAPWifiConfig() { return &this->config.ap_network; }
+class ProjectConfig : public Config, public ISubject
+{
+public:
+    ProjectConfig(const char *name = (const char *)__null);
+    virtual ~ProjectConfig();
+    void load();
+    void save();
+    void reset();
+    void initConfig();
+
+    Project_Config::DeviceConfig_t *getDeviceConfig() { return &this->config.device; }
+    std::vector<Project_Config::WiFiConfig_t> *getWifiConfigs() { return &this->config.networks; }
+    Project_Config::AP_WiFiConfig_t *getAPWifiConfig() { return &this->config.ap_network; }
 
     void setDeviceConfig(const char *name, const char *OTAPassword, int *OTAPort, bool shouldNotify);
-    void setCameraConfig(uint8_t *vflip, uint8_t *framesize, uint8_t *href, uint8_t *quality, bool shouldNotify);
     void setWifiConfig(const char *networkName, const char *ssid, const char *password, uint8_t *channel, bool shouldNotify);
     void setAPWifiConfig(const char *ssid, const char *password, uint8_t *channel, bool shouldNotify);
 
 private:
     const char *configFileName;
-    TrackerConfig_t config;
+    Project_Config::ProjectConfig_t config;
     bool _already_loaded;
+    const char *_name;
 };
 
 #endif // PROJECT_CONFIG_HPP

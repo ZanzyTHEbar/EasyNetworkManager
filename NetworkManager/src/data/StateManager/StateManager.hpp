@@ -6,9 +6,8 @@
  * StateManager
  * All Project States are managed here
  */
-class ProgramStates
+namespace ProgramStates
 {
-public:
     struct DeviceStates
     {
         enum State_e
@@ -93,6 +92,5 @@ extern StateManager<State_e> stateManager;
 extern StateManager<WiFiState_e> wifiStateManager;
 extern StateManager<WebServerState_e> webServerStateManager;
 extern StateManager<MDNSState_e> mdnsStateManager;
-
 
 #endif // STATEMANAGER_HPP

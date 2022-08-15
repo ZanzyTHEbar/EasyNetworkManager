@@ -19,9 +19,23 @@
 #include <AsyncTCP.h>
 #include "mbedtls/md.h"
 #include "wifihandler/wifiHandler.hpp"
+#include "wifihandler/utilities/utilities.hpp"
 
 class APIServer
 {
+private:
+    static const char *MIMETYPE_HTML;
+    /* static const char *MIMETYPE_CSS; */
+    /* static const char *MIMETYPE_JS; */
+    /* static const char *MIMETYPE_PNG; */
+    /* static const char *MIMETYPE_JPG; */
+    /* static const char *MIMETYPE_ICO; */
+    static const char *MIMETYPE_JSON;
+    static bool ssid_write;
+    static bool pass_write;
+    static bool channel_write;
+    std::string api_url;
+
 private:
     void command_handler(AsyncWebServerRequest *request);
 
@@ -52,16 +66,7 @@ private:
     command_map_wifi_conf_t command_map_wifi_conf;
     command_map_json_t command_map_json;
 
-    static const char *MIMETYPE_HTML;
-    /* static const char *MIMETYPE_CSS; */
-    /* static const char *MIMETYPE_JS; */
-    /* static const char *MIMETYPE_PNG; */
-    /* static const char *MIMETYPE_JPG; */
-    /* static const char *MIMETYPE_ICO; */
-    static const char *MIMETYPE_JSON;
-    static bool ssid_write;
-    static bool pass_write;
-    static bool channel_write;
+    function m_callback;
 
     struct LocalWifiConfig
     {
@@ -78,18 +83,18 @@ private:
     WifiConfig wifiConfig;
 
 public:
-    APIServer(int CONTROL_PORT, WiFiHandler *network);
+    APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url);
     void begin();
     void startAPIServer();
     void triggerWifiConfigWrite();
     void findParam(AsyncWebServerRequest *request, const char *param, String &value);
+    void addCommandHandler(std::string index, function func);
 
     class API_Utilities
     {
     public:
         API_Utilities();
         void notFound(AsyncWebServerRequest *request);
-        void my_delay(volatile long delay_time);
         std::string shaEncoder(std::string data);
         std::unordered_map<WebRequestMethodComposite, std::string> _networkMethodsMap = {
             {HTTP_GET, "GET"},

@@ -1,25 +1,31 @@
 #include "WifiHandler.hpp"
 #include <vector>
 
-WiFiHandler::WiFiHandler(ProjectConfig *configManager, StateManager<WiFiState_e> *stateManager, std::string ssid, std::string password, uint8_t 8channel) : configManager(configManager),
-																																							stateManager(stateManager),
-																																							ssid(ssid),
-																																							password(password),
-																																							channel(channel) {}
+WiFiHandler::WiFiHandler(ProjectConfig *configManager,
+						 StateManager<WiFiState_e> *stateManager,
+						 std::string ssid,
+						 std::string password,
+						 uint8_t channel) : configManager(configManager),
+											stateManager(stateManager),
+											ssid(ssid),
+											password(password),
+											channel(channel),
+											_enable_adhoc(false) {}
 
 WiFiHandler::~WiFiHandler() {}
 
 void WiFiHandler::setupWifi()
 {
-	if (ENABLE_ADHOC || stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
+	if (this->_enable_adhoc || stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
 	{
 		this->setUpADHOC();
 		return;
 	}
+
 	log_i("Initializing connection to wifi");
 	stateManager->setState(WiFiState_e::WiFiState_Connecting);
 
-	std::vector<ProjectConfig::WiFiConfig_t> *networks = configManager->getWifiConfigs();
+	std::vector<Project_Config::WiFiConfig_t> *networks = configManager->getWifiConfigs();
 	int connection_timeout = 30000; // 30 seconds
 
 	int count = 0;
@@ -99,9 +105,9 @@ void WiFiHandler::setUpADHOC()
 	}
 	else
 	{
-		strcpy(ssid, WIFI_AP_SSID);
-		strcpy(password, WIFI_AP_PASSWORD);
-		channel = ADHOC_CHANNEL;
+		strcpy(ssid, "EasyNetworkManager");
+		strcpy(password, "12345678");
+		channel = 1;
 	}
 
 	this->adhoc(ssid, password, channel);
@@ -121,7 +127,7 @@ void WiFiHandler::iniSTA()
 
 	log_i("Trying to connect to the %s network", WIFI_SSID);
 
-	WiFi.begin(WIFI_SSID, WIFI_PASSWORD, WIFI_CHANNEL);
+	WiFi.begin(this->ssid.c_str(), this->password.c_str(), this->channel);
 
 	if (!WiFi.isConnected())
 		log_i("\n\rCould not connect to %s, please try another network\n\r", WIFI_SSID);
@@ -151,4 +157,9 @@ void WiFiHandler::iniSTA()
 			return;
 		}
 	}
+}
+
+void WiFiHandler::toggleAdhoc(bool *enable)
+{
+	_enable_adhoc = enable;
 }

@@ -18,17 +18,13 @@ bool APIServer::channel_write = false;
 //!                                     API Server
 //*********************************************************************************************
 
-APIServer::APIServer(int CONTROL_PORT, WiFiHandler *network) : network(network),
-																							 server(new AsyncWebServer(CONTROL_PORT)) {}
+APIServer::APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url) : network(network),
+																					server(new AsyncWebServer(CONTROL_PORT)),
+																					api_url(api_url) {}
 
 void APIServer::startAPIServer()
 {
 	begin();
-	/* this->server->on(
-		"/control",
-		HTTP_GET,
-		std::bind(&APIServer::command_handler, this, std::placeholders::_1)); */
-
 	//! i have changed this to use lambdas instead of std::bind to avoid the overhead. Lambdas are always more preferable.
 	server->on("/", HTTP_GET, [&](AsyncWebServerRequest *request)
 			   { request->send(200); });
@@ -47,8 +43,7 @@ void APIServer::startAPIServer()
 	// std::bind(&APIServer::API_Utilities::notFound, &api_utilities, std::placeholders::_1);
 	server->onNotFound([&](AsyncWebServerRequest *request)
 					   { api_utilities.notFound(request); });
-	// Hex value of BUTT_PLUG_CONTROLLER == 425554545f504c55475f434f4e54524f4c4c4552
-	this->server->on("/control", HTTP_GET, [&](AsyncWebServerRequest *request)
+	this->server->on(api_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest *request)
 					 { command_handler(request); });
 
 	log_d("Initializing REST API");
@@ -83,6 +78,12 @@ void APIServer::begin()
 							 { setConfigJson(request); });
 	command_map_json.emplace("settings_json", [this](AsyncWebServerRequest *request) -> void
 							 { setSettingsJson(request); });
+}
+
+void APIServer::addCommandHandler(std::string index, function func)
+{
+	command_map_funct.emplace(index, [&](void) -> void
+							  { func(); });
 }
 
 void APIServer::command_handler(AsyncWebServerRequest *request)
@@ -175,7 +176,7 @@ void APIServer::triggerWifiConfigWrite()
 void APIServer::setDataJson(AsyncWebServerRequest *request)
 {
 	network->configManager->getDeviceConfig()->data_json = true;
-	api_utilities.my_delay(1L);
+	Network_Utilities::my_delay(1L);
 	String temp = network->configManager->getDeviceConfig()->data_json_string;
 	request->send(200, MIMETYPE_JSON, temp);
 	temp = "";
@@ -184,7 +185,7 @@ void APIServer::setDataJson(AsyncWebServerRequest *request)
 void APIServer::setConfigJson(AsyncWebServerRequest *request)
 {
 	network->configManager->getDeviceConfig()->config_json = true;
-	api_utilities.my_delay(1L);
+	Network_Utilities::my_delay(1L);
 	String temp = network->configManager->getDeviceConfig()->config_json_string;
 	request->send(200, MIMETYPE_JSON, temp);
 	temp = "";
@@ -193,7 +194,7 @@ void APIServer::setConfigJson(AsyncWebServerRequest *request)
 void APIServer::setSettingsJson(AsyncWebServerRequest *request)
 {
 	network->configManager->getDeviceConfig()->settings_json = true;
-	api_utilities.my_delay(1L);
+	Network_Utilities::my_delay(1L);
 	String temp = network->configManager->getDeviceConfig()->settings_json_string;
 	request->send(200, MIMETYPE_JSON, temp);
 	temp = "";
@@ -258,13 +259,6 @@ void APIServer::API_Utilities::notFound(AsyncWebServerRequest *request)
 
 	log_i(" http://%s%s/\n", request->host().c_str(), request->url().c_str());
 	request->send(404, "text/plain", "Not found.");
-}
-
-void APIServer::API_Utilities::my_delay(volatile long delay_time)
-{
-	delay_time = delay_time * 1e6L;
-	for (volatile long count = delay_time; count > 0L; count--)
-		;
 }
 
 APIServer::API_Utilities api_utilities;

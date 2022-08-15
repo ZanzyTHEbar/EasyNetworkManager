@@ -2,7 +2,7 @@
 
 Preferences preferences;
 
-ProjectConfig::ProjectConfig() : Config(&preferences, "config"), _already_loaded(false) {}
+ProjectConfig::ProjectConfig(const char *name) : _name(name), Config(&preferences, "config"), _already_loaded(false) {}
 
 ProjectConfig::~ProjectConfig() {}
 
@@ -12,9 +12,15 @@ ProjectConfig::~ProjectConfig() {}
  */
 void ProjectConfig::initConfig()
 {
+    if (_name == (const char *)__null)
+    {
+        log_e("Config name is null\n");
+        _name = "easynetworkmanager";
+    }
+
     begin();
     this->config.device = {
-        "EyeTrackVR",
+        _name,
         "",
         3232,
         false,
@@ -23,13 +29,6 @@ void ProjectConfig::initConfig()
         "",
         "",
         ""
-    };
-
-    this->config.camera = {
-        0,
-        0,
-        0,
-        0,
     };
 
     this->config.networks = {
@@ -63,13 +62,6 @@ void ProjectConfig::load()
 
     bool device_success = device_name_success && device_otapassword_success && device_otaport_success;
 
-    bool camera_vflip_success = this->read("camera_vflip", this->config.camera.vflip);
-    bool camera_framesize_success = this->read("cameraFrmsz", this->config.camera.framesize);
-    bool camera_href_success = this->read("camera_href", this->config.camera.href);
-    bool camera_quality_success = this->read("camera_quality", this->config.camera.quality);
-
-    bool camera_success = camera_vflip_success && camera_framesize_success && camera_href_success && camera_quality_success;
-
     bool network_info_success;
     for (int i = 0; i < this->config.networks.size(); i++)
     {
@@ -86,7 +78,7 @@ void ProjectConfig::load()
         network_info_success = networks_name_success && networks_ssid_success && networks_password_success && networks_channel_success;
     }
 
-    if (!device_success || !camera_success || !network_info_success)
+    if (!device_success || !network_info_success)
     {
         log_e("Failed to load project config - Generating config and restarting");
         save();
@@ -106,11 +98,6 @@ void ProjectConfig::save()
     this->write("device_name", this->config.device.name);
     this->write("ota_pass", this->config.device.OTAPassword);
     this->write("ota_port", this->config.device.OTAPort);
-
-    this->write("camera_vflip", this->config.camera.vflip);
-    this->write("cameraFrmsz", this->config.camera.framesize);
-    this->write("camera_href", this->config.camera.href);
-    this->write("camera_quality", this->config.camera.quality);
 
     for (int i = 0; i < this->config.networks.size(); i++)
     {
@@ -134,7 +121,7 @@ void ProjectConfig::reset()
 
 //**********************************************************************************************************************
 //*
-//*                                                DeviceConfig
+//!                                                DeviceConfig
 //*
 //**********************************************************************************************************************
 void ProjectConfig::setDeviceConfig(const char *name, const char *OTAPassword, int *OTAPort, bool shouldNotify)
@@ -151,25 +138,9 @@ void ProjectConfig::setDeviceConfig(const char *name, const char *OTAPassword, i
     }
 }
 
-void ProjectConfig::setCameraConfig(uint8_t *vflip, uint8_t *framesize, uint8_t *href, uint8_t *quality, bool shouldNotify)
-{
-    this->config.camera = {
-        *vflip,
-        *framesize,
-        *href,
-        *quality,
-    };
-
-    log_d("Updating camera config");
-    if (shouldNotify)
-    {
-        this->notify(ObserverEvent::cameraConfigUpdated);
-    }
-}
-
 void ProjectConfig::setWifiConfig(const char *networkName, const char *ssid, const char *password, uint8_t *channel, bool shouldNotify)
 {
-    WiFiConfig_t *networkToUpdate = nullptr;
+    Project_Config::WiFiConfig_t *networkToUpdate = nullptr;
 
     for (int i = 0; i < this->config.networks.size(); i++)
     {

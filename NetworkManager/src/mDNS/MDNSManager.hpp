@@ -9,9 +9,20 @@ class MDNSHandler : public IObserver
 private:
   StateManager<ProgramStates::DeviceStates::MDNSState_e> *stateManager;
   ProjectConfig *configManager;
+  std::string service_name;
+  std::string service_text;
+  std::string proto;
+  std::string key;
+  std::string value;
 
 public:
-  MDNSHandler(StateManager<ProgramStates::DeviceStates::MDNSState_e> *stateManager, ProjectConfig *configManager) : stateManager(stateManager), configManager(configManager) {}
+  MDNSHandler(StateManager<ProgramStates::DeviceStates::MDNSState_e> *stateManager,
+              ProjectConfig *configManager,
+              std::string service_name,
+              std::string service_text,
+              std::string proto,
+              std::string key,
+              std::string value);
   void startMDNS();
   void update(ObserverEvent::Event event);
 };

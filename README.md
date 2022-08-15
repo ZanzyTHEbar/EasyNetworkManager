@@ -43,8 +43,25 @@ All other dependencies _should_ be installed automatically. If not, please make 
 
 For basic usage please see the [examples](/NetworkManager/examples) folder.
 
-> **Note:** This library is still in development and is not yet complete.
-> For platformio you <u>must</u> define the following variables in your 
+To extend any of the enums please use the `data/utilities/enuminheritance.hpp` file.
+
+To extend any of the config sections, simply create a namespace with the same name as the config struct is in and add your own `struct` to it. For example, to extend the `DeviceConfig_t` `struct`, you would do the following:
+
+```cpp
+namespace Project_Config {
+
+    struct NewConfig_t {
+        DeviceConfig_t device;
+        String newConfig;
+        int newint;
+        bool newbool;
+    };
+}
+
+Project_Config::NewConfig_t newConfig; // this creates a new object of your config struct.
+```
+
+> **Note**: This library is still in development and is not yet complete, if there are any bugs please report them in the issues section.
 
 ## Modification
 
