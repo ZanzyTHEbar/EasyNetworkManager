@@ -27,11 +27,9 @@ lib_deps =
 
 To install this library in your Arduino IDE, you must add all dependencies (sorry) and then download this repository as a zip file and it as any other library :smile:.
 
-## Dependencies (required)
+## Dependencies
 
-- [EasyPreferencesLibrary project](https://github.com/ZanzyTHEbar/EasyPreferencesLibrary)
-
-All other dependencies _should_ be installed automatically. If not, please make a new issue and I will fix it.
+All dependencies _should_ be installed automatically. If not, please make a new issue and I will fix it.
 
 #### Dependencies used in this project
 
