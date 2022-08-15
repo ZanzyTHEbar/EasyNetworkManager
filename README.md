@@ -71,7 +71,7 @@ If you have any questions, please ask in the [discussions](https://github.com/Za
 
 ## Extras
 
-oh - to see any of the `log` statements - you need to add this:
+To see any of the `log` statements - you need to add this to your `platformio.ini`:
 
 ```ini
 build_flags = 
