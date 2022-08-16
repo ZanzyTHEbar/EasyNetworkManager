@@ -10,7 +10,7 @@
 //#include <data/utilities/makeunique.hpp> // used with smart pointers (unique_ptr) to create unique objects
 
 ProjectConfig configManager("Network");
-WiFiHandler network(&configManager, &wifiStateManager, "LoveHouse2G", "vxwby2Gwtswp", 1);
+WiFiHandler network(&configManager, &wifiStateManager, "ssid", "password", 1);
 APIServer server(80, &network, "/control", "/wifimanager");
 OTA ota(&configManager);
 MDNSHandler mDNS(&mdnsStateManager, &configManager, "EasyNetworkManager", "test", "tcp", "api_port", "80");
