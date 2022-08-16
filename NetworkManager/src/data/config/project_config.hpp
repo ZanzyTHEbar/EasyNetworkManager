@@ -49,7 +49,7 @@ namespace Project_Config
 class ProjectConfig : public Config, public ISubject
 {
 public:
-    ProjectConfig(const char *name = (const char *)__null);
+    ProjectConfig(std::string name = "");
     virtual ~ProjectConfig();
     void load();
     void save();
@@ -68,7 +68,7 @@ private:
     const char *configFileName;
     Project_Config::ProjectConfig_t config;
     bool _already_loaded;
-    const char *_name;
+    std::string _name;
 };
 
 #endif // PROJECT_CONFIG_HPP

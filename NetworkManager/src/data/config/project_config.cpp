@@ -2,7 +2,7 @@
 
 Preferences preferences;
 
-ProjectConfig::ProjectConfig(const char *name) : _name(name), Config(&preferences, "config"), _already_loaded(false) {}
+ProjectConfig::ProjectConfig(std::string name) : _name(name), Config(&preferences, "config"), _already_loaded(false) {}
 
 ProjectConfig::~ProjectConfig() {}
 
@@ -12,7 +12,7 @@ ProjectConfig::~ProjectConfig() {}
  */
 void ProjectConfig::initConfig()
 {
-    if (_name == (const char *)__null)
+    if (_name == "")
     {
         log_e("Config name is null\n");
         _name = "easynetworkmanager";

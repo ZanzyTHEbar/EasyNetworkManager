@@ -13,7 +13,7 @@ ProjectConfig configManager("Network");
 WiFiHandler network(&configManager, &wifiStateManager, "ssid", "password", 1);
 APIServer server(80, &network, "/control", "/wifimanager");
 OTA ota(&configManager);
-MDNSHandler mDNS(&mdnsStateManager, &configManager, "EasyNetworkManager", "test", "tcp", "api_port", "80");
+MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetworkmanager", "test", "_tcp", "apiport", "80");
 
 LEDManager ledManager(27);
 

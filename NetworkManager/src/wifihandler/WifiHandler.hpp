@@ -10,11 +10,11 @@
 class WiFiHandler
 {
 public:
-  WiFiHandler(ProjectConfig *configManager, StateManager<WiFiState_e> *stateManager, std::string ssid, std::string password, uint8_t channel);
+  WiFiHandler(ProjectConfig *configManager, StateManager<WiFiState_e> *stateManager, std::string ssid, std::string password, std::string hostname, uint8_t channel);
   virtual ~WiFiHandler();
   void setupWifi();
   void toggleAdhoc(bool *enable);
-  
+
   ProjectConfig *configManager;
   StateManager<WiFiState_e> *stateManager;
 
@@ -25,6 +25,7 @@ private:
 
   std::string ssid;
   std::string password;
+  std::string _hostname;
   uint8_t channel;
 
   bool _enable_adhoc;

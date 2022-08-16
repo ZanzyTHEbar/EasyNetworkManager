@@ -21,8 +21,8 @@ bool APIServer::channel_write = false;
 APIServer::APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url, std::string wifimanager_url) : network(network),
 																												 server(new AsyncWebServer(CONTROL_PORT)),
 																												 api_url(api_url),
-																												 wifimanager_url(wifimanager_url),
-																												 m_callback(NULL) {}
+																												 wifimanager_url(wifimanager_url) {}
+// m_callback(NULL)
 
 void APIServer::begin()
 {
@@ -33,7 +33,7 @@ void APIServer::begin()
 
 	server->on(api_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest *request)
 			   { command_handler(request);
-			     request->send(200, MIMETYPE_JSON, "Done. Settings have been set."); });
+				 request->send(200, MIMETYPE_JSON, "Done. Settings have been set."); });
 
 	if (api_utilities.initSPIFFS())
 	{
@@ -77,57 +77,68 @@ void APIServer::findParam(AsyncWebServerRequest *request, const char *param, Str
 
 void APIServer::setupServer()
 {
-	command_map_wifi_conf.emplace("ssid", [this](const char *value) -> void
-								  { setSSID(value); });
-	command_map_wifi_conf.emplace("password", [this](const char *value) -> void
-								  { setPass(value); });
-	command_map_wifi_conf.emplace("channel", [this](const char *value) -> void
-								  { setChannel(value); });
+	localWifiConfig = {
+		.ssid = "",
+		.pass = "",
+		.channel = 0,
+	};
 
-	command_map_funct.emplace("reboot_device", [this](void) -> void
-							  { rebootDevice(); });
-	command_map_funct.emplace("reset_config", [this](void) -> void
-							  { factoryReset(); });
+	localAPWifiConfig = {
+		.ssid = "",
+		.pass = "",
+		.channel = 0,
+	};
 
-	command_map_json.emplace("data_json", [this](AsyncWebServerRequest *request) -> void
-							 { setDataJson(request); });
-	command_map_json.emplace("config_json", [this](AsyncWebServerRequest *request) -> void
-							 { setConfigJson(request); });
-	command_map_json.emplace("settings_json", [this](AsyncWebServerRequest *request) -> void
-							 { setSettingsJson(request); });
+	command_map_wifi_conf.emplace("ssid", &APIServer::setWiFi);
+
+	command_map_method.emplace("reset_config", &APIServer::factoryReset);
 }
 
 void APIServer::command_handler(AsyncWebServerRequest *request)
 {
-	std::shared_ptr<APIServer> api_server = std::make_shared<APIServer>(*this);
 	int params = request->params();
 	for (int i = 0; i < params; i++)
 	{
 		AsyncWebParameter *param = request->getParam(i);
 		{
-			try
-			{
-				interface_norm.searchAndCall<void>(param->name().c_str());
-			}
-			catch (const std::exception &e)
-			{
-				log_e("Unknown Command: %s", e.what());
-			}
-			command_map_funct_t::const_iterator it_funct = command_map_funct.find(param->name().c_str());
-			command_map_json_t::const_iterator it_json = command_map_json.find(param->name().c_str());
+			command_map_method_t::const_iterator it_method = command_map_method.find(param->name().c_str());
+			// command_map_funct_t::const_iterator it_funct = command_map_funct.find(param->name().c_str());
+			//  command_map_json_t::const_iterator it_json = command_map_json.find(param->name().c_str());
 
-			if (it_funct != command_map_funct.end())
+			if (it_method != command_map_method.end())
 			{
-				command_map_funct.at(param->name().c_str())();
-
-				// auto &key_it_funct = it_funct->first;
+				(*this.*(it_method->second))();
 				log_i("Command %s executed", param->name().c_str());
 				request->send(200);
 			}
-			else if (it_json != command_map_json.end())
+			/* else if (it_funct != command_map_funct.end())
 			{
-				command_map_json.at(param->name().c_str())(request);
-				// auto &key_it_json = it_json->first;
+				(*(it_funct->second))();
+				log_i("Command %s executed", param->name().c_str());
+				request->send(200);
+			} */
+			else
+			{
+				log_e("Command %s not found", param->name().c_str());
+				request->send(404, MIMETYPE_JSON, "Error: Command not found");
+			}
+		}
+	}
+}
+
+void APIServer::wifi_command_handler(AsyncWebServerRequest *request)
+{
+
+	int params = request->params();
+	for (int i = 0; i < params; i++)
+	{
+		AsyncWebParameter *param = request->getParam(i);
+		command_map_wifi_conf_t::const_iterator it_wifi_funct = command_map_wifi_conf.find(param->name().c_str());
+		{
+			if (it_wifi_funct != command_map_wifi_conf.end())
+			{
+				(*this.*(it_wifi_funct->second))(param->value().c_str());
+				// command_map_wifi_conf.at(param->name().c_str())(param->value().c_str());
 				log_i("Command %s executed", param->name().c_str());
 			}
 			else
@@ -139,56 +150,45 @@ void APIServer::command_handler(AsyncWebServerRequest *request)
 	}
 }
 
-void APIServer::wifi_command_handler(AsyncWebServerRequest *request)
-{
-	APIServer api_server(*this);
-	int params = request->params();
-	for (int i = 0; i < params; i++)
-	{
-		AsyncWebParameter *param = request->getParam(i);
-		{
-			try
-			{
-				interface.searchAndCall<void>(api_server, param->name().c_str(), param->value().c_str());
-			}
-			catch (const std::exception &e)
-			{
-				log_e("Unknown Command: %s", e.what());
-			}
-		}
-		log_i("%s[%s]: %s\n", api_utilities._networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
-	}
-}
-
 //*********************************************************************************************
 //!                                     Command Functions
 //*********************************************************************************************
-void APIServer::setSSID(const char *value)
+void APIServer::setWiFi(const char *value)
 {
 	if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
-		this->wifiConfig.local_WifiConfig[0].ssid = value;
+	{
+		localAPWifiConfig.ssid = value;
+		localAPWifiConfig.pass = value;
+		localAPWifiConfig.channel = atoi(value);
+	}
 	else
-		this->wifiConfig.local_WifiConfig[1].ssid = value;
+	{
+		localWifiConfig.ssid = value;
+		localWifiConfig.pass = value;
+		localWifiConfig.channel = atoi(value);
+	}
 	ssid_write = true;
+	pass_write = true;
+	channel_write = true;
 }
 
-void APIServer::setPass(const char *value)
+/* void APIServer::setPass(const char *value)
 {
 	if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
-		this->wifiConfig.local_WifiConfig[0].pass = value;
+		localAPWifiConfig.pass = value;
 	else
-		this->wifiConfig.local_WifiConfig[1].pass = value;
+		localWifiConfig.pass = value;
 	pass_write = true;
 }
 
 void APIServer::setChannel(const char *value)
 {
 	if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
-		this->wifiConfig.local_WifiConfig[0].channel = atoi(value);
+		localAPWifiConfig.channel = atoi(value);
 	else
-		this->wifiConfig.local_WifiConfig[1].channel = atoi(value);
+		localWifiConfig.channel = atoi(value);
 	channel_write = true;
-}
+} */
 
 /**
  * * Trigger in main loop to save config to flash
@@ -202,9 +202,9 @@ void APIServer::triggerWifiConfigWrite()
 		pass_write = false;
 		channel_write = false;
 		if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
-			network->configManager->setWifiConfig(wifiConfig.local_WifiConfig[0].ssid.c_str(), wifiConfig.local_WifiConfig[0].ssid.c_str(), wifiConfig.local_WifiConfig[0].pass.c_str(), &wifiConfig.local_WifiConfig[0].channel, true);
+			network->configManager->setWifiConfig(localAPWifiConfig.ssid.c_str(), localAPWifiConfig.ssid.c_str(), localAPWifiConfig.pass.c_str(), &localAPWifiConfig.channel, true);
 		else
-			network->configManager->setWifiConfig(wifiConfig.local_WifiConfig[1].ssid.c_str(), wifiConfig.local_WifiConfig[1].ssid.c_str(), wifiConfig.local_WifiConfig[1].pass.c_str(), &wifiConfig.local_WifiConfig[1].channel, true);
+			network->configManager->setWifiConfig(localWifiConfig.ssid.c_str(), localWifiConfig.ssid.c_str(), localWifiConfig.pass.c_str(), &localWifiConfig.channel, true);
 		network->configManager->save();
 	}
 }
@@ -244,6 +244,7 @@ void APIServer::rebootDevice()
 
 void APIServer::factoryReset()
 {
+	log_d("Factory Reset");
 	network->configManager->reset();
 }
 

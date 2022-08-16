@@ -3,7 +3,6 @@
 #define XWEBSERVERHANDLER_HPP
 #include <unordered_map>
 #include <string>
-#include <api/utilities/interface.hpp>
 
 #define WEBSERVER_H
 
@@ -45,13 +44,11 @@ private:
 
     AsyncWebServer *server;
     WiFiHandler *network;
-    Interface<APIServer> interface;
-    Interface_norm interface_norm;
 
     /* Commands */
-    void setSSID(const char *value);
-    void setPass(const char *value);
-    void setChannel(const char *value);
+    void setWiFi(const char *value);
+    /* void setPass(const char *value);
+    void setChannel(const char *value); */
 
     void setDataJson(AsyncWebServerRequest *request);
     void setConfigJson(AsyncWebServerRequest *request);
@@ -60,19 +57,21 @@ private:
     void factoryReset();
     void rebootDevice();
 
-    typedef std::function<void(const char *)> wifi_conf_function;
-    typedef std::function<void(void)> function;
-    typedef std::function<void(AsyncWebServerRequest *)> function_w_request;
+    using wifi_conf_function = void (APIServer::*)(const char *);
 
+    using method = void (APIServer::*)();
+    typedef std::unordered_map<std::string, method> command_map_method_t;
+    command_map_method_t command_map_method;
+
+    /* using function = void (*)(void);
     typedef std::unordered_map<std::string, function> command_map_funct_t;
+    command_map_funct_t command_map_funct; */
+
     typedef std::unordered_map<std::string, wifi_conf_function> command_map_wifi_conf_t;
-    typedef std::unordered_map<std::string, function_w_request> command_map_json_t;
+    // typedef std::unordered_map<std::string, function> command_map_json_t;
 
-    command_map_funct_t command_map_funct;
     command_map_wifi_conf_t command_map_wifi_conf;
-    command_map_json_t command_map_json;
-
-    function m_callback;
+    // command_map_json_t command_map_json;
 
     struct LocalWifiConfig
     {
@@ -81,12 +80,16 @@ private:
         uint8_t channel;
     };
 
-    struct WifiConfig
+    LocalWifiConfig localWifiConfig;
+
+    struct LocalAPWifiConfig
     {
-        std::vector<LocalWifiConfig> local_WifiConfig;
+        std::string ssid;
+        std::string pass;
+        uint8_t channel;
     };
 
-    WifiConfig wifiConfig;
+    LocalWifiConfig localAPWifiConfig;
 
 public:
     APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url, std::string wifimanager_url);
@@ -96,19 +99,10 @@ public:
     void triggerWifiConfigWrite();
     void findParam(AsyncWebServerRequest *request, const char *param, String &value);
 
-    void addCommandHandler(std::string index, void (*funct)(void))
+   /*  void addCommandHandler(std::string index, function funct)
     {
-        /* command_map_funct.emplace(index, [&](void) -> void
-                                  { func(); }); */
-
-        interface_norm.insert(index, funct);
-    }
-
-    template<typename T, typename C, typename P>
-    void addMethodHandler(std::string index, T (C::*funct)(P))
-    {
-        interface.insert(index, funct);
-    }
+        command_map_funct.emplace(index, &funct);
+    } */
 
     class API_Utilities
     {

@@ -16,13 +16,14 @@ MDNSHandler::MDNSHandler(StateManager<ProgramStates::DeviceStates::MDNSState_e> 
 
 void MDNSHandler::startMDNS()
 {
-  Project_Config::DeviceConfig_t *deviceConfig = configManager->getDeviceConfig();
+  auto deviceConfig = configManager->getDeviceConfig();
   log_d("%s", deviceConfig->name.c_str());
   if (MDNS.begin(deviceConfig->name.c_str()))
   {
     stateManager->setState(MDNSState_e::MDNSState_Starting);
     MDNS.addService(service_name.c_str(), proto.c_str(), atoi(value.c_str()));
-    MDNS.addServiceTxt(service_text.c_str(), proto.c_str(), key.c_str(), value.c_str()); // ex: "camera", "tcp", "stream_port", "80"
+    MDNS.addServiceTxt(service_name.c_str(), proto.c_str(), key.c_str(), value.c_str()); // ex: "camera", "tcp", "stream_port", "80"
+    log_d("%s %s %s %s %s", service_name.c_str(), proto.c_str(), service_text.c_str(), key.c_str(), value.c_str());
     log_i("MDNS initialized!");
     stateManager->setState(MDNSState_e::MDNSState_Started);
   }
