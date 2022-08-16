@@ -9,21 +9,32 @@
 //#include <data/utilities/enuminheritance.hpp> // used for extending enums with new values
 //#include <data/utilities/makeunique.hpp> // used with smart pointers (unique_ptr) to create unique objects
 
-ProjectConfig configManager("EasyNetworkManager");
-WiFiHandler network(&configManager, &wifiStateManager, "EasyNetworkManager", "test", 1);
-APIServer server(80, &network, "/api/control", "/wifimanager");
+ProjectConfig configManager("Network");
+WiFiHandler network(&configManager, &wifiStateManager, "LoveHouse2G", "vxwby2Gwtswp", 1);
+APIServer server(80, &network, "/control", "/wifimanager");
 OTA ota(&configManager);
 MDNSHandler mDNS(&mdnsStateManager, &configManager, "EasyNetworkManager", "test", "tcp", "api_port", "80");
+
+LEDManager ledManager(27);
 
 void printHelloWorld()
 {
     Serial.println("Hello World!");
 }
 
+void blink()
+{
+    digitalWrite(27, HIGH);
+    delay(100);
+    digitalWrite(27, LOW);
+    delay(100);
+}
+
 void setup()
 {
     Serial.begin(115200);
     Serial.println("Hello, EasyNetworkManager!");
+    ledManager.begin();
 
     Serial.setDebugOutput(true);
     configManager.initConfig(); // call before load to initialise the structs
@@ -50,10 +61,11 @@ void setup()
     case WiFiState_e::WiFiState_Connected:
     {
         // only start the API server if we have wifi connection
+        server.addCommandHandler("hello_world", printHelloWorld); // add a command handler to the API server - you can add as many as you want - you can also add methods.
+        server.addCommandHandler("blink", blink);                 // add a command handler to the API server - you can add as many as you want - you can also add methods.
+
         server.begin();
         log_d("[SETUP]: Starting API Server");
-        server.addCommandHandler("hello_world", [&](void) -> void
-                                 { printHelloWorld(); }); // add a command handler to the API server - you can add as many as you want - you can also add methods.
         break;
     }
     case WiFiState_e::WiFiState_Connecting:

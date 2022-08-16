@@ -17,7 +17,7 @@ MDNSHandler::MDNSHandler(StateManager<ProgramStates::DeviceStates::MDNSState_e> 
 void MDNSHandler::startMDNS()
 {
   Project_Config::DeviceConfig_t *deviceConfig = configManager->getDeviceConfig();
-
+  log_d("%s", deviceConfig->name.c_str());
   if (MDNS.begin(deviceConfig->name.c_str()))
   {
     stateManager->setState(MDNSState_e::MDNSState_Starting);

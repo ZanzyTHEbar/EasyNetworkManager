@@ -21,7 +21,8 @@ bool APIServer::channel_write = false;
 APIServer::APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url, std::string wifimanager_url) : network(network),
 																												 server(new AsyncWebServer(CONTROL_PORT)),
 																												 api_url(api_url),
-																												 wifimanager_url(wifimanager_url) {}
+																												 wifimanager_url(wifimanager_url),
+																												 m_callback(NULL) {}
 
 void APIServer::begin()
 {
@@ -30,12 +31,21 @@ void APIServer::begin()
 	server->on("/", HTTP_GET, [&](AsyncWebServerRequest *request)
 			   { request->send(200); });
 
+	server->on(api_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest *request)
+			   { command_handler(request);
+			     request->send(200, MIMETYPE_JSON, "Done. Settings have been set."); });
+
 	if (api_utilities.initSPIFFS())
 	{
 		server->on(wifimanager_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest *request)
 				   { request->send(SPIFFS, "/wifimanager.html", MIMETYPE_HTML); });
 
 		server->serveStatic(wifimanager_url.c_str(), SPIFFS, "/");
+
+		server->on(wifimanager_url.c_str(), HTTP_POST, [&](AsyncWebServerRequest *request)
+				   { 
+					wifi_command_handler(request);
+					request->send(200, MIMETYPE_JSON, "Done. Wifi Creds have been set."); });
 	}
 
 	// preflight cors check
@@ -52,11 +62,9 @@ void APIServer::begin()
 	// std::bind(&APIServer::API_Utilities::notFound, &api_utilities, std::placeholders::_1);
 	server->onNotFound([&](AsyncWebServerRequest *request)
 					   { api_utilities.notFound(request); });
-	this->server->on(api_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest *request)
-					 { command_handler(request); });
 
 	log_d("Initializing REST API");
-	this->server->begin();
+	server->begin();
 }
 
 void APIServer::findParam(AsyncWebServerRequest *request, const char *param, String &value)
@@ -89,47 +97,66 @@ void APIServer::setupServer()
 							 { setSettingsJson(request); });
 }
 
-void APIServer::addCommandHandler(std::string index, function func)
-{
-	command_map_funct.emplace(index, [&](void) -> void
-							  { func(); });
-}
-
 void APIServer::command_handler(AsyncWebServerRequest *request)
 {
+	std::shared_ptr<APIServer> api_server = std::make_shared<APIServer>(*this);
 	int params = request->params();
 	for (int i = 0; i < params; i++)
 	{
 		AsyncWebParameter *param = request->getParam(i);
 		{
-			command_map_wifi_conf_t::const_iterator it_wifi_conf = command_map_wifi_conf.find(param->name().c_str());
+			try
+			{
+				interface_norm.searchAndCall<void>(param->name().c_str());
+			}
+			catch (const std::exception &e)
+			{
+				log_e("Unknown Command: %s", e.what());
+			}
 			command_map_funct_t::const_iterator it_funct = command_map_funct.find(param->name().c_str());
 			command_map_json_t::const_iterator it_json = command_map_json.find(param->name().c_str());
 
-			if (it_wifi_conf != command_map_wifi_conf.end())
-			{
-				command_map_wifi_conf.at(param->name().c_str())(param->value().c_str());
-				auto &key_it = it_wifi_conf->first;
-				log_i("Command %s executed", key_it.c_str());
-			}
-			else if (it_funct != command_map_funct.end())
+			if (it_funct != command_map_funct.end())
 			{
 				command_map_funct.at(param->name().c_str())();
-				auto &key_it_funct = it_funct->first;
-				log_i("Command %s executed", key_it_funct.c_str());
+
+				// auto &key_it_funct = it_funct->first;
+				log_i("Command %s executed", param->name().c_str());
+				request->send(200);
 			}
 			else if (it_json != command_map_json.end())
 			{
 				command_map_json.at(param->name().c_str())(request);
-				auto &key_it_json = it_json->first;
-				log_i("Command %s executed", key_it_json.c_str());
+				// auto &key_it_json = it_json->first;
+				log_i("Command %s executed", param->name().c_str());
 			}
 			else
 			{
 				log_i("Command not found");
 			}
 		}
-		log_i("GET[%s]: %s\n", param->name().c_str(), param->value().c_str());
+		log_i("%s[%s]: %s\n", api_utilities._networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
+	}
+}
+
+void APIServer::wifi_command_handler(AsyncWebServerRequest *request)
+{
+	APIServer api_server(*this);
+	int params = request->params();
+	for (int i = 0; i < params; i++)
+	{
+		AsyncWebParameter *param = request->getParam(i);
+		{
+			try
+			{
+				interface.searchAndCall<void>(api_server, param->name().c_str(), param->value().c_str());
+			}
+			catch (const std::exception &e)
+			{
+				log_e("Unknown Command: %s", e.what());
+			}
+		}
+		log_i("%s[%s]: %s\n", api_utilities._networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
 	}
 }
 
@@ -259,7 +286,7 @@ void APIServer::API_Utilities::notFound(AsyncWebServerRequest *request)
 {
 	try
 	{
-		log_i("%s", _networkMethodsMap[request->method()]);
+		log_i("%s", _networkMethodsMap[request->method()].c_str());
 	}
 	catch (const std::exception &e)
 	{

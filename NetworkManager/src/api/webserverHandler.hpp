@@ -3,6 +3,7 @@
 #define XWEBSERVERHANDLER_HPP
 #include <unordered_map>
 #include <string>
+#include <api/utilities/interface.hpp>
 
 #define WEBSERVER_H
 
@@ -40,9 +41,12 @@ private:
 
 private:
     void command_handler(AsyncWebServerRequest *request);
+    void wifi_command_handler(AsyncWebServerRequest *request);
 
     AsyncWebServer *server;
     WiFiHandler *network;
+    Interface<APIServer> interface;
+    Interface_norm interface_norm;
 
     /* Commands */
     void setSSID(const char *value);
@@ -91,7 +95,20 @@ public:
     void startAPIServer();
     void triggerWifiConfigWrite();
     void findParam(AsyncWebServerRequest *request, const char *param, String &value);
-    void addCommandHandler(std::string index, function func);
+
+    void addCommandHandler(std::string index, void (*funct)(void))
+    {
+        /* command_map_funct.emplace(index, [&](void) -> void
+                                  { func(); }); */
+
+        interface_norm.insert(index, funct);
+    }
+
+    template<typename T, typename C, typename P>
+    void addMethodHandler(std::string index, T (C::*funct)(P))
+    {
+        interface.insert(index, funct);
+    }
 
     class API_Utilities
     {

@@ -21,7 +21,7 @@ void ProjectConfig::initConfig()
     begin();
     this->config.device = {
         _name,
-        "",
+        "12345678",
         3232,
         false,
         false,

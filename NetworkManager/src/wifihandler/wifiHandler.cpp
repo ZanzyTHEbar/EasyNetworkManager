@@ -39,15 +39,6 @@ void WiFiHandler::setupWifi()
 		WiFi.begin(networkIterator->ssid.c_str(), networkIterator->password.c_str());
 		count++;
 
-		if (!WiFi.isConnected())
-			log_i("\n\rCould not connect to %s, trying another network\n\r", networkIterator->ssid);
-		else
-		{
-			log_i("\n\rSuccessfully connected to %s\n\r", networkIterator->ssid);
-			stateManager->setState(WiFiState_e::WiFiState_Connected);
-			return;
-		}
-
 		while (WiFi.status() != WL_CONNECTED)
 		{
 			stateManager->setState(ProgramStates::DeviceStates::WiFiState_e::WiFiState_Connecting);
@@ -59,11 +50,19 @@ void WiFiHandler::setupWifi()
 				log_i("[INFO]: WiFi connection timed out.\n");
 				// we've tried all saved networks, none worked, let's error out
 				log_e("Could not connect to any of the saved networks, check your Wifi credentials");
-				stateManager->setState(WiFiState_e::WiFiState_Error);
+				stateManager->setState(WiFiState_e::WiFiState_Disconnected);
+				log_i("[INFO]: Attempting to connect to hardcoded network");
 				this->iniSTA();
-				log_i("[INFO]: Attempting to connect to hardcoded network from ini file");
 				return;
 			}
+		}
+		if (!WiFi.isConnected())
+			log_i("\n\rCould not connect to %s, trying another network\n\r", networkIterator->ssid);
+		else
+		{
+			log_i("\n\rSuccessfully connected to %s\n\r", networkIterator->ssid);
+			stateManager->setState(WiFiState_e::WiFiState_Connected);
+			return;
 		}
 	}
 }
@@ -125,18 +124,9 @@ void WiFiHandler::iniSTA()
 	unsigned long currentMillis = millis();
 	unsigned long _previousMillis = currentMillis;
 
-	log_i("Trying to connect to the %s network", WIFI_SSID);
+	log_i("Trying to connect to the %s network", this->ssid.c_str());
 
 	WiFi.begin(this->ssid.c_str(), this->password.c_str(), this->channel);
-
-	if (!WiFi.isConnected())
-		log_i("\n\rCould not connect to %s, please try another network\n\r", WIFI_SSID);
-	else
-	{
-		log_i("\n\rSuccessfully connected to %s\n\r", WIFI_SSID);
-		stateManager->setState(WiFiState_e::WiFiState_Connected);
-		return;
-	}
 
 	while (WiFi.status() != WL_CONNECTED)
 	{
@@ -156,6 +146,15 @@ void WiFiHandler::iniSTA()
 			stateManager->setState(WiFiState_e::WiFiState_ADHOC);
 			return;
 		}
+	}
+
+	if (!WiFi.isConnected())
+		log_i("\n\rCould not connect to %s, please try another network\n\r", this->ssid.c_str());
+	else
+	{
+		log_i("\n\rSuccessfully connected to %s\n\r", this->ssid.c_str());
+		stateManager->setState(WiFiState_e::WiFiState_Connected);
+		return;
 	}
 }
 
