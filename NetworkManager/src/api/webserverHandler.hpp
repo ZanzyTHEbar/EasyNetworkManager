@@ -37,9 +37,30 @@ private:
     static bool channel_write;
     std::string api_url;
     std::string wifimanager_url;
+    std::string callback_index;
 
-private:
-    void command_handler(AsyncWebServerRequest *request);
+    struct node
+    {
+        std::string key;
+        void (*value)(void);
+        struct node *next;
+    };
+
+    typedef struct node node_t;
+
+    node_t *head;
+    node_t *current;
+
+    struct LinkedList
+    {
+        node_t n1, n2, n3;
+        node_t *head; 
+    };
+
+    LinkedList commandHandlerList;
+
+    private : void
+              command_handler(AsyncWebServerRequest *request);
     void wifi_command_handler(AsyncWebServerRequest *request);
 
     AsyncWebServer *server;
@@ -63,15 +84,9 @@ private:
     typedef std::unordered_map<std::string, method> command_map_method_t;
     command_map_method_t command_map_method;
 
-    /* using function = void (*)(void);
-    typedef std::unordered_map<std::string, function> command_map_funct_t;
-    command_map_funct_t command_map_funct; */
-
     typedef std::unordered_map<std::string, wifi_conf_function> command_map_wifi_conf_t;
-    // typedef std::unordered_map<std::string, function> command_map_json_t;
 
     command_map_wifi_conf_t command_map_wifi_conf;
-    // command_map_json_t command_map_json;
 
     struct LocalWifiConfig
     {
@@ -98,11 +113,9 @@ public:
     void startAPIServer();
     void triggerWifiConfigWrite();
     void findParam(AsyncWebServerRequest *request, const char *param, String &value);
-
-   /*  void addCommandHandler(std::string index, function funct)
-    {
-        command_map_funct.emplace(index, &funct);
-    } */
+    void addCommandHandler(std::string index, void (*funct)(void));
+    void addCommandHandler(int, void (*funct)(void));
+    void updateCommandHandlers();
 
     class API_Utilities
     {

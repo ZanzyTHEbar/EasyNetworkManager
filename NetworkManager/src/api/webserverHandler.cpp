@@ -21,7 +21,9 @@ bool APIServer::channel_write = false;
 APIServer::APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url, std::string wifimanager_url) : network(network),
 																												 server(new AsyncWebServer(CONTROL_PORT)),
 																												 api_url(api_url),
-																												 wifimanager_url(wifimanager_url) {}
+																												 wifimanager_url(wifimanager_url),
+																												 callback_index(""),
+																												 head(NULL) {}
 // m_callback(NULL)
 
 void APIServer::begin()
@@ -75,6 +77,12 @@ void APIServer::findParam(AsyncWebServerRequest *request, const char *param, Str
 	}
 }
 
+void APIServer::addCommandHandler(std::string index, void (*funct)(void))
+{
+	commandHandlerList.n1.key = index;
+	commandHandlerList.n1.value = funct;
+}
+
 void APIServer::setupServer()
 {
 	localWifiConfig = {
@@ -92,6 +100,7 @@ void APIServer::setupServer()
 	command_map_wifi_conf.emplace("ssid", &APIServer::setWiFi);
 
 	command_map_method.emplace("reset_config", &APIServer::factoryReset);
+	command_map_method.emplace("reboot_device", &APIServer::rebootDevice);
 }
 
 void APIServer::command_handler(AsyncWebServerRequest *request)
@@ -138,7 +147,6 @@ void APIServer::wifi_command_handler(AsyncWebServerRequest *request)
 			if (it_wifi_funct != command_map_wifi_conf.end())
 			{
 				(*this.*(it_wifi_funct->second))(param->value().c_str());
-				// command_map_wifi_conf.at(param->name().c_str())(param->value().c_str());
 				log_i("Command %s executed", param->name().c_str());
 			}
 			else
