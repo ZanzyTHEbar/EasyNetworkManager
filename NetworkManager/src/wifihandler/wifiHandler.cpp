@@ -28,6 +28,16 @@ void WiFiHandler::setupWifi()
 	stateManager->setState(WiFiState_e::WiFiState_Connecting);
 
 	std::vector<Project_Config::WiFiConfig_t> *networks = configManager->getWifiConfigs();
+
+	// check size of networks
+	if (networks->size() == 0)
+	{
+		log_e("No networks found in config");
+		this->iniSTA();
+		stateManager->setState(WiFiState_e::WiFiState_Error);
+		return;
+	}
+
 	int connection_timeout = 30000; // 30 seconds
 
 	int count = 0;
@@ -130,8 +140,16 @@ void WiFiHandler::iniSTA()
 
 	log_i("Trying to connect to the %s network", this->ssid.c_str());
 
-	//WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
-	//WiFi.setHostname(_hostname.c_str());
+	// WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
+	// WiFi.setHostname(_hostname.c_str());
+	//  check size of networks
+	if (this->ssid.size() == 0)
+	{
+		log_e("No networks passed into the constructor");
+		this->setUpADHOC();
+		stateManager->setState(WiFiState_e::WiFiState_Error);
+		return;
+	}
 	WiFi.begin(this->ssid.c_str(), this->password.c_str(), this->channel);
 	//WiFi.setTxPower(WIFI_POWER_11dBm);
 
