@@ -61,6 +61,39 @@ namespace Project_Config {
 Project_Config::NewConfig_t newConfig; // this creates a new object of your config struct.
 ```
 
+> **Warning**: It is **required** to add a build flag to your setup for the code to function properly.
+
+For `platformio`
+
+```ini
+build_flags = 
+  -DASYNCWEBSERVER_REGEX ; add regex support to AsyncWebServer
+```
+
+For the Arduino IDE:
+
+Create, if missing, or update the `platform.local.txt` file.
+
+The paths are:
+
+>Windows
+
+```bash
+Windows: C:\Users\(username)\AppData\Local\Arduino15\packages\espxxxx\hardware\espxxxx\{version}\platform.local.txt
+```
+
+>Linux
+
+```bash
+Linux: ~/.arduino15/packages/espxxxx/hardware/espxxxx/{version}/platform.local.txt
+```
+
+The text to add is:
+
+```txt
+compiler.cpp.extra_flags=-DASYNCWEBSERVER_REGEX=1
+```
+
 > **Note**: This library is still in development and is not yet complete, if there are any bugs please report them in the issues section.
 
 ## Modification
@@ -75,7 +108,14 @@ To see any of the `log` statements - you need to add this to your `platformio.in
 
 ```ini
 build_flags = 
-  -DCORE_DEBUG_LEVEL=4
+  -DCORE_DEBUG_LEVEL=4 ; add verbose debug logging in serial monitor
+
+; other build parameters
+monitor_filters = 
+	esp32_exception_decoder
+build_type = debug
+lib_ldf_mode = deep+
+board_build.partitions = min_spiffs.csv ; use min_spiffs partition table for a large WebServer App - or huge_app.csv for a large Code-based App
 ```
 
 If you want to build in debug mode add this (it's not a build flag):
