@@ -14,17 +14,19 @@
 ProjectConfig configManager("network");
 WiFiHandler network(&configManager, &wifiStateManager, "SSID", "PASS", "_easynetworkmanager", 1);
 
-APIServer server(80, &network, NULL, "api/v1", "/wifimanager"); // NULL is required, it is a placeholder for the DNSServer - which is not yet fully implemented. 
+//? NULL is required, it is a placeholder for the DNSServer - which is not yet fully implemented.
+//? The DNSServer is used to redirect the user to the captive portal when they connect to the network. Will be implemented soon.
+//! The routes require a leading forward slash, as show here
+APIServer server(80, &network, NULL, "/api/v1", "/wifimanager"); 
 OTA ota(&configManager);
 MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetworkmanager", "test", "_tcp", "api_port", "80"); //! service name and service protocol have to be lowercase and begin with an underscore
-
-LEDManager ledManager(27);
 
 void printHelloWorld()
 {
     Serial.println("Hello World!");
 }
 
+// Will implement an example of how to set callbacks in the future
 void blink()
 {
     digitalWrite(27, HIGH);

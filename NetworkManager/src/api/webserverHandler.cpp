@@ -17,10 +17,16 @@ void APIServer::begin()
 	log_d("Initializing REST API");
 	this->setupServer();
 	BaseAPI::begin();
+
 	char buffer[1000];
-	sniprintf(buffer, sizeof(buffer), "^\\/%s\\/([a-zA-Z0-9]+)\\/command\\/([a-zA-Z0-9]+)$", this->api_url.c_str());
+	snprintf(buffer, sizeof(buffer), "^\\%s\\/([a-zA-Z0-9]+)\\/command\\/([a-zA-Z0-9]+)$", this->api_url.c_str());
 	log_d("API URL: %s", buffer);
 	server->on(buffer, HTTP_ANY, [&](AsyncWebServerRequest *request)
+			   { handleRequest(request); });
+
+	char buf[1000];
+	snprintf(buf, sizeof(buf), "^\\%s\\/([a-zA-Z0-9]+)\\/command\\/([a-zA-Z0-9]+)$", this->wifimanager_url.c_str());
+	server->on(buf, HTTP_ANY, [&](AsyncWebServerRequest *request)
 			   { handleRequest(request); });
 
 	server->begin();
@@ -92,12 +98,8 @@ void APIServer::routeHandler(std::string index, AsyncWebServerRequest *request)
 
 void APIServer::handleRequest(AsyncWebServerRequest *request)
 {
-	log_i("Request: %s", request->url().c_str());
 	// Get the route
-	// std::string route = request->url().c_str();
-	// split the url into parts
-	// std::string urls = strtok(strdup(route.c_str()), api_url.c_str());
-	// std::vector<std::string> target = split(urls.substr(1, urls.length()), '/');
+	log_i("Request: %s", request->url().c_str());
 	int params = request->params();
 	auto it_map = route_map.find(request->pathArg(0).c_str());
 	log_i("Request: %s", request->pathArg(0).c_str());

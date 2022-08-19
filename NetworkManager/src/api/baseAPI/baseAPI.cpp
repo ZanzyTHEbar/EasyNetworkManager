@@ -19,6 +19,7 @@ void BaseAPI::begin()
     {
         /* server->on(wifimanager_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest *request)
                    { request->send(SPIFFS, "/wifimanager.html", MIMETYPE_HTML); }); */
+
         server->serveStatic(wifimanager_url.c_str(), SPIFFS, "/wifimanager.html").setCacheControl("max-age=600");
     }
 
@@ -82,13 +83,11 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
                 localWifiConfig.pass = param->value().c_str();
                 localWifiConfig.channel = atoi(param->value().c_str());
             }
-            log_i("%s[%s]: %s\n", _networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
         }
         ssid_write = true;
         pass_write = true;
         channel_write = true;
-        request->send(200, MIMETYPE_JSON, "{\"msg:\"\"Done. Wifi Creds have been set.\"}");
-        request->redirect("/");
+        request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Wifi Creds have been set.\"}");
         break;
     }
     default:
@@ -227,14 +226,3 @@ void BaseAPI::factoryReset(AsyncWebServerRequest *request)
     }
     }
 }
-
-/**
- * @brief This function is used to set the callback functions for the API
- * @attention This function must be called before begin()
- * @param callback
- */
-/* void BaseAPI::setCallback(call_back_function_t2 callback)
-{
-    this->function_callback = callback;
-}
- */
