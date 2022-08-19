@@ -1,72 +1,40 @@
 #include "webserverHandler.hpp"
 
-//! These have to be called before the constructor of the class because they are static
-//! C++ 11 does not have inline variables, sadly. So we have to do this.
-const char *APIServer::MIMETYPE_HTML{"text/html"};
-// const char *APIServer::MIMETYPE_CSS{"text/css"};
-// const char *APIServer::MIMETYPE_JS{"application/javascript"};
-// const char *APIServer::MIMETYPE_PNG{"image/png"};
-// const char *APIServer::MIMETYPE_JPG{"image/jpeg"};
-// const char *APIServer::MIMETYPE_ICO{"image/x-icon"};
-const char *APIServer::MIMETYPE_JSON{"application/json"};
-
-bool APIServer::ssid_write = false;
-bool APIServer::pass_write = false;
-bool APIServer::channel_write = false;
-
 //*********************************************************************************************
 //!                                     API Server
 //*********************************************************************************************
 
-APIServer::APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url, std::string wifimanager_url) : network(network),
-																												 server(new AsyncWebServer(CONTROL_PORT)),
-																												 api_url(api_url),
-																												 wifimanager_url(wifimanager_url),
-																												 callback_index(""),
-																												 head(NULL) {}
-// m_callback(NULL)
+APIServer::APIServer(int CONTROL_PORT,
+					 WiFiHandler *network,
+					 DNSServer *dnsServer,
+					 std::string api_url,
+					 std::string wifimanager_url) : BaseAPI(CONTROL_PORT, network, dnsServer, api_url, wifimanager_url) {}
+
+APIServer::~APIServer() {}
 
 void APIServer::begin()
 {
-	this->setupServer();
-	//! i have changed this to use lambdas instead of std::bind to avoid the overhead. Lambdas are always more preferable.
-	server->on("/", HTTP_GET, [&](AsyncWebServerRequest *request)
-			   { request->send(200); });
-
-	server->on(api_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest *request)
-			   { command_handler(request);
-				 request->send(200, MIMETYPE_JSON, "Done. Settings have been set."); });
-
-	if (api_utilities.initSPIFFS())
-	{
-		server->on(wifimanager_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest *request)
-				   { request->send(SPIFFS, "/wifimanager.html", MIMETYPE_HTML); });
-
-		server->serveStatic(wifimanager_url.c_str(), SPIFFS, "/");
-
-		server->on(wifimanager_url.c_str(), HTTP_POST, [&](AsyncWebServerRequest *request)
-				   { 
-					wifi_command_handler(request);
-					request->send(200, MIMETYPE_JSON, "Done. Wifi Creds have been set."); });
-	}
-
-	// preflight cors check
-	server->on("/", HTTP_OPTIONS, [&](AsyncWebServerRequest *request)
-			   {
-        AsyncWebServerResponse* response = request->beginResponse(204);
-        response->addHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
-        response->addHeader("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization, FileSize");
-        response->addHeader("Access-Control-Allow-Credentials", "true");
-        request->send(response); });
-
-	DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
-
-	// std::bind(&APIServer::API_Utilities::notFound, &api_utilities, std::placeholders::_1);
-	server->onNotFound([&](AsyncWebServerRequest *request)
-					   { api_utilities.notFound(request); });
-
 	log_d("Initializing REST API");
+	this->setupServer();
+	BaseAPI::begin();
+	char buffer[1000];
+	sniprintf(buffer, sizeof(buffer), "^\\/%s\\/([a-zA-Z0-9]+)\\/command\\/([a-zA-Z0-9]+)$", this->api_url.c_str());
+	log_d("API URL: %s", buffer);
+	server->on(buffer, HTTP_ANY, [&](AsyncWebServerRequest *request)
+			   { handleRequest(request); });
+
 	server->begin();
+}
+
+void APIServer::setupServer()
+{
+	// Set default routes
+	routes.emplace("wifi", &APIServer::setWiFi);
+	routes.emplace("reset_config", &APIServer::factoryReset);
+	routes.emplace("reboot_device", &APIServer::rebootDevice);
+	routes.emplace("set_json", &APIServer::handleJson);
+
+	routeHandler("builtin", routes);  // add new map to the route map
 }
 
 void APIServer::findParam(AsyncWebServerRequest *request, const char *param, String &value)
@@ -77,33 +45,97 @@ void APIServer::findParam(AsyncWebServerRequest *request, const char *param, Str
 	}
 }
 
-void APIServer::addCommandHandler(std::string index, void (*funct)(void))
+/**
+ * @brief Add a command handler to the API
+ *
+ * @param index
+ * @param funct
+ * @return \c vector<string> a list of the indexes of the command handlers
+ */
+std::vector<std::string> APIServer::routeHandler(std::string index, route_t route)
 {
-	commandHandlerList.n1.key = index;
-	commandHandlerList.n1.value = funct;
+	route_map.emplace(index, route);
+	std::vector<std::string> indexes;
+	indexes.reserve(route.size());
+
+	for (const auto &key : route)
+	{
+		indexes.push_back(key.first);
+	}
+
+	return indexes;
 }
 
-void APIServer::setupServer()
+/**
+ * @brief Add a command handler to the API
+ *
+ * @param index
+ * @param request
+ * @return \c vector<string> a list of the indexes of the command handlers
+ */
+void APIServer::routeHandler(std::string index, AsyncWebServerRequest *request)
 {
-	localWifiConfig = {
-		.ssid = "",
-		.pass = "",
-		.channel = 0,
-	};
-
-	localAPWifiConfig = {
-		.ssid = "",
-		.pass = "",
-		.channel = 0,
-	};
-
-	command_map_wifi_conf.emplace("ssid", &APIServer::setWiFi);
-
-	command_map_method.emplace("reset_config", &APIServer::factoryReset);
-	command_map_method.emplace("reboot_device", &APIServer::rebootDevice);
+	switch (_networkMethodsMap_enum[request->method()])
+	{
+	case DELETE:
+	{
+		route_map.erase(index);
+		break;
+	}
+	default:
+	{
+		request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Request\"}");
+		break;
+	}
+	}
 }
 
-void APIServer::command_handler(AsyncWebServerRequest *request)
+void APIServer::handleRequest(AsyncWebServerRequest *request)
+{
+	log_i("Request: %s", request->url().c_str());
+	// Get the route
+	// std::string route = request->url().c_str();
+	// split the url into parts
+	// std::string urls = strtok(strdup(route.c_str()), api_url.c_str());
+	// std::vector<std::string> target = split(urls.substr(1, urls.length()), '/');
+	int params = request->params();
+	auto it_map = route_map.find(request->pathArg(0).c_str());
+	log_i("Request: %s", request->pathArg(0).c_str());
+	auto it_method = it_map->second.find(request->pathArg(1).c_str());
+	log_i("Request: %s", request->pathArg(1).c_str());
+
+	for (int i = 0; i < params; i++)
+	{
+		AsyncWebParameter *param = request->getParam(i);
+		{
+			{
+				if (it_map != route_map.end())
+				{
+					if (it_method != it_map->second.end())
+					{
+						(*this.*(it_method->second))(request);
+					}
+					else
+					{
+						request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Command\"}");
+						request->redirect("/");
+						return;
+					}
+				}
+				else
+				{
+					request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Map Index\"}");
+					request->redirect("/");
+					return;
+				}
+			}
+			log_i("%s[%s]: %s\n", _networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
+		}
+	}
+	request->send(200, MIMETYPE_JSON, "{\"msg\":\"Command executed\"}");
+}
+
+/* void APIServer::command_handler(AsyncWebServerRequest *request)
 {
 	int params = request->params();
 	for (int i = 0; i < params; i++)
@@ -120,12 +152,12 @@ void APIServer::command_handler(AsyncWebServerRequest *request)
 				log_i("Command %s executed", param->name().c_str());
 				request->send(200);
 			}
-			/* else if (it_funct != command_map_funct.end())
+			else if (it_funct != command_map_funct.end())
 			{
 				(*(it_funct->second))();
 				log_i("Command %s executed", param->name().c_str());
 				request->send(200);
-			} */
+			}
 			else
 			{
 				log_e("Command %s not found", param->name().c_str());
@@ -133,11 +165,10 @@ void APIServer::command_handler(AsyncWebServerRequest *request)
 			}
 		}
 	}
-}
+} */
 
-void APIServer::wifi_command_handler(AsyncWebServerRequest *request)
+/* void APIServer::wifi_command_handler(AsyncWebServerRequest *request)
 {
-
 	int params = request->params();
 	for (int i = 0; i < params; i++)
 	{
@@ -154,207 +185,6 @@ void APIServer::wifi_command_handler(AsyncWebServerRequest *request)
 				log_i("Command not found");
 			}
 		}
-		log_i("%s[%s]: %s\n", api_utilities._networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
+		log_i("%s[%s]: %s\n", _networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
 	}
-}
-
-//*********************************************************************************************
-//!                                     Command Functions
-//*********************************************************************************************
-void APIServer::setWiFi(const char *value)
-{
-	if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
-	{
-		localAPWifiConfig.ssid = value;
-		localAPWifiConfig.pass = value;
-		localAPWifiConfig.channel = atoi(value);
-	}
-	else
-	{
-		localWifiConfig.ssid = value;
-		localWifiConfig.pass = value;
-		localWifiConfig.channel = atoi(value);
-	}
-	ssid_write = true;
-	pass_write = true;
-	channel_write = true;
-}
-
-/* void APIServer::setPass(const char *value)
-{
-	if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
-		localAPWifiConfig.pass = value;
-	else
-		localWifiConfig.pass = value;
-	pass_write = true;
-}
-
-void APIServer::setChannel(const char *value)
-{
-	if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
-		localAPWifiConfig.channel = atoi(value);
-	else
-		localWifiConfig.channel = atoi(value);
-	channel_write = true;
 } */
-
-/**
- * * Trigger in main loop to save config to flash
- * ? Should we force the users to update all config params before triggering a config write?
- */
-void APIServer::triggerWifiConfigWrite()
-{
-	if (ssid_write && pass_write && channel_write)
-	{
-		ssid_write = false;
-		pass_write = false;
-		channel_write = false;
-		if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
-			network->configManager->setWifiConfig(localAPWifiConfig.ssid.c_str(), localAPWifiConfig.ssid.c_str(), localAPWifiConfig.pass.c_str(), &localAPWifiConfig.channel, true);
-		else
-			network->configManager->setWifiConfig(localWifiConfig.ssid.c_str(), localWifiConfig.ssid.c_str(), localWifiConfig.pass.c_str(), &localWifiConfig.channel, true);
-		network->configManager->save();
-	}
-}
-
-void APIServer::setDataJson(AsyncWebServerRequest *request)
-{
-	network->configManager->getDeviceConfig()->data_json = true;
-	Network_Utilities::my_delay(1L);
-	String temp = network->configManager->getDeviceConfig()->data_json_string;
-	request->send(200, MIMETYPE_JSON, temp);
-	temp = "";
-}
-
-void APIServer::setConfigJson(AsyncWebServerRequest *request)
-{
-	network->configManager->getDeviceConfig()->config_json = true;
-	Network_Utilities::my_delay(1L);
-	String temp = network->configManager->getDeviceConfig()->config_json_string;
-	request->send(200, MIMETYPE_JSON, temp);
-	temp = "";
-}
-
-void APIServer::setSettingsJson(AsyncWebServerRequest *request)
-{
-	network->configManager->getDeviceConfig()->settings_json = true;
-	Network_Utilities::my_delay(1L);
-	String temp = network->configManager->getDeviceConfig()->settings_json_string;
-	request->send(200, MIMETYPE_JSON, temp);
-	temp = "";
-}
-
-void APIServer::rebootDevice()
-{
-	delay(20000);
-	ESP.restart();
-}
-
-void APIServer::factoryReset()
-{
-	log_d("Factory Reset");
-	network->configManager->reset();
-}
-
-//*********************************************************************************************
-//!                                     API Utilities
-//*********************************************************************************************
-
-APIServer::API_Utilities::API_Utilities() {}
-
-std::string APIServer::API_Utilities::shaEncoder(std::string data)
-{
-	const char *data_c = data.c_str();
-	int size = 20;
-	uint8_t hash[size];
-	mbedtls_md_context_t ctx;
-	mbedtls_md_type_t md_type = MBEDTLS_MD_SHA1;
-
-	const size_t len = strlen(data_c);
-	mbedtls_md_init(&ctx);
-	mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(md_type), 0);
-	mbedtls_md_starts(&ctx);
-	mbedtls_md_update(&ctx, (const unsigned char *)data_c, len);
-	mbedtls_md_finish(&ctx, hash);
-	mbedtls_md_free(&ctx);
-
-	std::string hash_string = "";
-	for (uint16_t i = 0; i < size; i++)
-	{
-		std::string hex = String(hash[i], HEX).c_str();
-		if (hex.length() < 2)
-		{
-			hex = "0" + hex;
-		}
-		hash_string += hex;
-	}
-	return hash_string;
-}
-
-void APIServer::API_Utilities::notFound(AsyncWebServerRequest *request)
-{
-	try
-	{
-		log_i("%s", _networkMethodsMap[request->method()].c_str());
-	}
-	catch (const std::exception &e)
-	{
-		log_i("UNKNOWN");
-	}
-
-	log_i(" http://%s%s/\n", request->host().c_str(), request->url().c_str());
-	request->send(404, "text/plain", "Not found.");
-}
-
-// Initialize SPIFFS
-bool APIServer::API_Utilities::initSPIFFS()
-{
-	bool init_spiffs = SPIFFS.begin(false);
-	log_e("[SPIFFS]: SPIFFS Initialized: %s", init_spiffs ? "true" : "false");
-	return init_spiffs;
-}
-
-// Read File from SPIFFS
-String APIServer::API_Utilities::readFile(fs::FS &fs, std::string path)
-{
-	log_i("Reading file: %s\r\n", path.c_str());
-
-	File file = fs.open(path.c_str());
-	if (!file || file.isDirectory())
-	{
-		log_e("[INFO]: Failed to open file for reading");
-		return String();
-	}
-
-	String fileContent;
-	while (file.available())
-	{
-		fileContent = file.readStringUntil('\n');
-		break;
-	}
-	return fileContent;
-}
-
-// Write file to SPIFFS
-void APIServer::API_Utilities::writeFile(fs::FS &fs, std::string path, std::string message)
-{
-	log_i("[Writing File]: Writing file: %s\r\n", path);
-	Network_Utilities::my_delay(0.1L);
-
-	File file = fs.open(path.c_str(), FILE_WRITE);
-	if (!file)
-	{
-		log_i("[Writing File]: failed to open file for writing");
-		return;
-	}
-	if (file.print(message.c_str()))
-	{
-		log_i("[Writing File]: file written");
-	}
-	else
-	{
-		log_i("[Writing File]: file write failed");
-	}
-}
-
-APIServer::API_Utilities api_utilities;

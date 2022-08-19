@@ -1,140 +1,31 @@
 #pragma once
 #ifndef XWEBSERVERHANDLER_HPP
 #define XWEBSERVERHANDLER_HPP
-#include <unordered_map>
-#include <string>
 
-#define WEBSERVER_H
+#include "api/baseAPI/baseAPI.hpp"
 
-#define HTTP_GET 0b00000001
-#define HTTP_POST 0b00000010
-#define HTTP_DELETE 0b00000100
-#define HTTP_PUT 0b00001000
-#define HTTP_PATCH 0b00010000
-#define HTTP_HEAD 0b00100000
-#define HTTP_OPTIONS 0b01000000
-#define HTTP_ANY 0b01111111
-
-#include <ESPAsyncWebServer.h>
-#include <AsyncTCP.h>
-#include <SPIFFS.h>
-#include "mbedtls/md.h"
-#include "wifihandler/wifiHandler.hpp"
-#include "wifihandler/utilities/utilities.hpp"
-
-class APIServer
+class APIServer : public BaseAPI
 {
 private:
-    static const char *MIMETYPE_HTML;
-    /* static const char *MIMETYPE_CSS; */
-    /* static const char *MIMETYPE_JS; */
-    /* static const char *MIMETYPE_PNG; */
-    /* static const char *MIMETYPE_JPG; */
-    /* static const char *MIMETYPE_ICO; */
-    static const char *MIMETYPE_JSON;
-    static bool ssid_write;
-    static bool pass_write;
-    static bool channel_write;
-    std::string api_url;
-    std::string wifimanager_url;
-    std::string callback_index;
-
-    struct node
-    {
-        std::string key;
-        void (*value)(void);
-        struct node *next;
-    };
-
-    typedef struct node node_t;
-
-    node_t *head;
-    node_t *current;
-
-    struct LinkedList
-    {
-        node_t n1, n2, n3;
-        node_t *head; 
-    };
-
-    LinkedList commandHandlerList;
-
-    private : void
-              command_handler(AsyncWebServerRequest *request);
+    /* Handlers */
+    void command_handler(AsyncWebServerRequest *request);
     void wifi_command_handler(AsyncWebServerRequest *request);
 
-    AsyncWebServer *server;
-    WiFiHandler *network;
-
-    /* Commands */
-    void setWiFi(const char *value);
-    /* void setPass(const char *value);
-    void setChannel(const char *value); */
-
-    void setDataJson(AsyncWebServerRequest *request);
-    void setConfigJson(AsyncWebServerRequest *request);
-    void setSettingsJson(AsyncWebServerRequest *request);
-
-    void factoryReset();
-    void rebootDevice();
-
-    using wifi_conf_function = void (APIServer::*)(const char *);
-
-    using method = void (APIServer::*)();
-    typedef std::unordered_map<std::string, method> command_map_method_t;
-    command_map_method_t command_map_method;
-
-    typedef std::unordered_map<std::string, wifi_conf_function> command_map_wifi_conf_t;
-
-    command_map_wifi_conf_t command_map_wifi_conf;
-
-    struct LocalWifiConfig
-    {
-        std::string ssid;
-        std::string pass;
-        uint8_t channel;
-    };
-
-    LocalWifiConfig localWifiConfig;
-
-    struct LocalAPWifiConfig
-    {
-        std::string ssid;
-        std::string pass;
-        uint8_t channel;
-    };
-
-    LocalWifiConfig localAPWifiConfig;
-
 public:
-    APIServer(int CONTROL_PORT, WiFiHandler *network, std::string api_url, std::string wifimanager_url);
+    APIServer(int CONTROL_PORT,
+              WiFiHandler *network,
+              DNSServer *dnsServer,
+              std::string api_url,
+              std::string wifimanager_url);
+
+    virtual ~APIServer();
     void begin();
     void setupServer();
-    void startAPIServer();
-    void triggerWifiConfigWrite();
-    void findParam(AsyncWebServerRequest *request, const char *param, String &value);
-    void addCommandHandler(std::string index, void (*funct)(void));
-    void addCommandHandler(int, void (*funct)(void));
-    void updateCommandHandlers();
 
-    class API_Utilities
-    {
-    public:
-        API_Utilities();
-        void notFound(AsyncWebServerRequest *request);
-        String readFile(fs::FS &fs, std::string path);
-        void writeFile(fs::FS &fs, std::string path, std::string message);
-        bool initSPIFFS();
-        std::string shaEncoder(std::string data);
-        std::unordered_map<WebRequestMethodComposite, std::string> _networkMethodsMap = {
-            {HTTP_GET, "GET"},
-            {HTTP_POST, "POST"},
-            {HTTP_PUT, "PUT"},
-            {HTTP_DELETE, "DELETE"},
-            {HTTP_PATCH, "PATCH"},
-            {HTTP_OPTIONS, "OPTIONS"},
-        };
-    };
+    void findParam(AsyncWebServerRequest *request, const char *param, String &value);
+    void updateCommandHandlers();
+    std::vector<std::string> routeHandler(std::string index, route_t route);
+    void routeHandler(std::string index, AsyncWebServerRequest *request);
+    void handleRequest(AsyncWebServerRequest *request);
 };
-extern APIServer::API_Utilities api_utilities;
 #endif // WEBSERVERHANDLER_HPP
