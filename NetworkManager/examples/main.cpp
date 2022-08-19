@@ -12,9 +12,9 @@
 //#include <data/utilities/makeunique.hpp> // used with smart pointers (unique_ptr) to create unique objects
 
 ProjectConfig configManager("network");
-WiFiHandler network(&configManager, &wifiStateManager, "LoveHouse2G", "vxwby2Gwtswp", "_easynetworkmanager", 1);
+WiFiHandler network(&configManager, &wifiStateManager, "SSID", "PASS", "_easynetworkmanager", 1);
 
-APIServer server(80, &network, NULL, "api/v1", "/wifimanager");
+APIServer server(80, &network, NULL, "api/v1", "/wifimanager"); // NULL is required, it is a placeholder for the DNSServer - which is not yet fully implemented. 
 OTA ota(&configManager);
 MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetworkmanager", "test", "_tcp", "api_port", "80"); //! service name and service protocol have to be lowercase and begin with an underscore
 
