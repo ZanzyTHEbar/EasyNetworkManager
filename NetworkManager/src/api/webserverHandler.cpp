@@ -1,5 +1,7 @@
 #include "webserverHandler.hpp"
 
+std::vector<BaseAPI::stateFunctionRow_t> APIServer::stateFunctionRows = {{"", NULL}};
+
 //*********************************************************************************************
 //!                                     API Server
 //*********************************************************************************************
@@ -8,7 +10,13 @@ APIServer::APIServer(int CONTROL_PORT,
 					 WiFiHandler *network,
 					 DNSServer *dnsServer,
 					 std::string api_url,
-					 std::string wifimanager_url) : BaseAPI(CONTROL_PORT, network, dnsServer, api_url, wifimanager_url) {}
+					 std::string wifimanager_url,
+					 std::string userCommands) : BaseAPI(CONTROL_PORT,
+														 network,
+														 dnsServer,
+														 api_url,
+														 wifimanager_url,
+														 userCommands) {}
 
 APIServer::~APIServer() {}
 
@@ -29,6 +37,11 @@ void APIServer::begin()
 	server->on(buf, HTTP_ANY, [&](AsyncWebServerRequest *request)
 			   { handleRequest(request); });
 
+	char buff[1000];
+	snprintf(buff, sizeof(buff), "^\\%s\\/command\\/([a-zA-Z0-9]+)$", this->userCommands.c_str());
+	server->on(buff, HTTP_ANY, [&](AsyncWebServerRequest *request)
+			   { handleUserCommands(request); });
+
 	server->begin();
 }
 
@@ -40,7 +53,7 @@ void APIServer::setupServer()
 	routes.emplace("reboot_device", &APIServer::rebootDevice);
 	routes.emplace("set_json", &APIServer::handleJson);
 
-	routeHandler("builtin", routes);  // add new map to the route map
+	routeHandler("builtin", routes); // add new map to the route map
 }
 
 void APIServer::findParam(AsyncWebServerRequest *request, const char *param, String &value)
@@ -99,7 +112,7 @@ void APIServer::routeHandler(std::string index, AsyncWebServerRequest *request)
 void APIServer::handleRequest(AsyncWebServerRequest *request)
 {
 	// Get the route
-	log_i("Request: %s", request->url().c_str());
+	log_i("Request URL: %s", request->url().c_str());
 	int params = request->params();
 	auto it_map = route_map.find(request->pathArg(0).c_str());
 	log_i("Request: %s", request->pathArg(0).c_str());
@@ -137,56 +150,25 @@ void APIServer::handleRequest(AsyncWebServerRequest *request)
 	request->send(200, MIMETYPE_JSON, "{\"msg\":\"Command executed\"}");
 }
 
-/* void APIServer::command_handler(AsyncWebServerRequest *request)
+void APIServer::updateCommandHandlers(std::string index, stateFunction_t funct)
 {
-	int params = request->params();
-	for (int i = 0; i < params; i++)
-	{
-		AsyncWebParameter *param = request->getParam(i);
-		{
-			command_map_method_t::const_iterator it_method = command_map_method.find(param->name().c_str());
-			// command_map_funct_t::const_iterator it_funct = command_map_funct.find(param->name().c_str());
-			//  command_map_json_t::const_iterator it_json = command_map_json.find(param->name().c_str());
+	stateFunctionRows.emplace_back(index, funct);
+}
 
-			if (it_method != command_map_method.end())
-			{
-				(*this.*(it_method->second))();
-				log_i("Command %s executed", param->name().c_str());
-				request->send(200);
-			}
-			else if (it_funct != command_map_funct.end())
-			{
-				(*(it_funct->second))();
-				log_i("Command %s executed", param->name().c_str());
-				request->send(200);
-			}
-			else
-			{
-				log_e("Command %s not found", param->name().c_str());
-				request->send(404, MIMETYPE_JSON, "Error: Command not found");
-			}
+void APIServer::handleUserCommands(AsyncWebServerRequest *request)
+{
+	for (const auto &member : stateFunctionRows)
+	{
+		if (member.name == request->pathArg(0).c_str())
+		{
+			log_i("User Command Executed: %s", request->pathArg(0).c_str());
+			// Call the function
+			member.func();
+			return;
+		}
+		else
+		{
+			log_i("User Command Not Found: %s", request->pathArg(0).c_str());
 		}
 	}
-} */
-
-/* void APIServer::wifi_command_handler(AsyncWebServerRequest *request)
-{
-	int params = request->params();
-	for (int i = 0; i < params; i++)
-	{
-		AsyncWebParameter *param = request->getParam(i);
-		command_map_wifi_conf_t::const_iterator it_wifi_funct = command_map_wifi_conf.find(param->name().c_str());
-		{
-			if (it_wifi_funct != command_map_wifi_conf.end())
-			{
-				(*this.*(it_wifi_funct->second))(param->value().c_str());
-				log_i("Command %s executed", param->name().c_str());
-			}
-			else
-			{
-				log_i("Command not found");
-			}
-		}
-		log_i("%s[%s]: %s\n", _networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
-	}
-} */
+}

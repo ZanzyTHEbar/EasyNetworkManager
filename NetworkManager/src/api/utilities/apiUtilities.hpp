@@ -30,7 +30,8 @@ public:
                   WiFiHandler *network,
                   DNSServer *dnsServer,
                   std::string api_url,
-                  std::string wifimanager_url);
+                  std::string wifimanager_url,
+                  std::string userCommands);
     virtual ~API_Utilities();
 
 protected:
@@ -77,6 +78,7 @@ protected:
 protected:
     std::string api_url;
     std::string wifimanager_url;
+    std::string userCommands;
 
     static bool ssid_write;
     static bool pass_write;

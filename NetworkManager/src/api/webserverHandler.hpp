@@ -8,24 +8,27 @@ class APIServer : public BaseAPI
 {
 private:
     /* Handlers */
-    void command_handler(AsyncWebServerRequest *request);
-    void wifi_command_handler(AsyncWebServerRequest *request);
+    void handleRequest(AsyncWebServerRequest *request);
+    void handleUserCommands(AsyncWebServerRequest *request);
 
 public:
     APIServer(int CONTROL_PORT,
               WiFiHandler *network,
               DNSServer *dnsServer,
               std::string api_url,
-              std::string wifimanager_url);
+              std::string wifimanager_url,
+              std::string userCommands);
 
     virtual ~APIServer();
     void begin();
     void setupServer();
 
     void findParam(AsyncWebServerRequest *request, const char *param, String &value);
-    void updateCommandHandlers();
+    void updateCommandHandlers(std::string index, stateFunction_t funct);
     std::vector<std::string> routeHandler(std::string index, route_t route);
     void routeHandler(std::string index, AsyncWebServerRequest *request);
-    void handleRequest(AsyncWebServerRequest *request);
+
+public:
+    static std::vector<stateFunctionRow_t> stateFunctionRows;
 };
 #endif // WEBSERVERHANDLER_HPP
