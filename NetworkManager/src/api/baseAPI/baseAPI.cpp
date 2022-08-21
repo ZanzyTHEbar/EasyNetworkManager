@@ -4,7 +4,13 @@ BaseAPI::BaseAPI(int CONTROL_PORT,
                  WiFiHandler *network,
                  DNSServer *dnsServer,
                  std::string api_url,
-                 std::string wifimanager_url) : API_Utilities(CONTROL_PORT, network, dnsServer, api_url, wifimanager_url) {}
+                 std::string wifimanager_url,
+                 std::string userCommands) : API_Utilities(CONTROL_PORT, 
+                 network, 
+                 dnsServer, 
+                 api_url, 
+                 wifimanager_url,
+                 userCommands) {}
 
 BaseAPI::~BaseAPI() {}
 

@@ -69,13 +69,18 @@ public:
             WiFiHandler *network,
             DNSServer *dnsServer,
             std::string api_url,
-            std::string wifimanager_url);
+            std::string wifimanager_url,
+            std::string userCommands);
     virtual ~BaseAPI();
     virtual void begin();
     virtual void setupServer();
     void triggerWifiConfigWrite();
     void loop();
     void handle();
+
+public:
+    typedef void (*stateFunction_t)(void);
+    std::unordered_map<std::string, stateFunction_t> stateFunctionMap;
 };
 
 #endif // BASEAPI_HPP

@@ -22,11 +22,13 @@ API_Utilities::API_Utilities(int CONTROL_PORT,
                              WiFiHandler *network,
                              DNSServer *dnsServer,
                              std::string api_url,
-                             std::string wifimanager_url) : server(new AsyncWebServer(CONTROL_PORT)),
-                                                            dnsServer(NULL),
-                                                            network(network),
-                                                            api_url(api_url),
-                                                            wifimanager_url(wifimanager_url)
+                             std::string wifimanager_url,
+                             std::string userCommands) : server(new AsyncWebServer(CONTROL_PORT)),
+                                                         dnsServer(NULL),
+                                                         network(network),
+                                                         api_url(api_url),
+                                                         wifimanager_url(wifimanager_url),
+                                                         userCommands(userCommands)
 {
     if (dnsServer != NULL)
     {
