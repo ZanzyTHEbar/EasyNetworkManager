@@ -10,16 +10,16 @@
 //#include <memory>
 //#include <data/utilities/enuminheritance.hpp> // used for extending enums with new values
 //#include <data/utilities/makeunique.hpp> // used with smart pointers (unique_ptr) to create unique objects
-#include <LEDManager.cpp>
 
 ProjectConfig configManager("network");
 WiFiHandler network(&configManager, &wifiStateManager, "LoveHouse2G", "vxwby2Gwtswp", "_easynetworkmanager", 1);
 
-APIServer server(80, &network, NULL, "/api/v1", "/wifimanager", "/userCommands");
+APIServer server(80, &network, NULL, "/api/v1", "/wifimanager", "/userCommands"); // base url, wifimanager url, user commands url
+
+//* to access the user commands, use the following url: http://<ip>/<base_url>/<userCommands_url>/command/<command_name>
+
 OTA ota(&configManager);
 MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetworkmanager", "test", "_tcp", "api_port", "80"); //! service name and service protocol have to be lowercase and begin with an underscore
-
-LEDManager ledManager(27);
 
 void printHelloWorld()
 {
@@ -28,14 +28,16 @@ void printHelloWorld()
 
 void blink()
 {
-	ledManager.blink(1000L);
+	delay(1000);
+	digitalWrite(27, HIGH);
+	delay(1000);
+	digitalWrite(27, LOW);
 }
 
 void setup()
 {
 	Serial.begin(115200);
 	Serial.println("Hello, EasyNetworkManager!");
-	ledManager.begin();
 
 	Serial.setDebugOutput(true);
 	configManager.initConfig(); // call before load to initialise the structs
@@ -62,7 +64,7 @@ void setup()
 	case WiFiState_e::WiFiState_Connected:
 	{
 		// only start the API server if we have wifi connection
-		server.updateCommandHandlers("blink", blink); // add a command handler to the API server - you can add as many as you want - you can also add methods.
+		server.updateCommandHandlers("blink", blink);				 // add a command handler to the API server - you can add as many as you want - you can also add methods.
 		server.updateCommandHandlers("helloWorld", printHelloWorld); // add a command handler to the API server - you can add as many as you want - you can also add methods.
 		server.begin();
 		log_d("[SETUP]: Starting API Server");

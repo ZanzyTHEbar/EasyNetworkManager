@@ -80,12 +80,7 @@ public:
 
 public:
     typedef void (*stateFunction_t)(void);
-    struct stateFunctionRow_t
-    {
-        stateFunctionRow_t(std::string name_, stateFunction_t func_) : name(name_), func(func_){};
-        std::string name;
-        stateFunction_t func;
-    };
+    std::unordered_map<std::string, stateFunction_t> stateFunctionMap;
 };
 
 #endif // BASEAPI_HPP

@@ -1,7 +1,6 @@
 #pragma once
 #ifndef XWEBSERVERHANDLER_HPP
 #define XWEBSERVERHANDLER_HPP
-
 #include "api/baseAPI/baseAPI.hpp"
 
 class APIServer : public BaseAPI
@@ -24,11 +23,8 @@ public:
     void setupServer();
 
     void findParam(AsyncWebServerRequest *request, const char *param, String &value);
-    void updateCommandHandlers(std::string index, stateFunction_t funct);
+    void updateCommandHandlers(std::string url, stateFunction_t funct);
     std::vector<std::string> routeHandler(std::string index, route_t route);
     void routeHandler(std::string index, AsyncWebServerRequest *request);
-
-public:
-    static std::vector<stateFunctionRow_t> stateFunctionRows;
 };
 #endif // WEBSERVERHANDLER_HPP

@@ -1,7 +1,5 @@
 #include "webserverHandler.hpp"
 
-std::vector<BaseAPI::stateFunctionRow_t> APIServer::stateFunctionRows = {{"", NULL}};
-
 //*********************************************************************************************
 //!                                     API Server
 //*********************************************************************************************
@@ -37,10 +35,10 @@ void APIServer::begin()
 	server->on(buf, HTTP_ANY, [&](AsyncWebServerRequest *request)
 			   { handleRequest(request); });
 
-	char buff[1000];
+	/* char buff[1000];
 	snprintf(buff, sizeof(buff), "^\\%s\\/command\\/([a-zA-Z0-9]+)$", this->userCommands.c_str());
 	server->on(buff, HTTP_ANY, [&](AsyncWebServerRequest *request)
-			   { handleUserCommands(request); });
+			   { handleUserCommands(request); }); */
 
 	server->begin();
 }
@@ -111,6 +109,14 @@ void APIServer::routeHandler(std::string index, AsyncWebServerRequest *request)
 
 void APIServer::handleRequest(AsyncWebServerRequest *request)
 {
+	std::vector<std::string> temp = split(userCommands.c_str(), '/');
+	
+	if (strcmp(request->pathArg(0).c_str(), temp[1].c_str()) == 0)
+	{
+		handleUserCommands(request);
+		return;
+	}
+
 	// Get the route
 	log_i("Request URL: %s", request->url().c_str());
 	int params = request->params();
@@ -150,25 +156,32 @@ void APIServer::handleRequest(AsyncWebServerRequest *request)
 	request->send(200, MIMETYPE_JSON, "{\"msg\":\"Command executed\"}");
 }
 
-void APIServer::updateCommandHandlers(std::string index, stateFunction_t funct)
+void APIServer::updateCommandHandlers(std::string url, stateFunction_t funct)
 {
-	stateFunctionRows.emplace_back(index, funct);
+	stateFunctionMap.emplace(url, funct);
 }
 
+/**
+ * @brief Add a command handler to the API
+ *
+ * @param request
+ * @return \c void
+ * @note This function is called by the API server when a command is received
+ * @warning  \c This function requries the user to access the index using a url parameter \c we need to fix this!! I need a better implemenation
+ *
+ */
 void APIServer::handleUserCommands(AsyncWebServerRequest *request)
 {
-	for (const auto &member : stateFunctionRows)
+	std::string url = request->pathArg(1).c_str();
+	auto it = stateFunctionMap.find(url);
+	if (it != stateFunctionMap.end())
 	{
-		if (member.name == request->pathArg(0).c_str())
-		{
-			log_i("User Command Executed: %s", request->pathArg(0).c_str());
-			// Call the function
-			member.func();
-			return;
-		}
-		else
-		{
-			log_i("User Command Not Found: %s", request->pathArg(0).c_str());
-		}
+		(*it->second)();
+	}
+	else
+	{
+		request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Command\"}");
+		request->redirect("/");
+		return;
 	}
 }
