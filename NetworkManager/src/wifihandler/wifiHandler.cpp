@@ -74,7 +74,7 @@ void WiFiHandler::setupWifi()
 			log_i("\n\rCould not connect to %s, trying another network\n\r", networkIterator->ssid);
 		else
 		{
-			log_i("\n\rSuccessfully connected to %s\n\r", networkIterator->ssid);
+			log_i("\n\rSuccessfully connected to %s\n\r", networkIterator->ssid.c_str());
 			stateManager->setState(WiFiState_e::WiFiState_Connected);
 			return;
 		}
@@ -147,8 +147,8 @@ void WiFiHandler::iniSTA()
 	if (this->ssid.size() == 0)
 	{
 		log_e("No networks passed into the constructor");
-		this->setUpADHOC();
 		stateManager->setState(WiFiState_e::WiFiState_Error);
+		this->setUpADHOC();
 		return;
 	}
 	WiFi.begin(this->ssid.c_str(), this->password.c_str(), this->channel);

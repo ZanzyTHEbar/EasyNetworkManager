@@ -7,6 +7,7 @@
 #include <string>
 
 #include "data/utilities/Observer.hpp"
+#include "data/utilities/helpers.hpp"
 
 namespace Project_Config
 {
