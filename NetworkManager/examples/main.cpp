@@ -1,25 +1,31 @@
 #include <Arduino.h>
-#include <data/config/project_config.hpp>
-#include <data/StateManager/StateManager.hpp>
-#include <data/utilities/Observer.hpp>
-#include <wifihandler/wifiHandler.hpp>
-#include <api/utilities/apiUtilities.hpp>
-#include <api/webserverHandler.hpp>
+
+//? Here is a list of all the library header files - required ones are marked with an asterisk (*)
+
+//! Optional header files
 #include <mDNS/MDNSManager.hpp>
 #include <ota/OTA.hpp>
 //#include <memory>
+//#include <data/utilities/Observer.hpp>
+//#include <api/utilities/apiUtilities.hpp>
 //#include <data/utilities/enuminheritance.hpp> // used for extending enums with new values
 //#include <data/utilities/makeunique.hpp> // used with smart pointers (unique_ptr) to create unique objects
+//#include <data/utilities/helpers.hpp> // various helper functions
+//#include <data/utilities/network_utilities.hpp> // various network utilities
+//#include <wifihandler/utilities/utilities.hpp> // various wifi related utilities
 
-ProjectConfig configManager("network");
-WiFiHandler network(&configManager, &wifiStateManager, "LoveHouse2G", "vxwby2Gwtswp", "_easynetworkmanager", 1);
+//! Required header files
+#include <data/config/project_config.hpp>	  //! (*)
+#include <data/StateManager/StateManager.hpp> //! (*)
+#include <wifihandler/wifiHandler.hpp>		  //! (*)
+#include <api/webserverHandler.hpp>			  //! (*)
 
-APIServer server(80, &network, NULL, "/api/v1", "/wifimanager", "/userCommands"); // base url, wifimanager url, user commands url
+ProjectConfig configManager;
+WiFiHandler network(&configManager, &wifiStateManager, "", "", "_easynetwork", 1);
 
-//* to access the user commands, use the following url: http://<ip>/<base_url>/<userCommands_url>/command/<command_name>
-
+APIServer server(80, &network, NULL, "/api/v1", "/wifimanager", "/userCommands");
 OTA ota(&configManager);
-MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetworkmanager", "test", "_tcp", "api_port", "80"); //! service name and service protocol have to be lowercase and begin with an underscore
+MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test", "_tcp", "_api_port", "80"); //! service name and service protocol have to be lowercase and begin with an underscore
 
 void printHelloWorld()
 {
@@ -28,10 +34,10 @@ void printHelloWorld()
 
 void blink()
 {
-	delay(1000);
 	digitalWrite(27, HIGH);
-	delay(1000);
+	delay(500);
 	digitalWrite(27, LOW);
+	delay(500);
 }
 
 void setup()
@@ -59,7 +65,12 @@ void setup()
 	}
 	case WiFiState_e::WiFiState_ADHOC:
 	{
-		// do not put a break here, as we want to fall through to the next case
+		// only start the API server if we have wifi connection
+		server.updateCommandHandlers("blink", blink);				 // add a command handler to the API server - you can add as many as you want - you can also add methods.
+		server.updateCommandHandlers("helloWorld", printHelloWorld); // add a command handler to the API server - you can add as many as you want - you can also add methods.
+		server.begin();
+		log_d("[SETUP]: Starting API Server");
+		break;
 	}
 	case WiFiState_e::WiFiState_Connected:
 	{
@@ -85,5 +96,4 @@ void setup()
 void loop()
 {
 	ota.HandleOTAUpdate();
-	server.triggerWifiConfigWrite();
 }
