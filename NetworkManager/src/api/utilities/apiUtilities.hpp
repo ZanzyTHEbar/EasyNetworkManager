@@ -29,9 +29,9 @@ public:
     API_Utilities(int CONTROL_PORT,
                   WiFiHandler *network,
                   DNSServer *dnsServer,
-                  std::string api_url,
-                  std::string wifimanager_url,
-                  std::string userCommands);
+                  const std::string &api_url,
+                  const std::string &wifimanager_url,
+                  const std::string &userCommands);
     virtual ~API_Utilities();
 
 protected:

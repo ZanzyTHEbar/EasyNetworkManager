@@ -1,8 +1,6 @@
 #include "project_config.hpp"
 
-Preferences preferences;
-
-ProjectConfig::ProjectConfig(std::string name) : _name(name), Config(&preferences, "config"), _already_loaded(false) {}
+ProjectConfig::ProjectConfig(const std::string &name) : _name(std::move(name)), _already_loaded(false) {}
 
 ProjectConfig::~ProjectConfig() {}
 
@@ -12,13 +10,17 @@ ProjectConfig::~ProjectConfig() {}
  */
 void ProjectConfig::initConfig()
 {
-    if (_name == "")
+    if (_name.empty())
     {
         log_e("Config name is null\n");
-        _name = "easynetworkmanager";
+        _name = "easynetwork";
     }
 
-    begin();
+    bool successs = begin(_name.c_str());
+
+    log_i("Config name: %s", _name.c_str());
+    log_i("Config loaded: %s", successs ? "true" : "false");
+
     this->config.device = {
         _name,
         "12345678",
@@ -28,23 +30,62 @@ void ProjectConfig::initConfig()
         false,
         "",
         "",
-        ""
-    };
-
-    this->config.networks = {
-        {
-            "",
-            "",
-            "",
-            0,
-        },
+        "",
     };
 
     this->config.ap_network = {
         "",
         "",
-        0,
+        1,
     };
+}
+
+void ProjectConfig::save()
+{
+    log_d("Saving project config");
+
+    /* Device Config */
+    putString("deviceName", this->config.device.name.c_str());
+    putString("OTAPassword", this->config.device.OTAPassword.c_str());
+    putInt("OTAPort", this->config.device.OTAPort);
+    //! No need to save the JSON strings or bools, they are generated and used on the fly
+
+    /* WiFi Config */
+    putInt("networkCount", this->config.networks.size());
+
+    std::string name = "name";
+    std::string ssid = "ssid";
+    std::string password = "pass";
+    std::string channel = "channel";
+    for (int i = 0; i < this->config.networks.size(); i++)
+    {
+        char buffer[2];
+        std::string iter_str = Helpers::itoa(i, buffer, 10);
+
+        name.append(iter_str);
+        ssid.append(iter_str);
+        password.append(iter_str);
+        channel.append(iter_str);
+
+        putString(name.c_str(), this->config.networks[i].name.c_str());
+        putString(ssid.c_str(), this->config.networks[i].ssid.c_str());
+        putString(password.c_str(), this->config.networks[i].password.c_str());
+        putInt(channel.c_str(), this->config.networks[i].channel);
+    }
+
+    /* AP Config */
+    putString("apSSID", this->config.ap_network.ssid.c_str());
+    putString("apPass", this->config.ap_network.password.c_str());
+    putUInt("apChannel", this->config.ap_network.channel);
+
+    log_i("Project config saved and system is rebooting");
+    ESP.restart();
+}
+
+bool ProjectConfig::reset()
+{
+    log_w("Resetting project config");
+    return clear();
 }
 
 void ProjectConfig::load()
@@ -56,67 +97,48 @@ void ProjectConfig::load()
         return;
     }
 
-    bool device_name_success = this->read("device_name", this->config.device.name);
-    bool device_otapassword_success = this->read("ota_pass", this->config.device.OTAPassword);
-    bool device_otaport_success = this->read("ota_port", this->config.device.OTAPort);
+    /* Device Config */
+    this->config.device.name = getString("deviceName", "easynetwork").c_str();
+    this->config.device.OTAPassword = getString("OTAPassword", "12345678").c_str();
+    this->config.device.OTAPort = getInt("OTAPort", 3232);
+    //! No need to load the JSON strings or bools, they are generated and used on the fly
 
-    bool device_success = device_name_success && device_otapassword_success && device_otaport_success;
-
-    bool network_info_success;
-    for (int i = 0; i < this->config.networks.size(); i++)
+    /* WiFi Config */
+    int networkCount = getInt("networkCount", 0);
+    std::string name = "name";
+    std::string ssid = "ssid";
+    std::string password = "pass";
+    std::string channel = "channel";
+    for (int i = 0; i < networkCount; i++)
     {
-        char buff[25];
-        snprintf(buff, sizeof(buff), "%d_name", i);
-        bool networks_name_success = this->read(buff, this->config.networks[i].name);
-        snprintf(buff, sizeof(buff), "%d_ssid", i);
-        bool networks_ssid_success = this->read(buff, this->config.networks[i].ssid);
-        snprintf(buff, sizeof(buff), "%d_password", i);
-        bool networks_password_success = this->read(buff, this->config.networks[i].password);
-        snprintf(buff, sizeof(buff), "%d_channel", i);
-        bool networks_channel_success = this->read(buff, this->config.networks[i].channel);
+        char buffer[2];
+        std::string iter_str = Helpers::itoa(i, buffer, 10);
 
-        network_info_success = networks_name_success && networks_ssid_success && networks_password_success && networks_channel_success;
+        name.append(iter_str);
+        ssid.append(iter_str);
+        password.append(iter_str);
+        channel.append(iter_str);
+
+        const std::string &temp_1 = getString(name.c_str()).c_str();
+        const std::string &temp_2 = getString(ssid.c_str()).c_str();
+        const std::string &temp_3 = getString(password.c_str()).c_str();
+        uint8_t temp_4 = getUInt(channel.c_str());
+
+        //! push_back creates a copy of the object, so we need to use emplace_back
+        this->config.networks.emplace_back(
+            temp_1,
+            temp_2,
+            temp_3,
+            temp_4);
     }
 
-    if (!device_success || !network_info_success)
-    {
-        log_e("Failed to load project config - Generating config and restarting");
-        save();
-        delay(1000);
-        ESP.restart();
-        return;
-    }
+    /* AP Config */
+    this->config.ap_network.ssid = getString("apSSID", "easynetwork").c_str();
+    this->config.ap_network.password = getString("apPass", "12345678").c_str();
+    this->config.ap_network.channel = getUInt("apChannel", 1);
 
     this->_already_loaded = true;
     this->notify(ObserverEvent::configLoaded);
-}
-
-void ProjectConfig::save()
-{
-    log_d("Saving project config");
-
-    this->write("device_name", this->config.device.name);
-    this->write("ota_pass", this->config.device.OTAPassword);
-    this->write("ota_port", this->config.device.OTAPort);
-
-    for (int i = 0; i < this->config.networks.size(); i++)
-    {
-        char buff[25];
-        snprintf(buff, sizeof(buff), "%d_name", i);
-        this->write(buff, this->config.networks[i].name);
-        snprintf(buff, sizeof(buff), "%d_ssid", i);
-        this->write(buff, this->config.networks[i].ssid);
-        snprintf(buff, sizeof(buff), "%d_password", i);
-        this->write(buff, this->config.networks[i].password);
-        snprintf(buff, sizeof(buff), "%d_channel", i);
-        this->write(buff, this->config.networks[i].channel);
-    }
-}
-
-void ProjectConfig::reset()
-{
-    log_w("Resetting project config");
-    this->clear();
 }
 
 //**********************************************************************************************************************
@@ -124,53 +146,63 @@ void ProjectConfig::reset()
 //!                                                DeviceConfig
 //*
 //**********************************************************************************************************************
-void ProjectConfig::setDeviceConfig(const char *name, const char *OTAPassword, int *OTAPort, bool shouldNotify)
+void ProjectConfig::setDeviceConfig(const std::string &name, const std::string &OTAPassword, int *OTAPort, bool shouldNotify)
 {
     log_d("Updating device config");
-    this->config.device = {
-        (char *)name,
-        (char *)OTAPassword,
-        *OTAPort,
-    };
+    this->config.device.name.assign(name);
+    this->config.device.OTAPassword.assign(OTAPassword);
+    this->config.device.OTAPort = *OTAPort;
+    
     if (shouldNotify)
     {
         this->notify(ObserverEvent::deviceConfigUpdated);
     }
 }
 
-void ProjectConfig::setWifiConfig(const char *networkName, const char *ssid, const char *password, uint8_t *channel, bool shouldNotify)
+void ProjectConfig::setWifiConfig(const std::string &networkName, const std::string &ssid, const std::string &password, uint8_t *channel, bool shouldNotify)
 {
     Project_Config::WiFiConfig_t *networkToUpdate = nullptr;
 
-    for (int i = 0; i < this->config.networks.size(); i++)
+    size_t size = this->config.networks.size();
+    if (size > 0)
     {
-        if (strcmp(this->config.networks[i].name.c_str(), networkName) == 0)
-            networkToUpdate = &this->config.networks[i];
+        for (int i = 0; i < size; i++)
+        {
+            if (strcmp(this->config.networks[i].name.c_str(), networkName.c_str()) == 0)
+                networkToUpdate = &this->config.networks[i];
+
+            //! push_back creates a copy of the object, so we need to use emplace_back
+            if (networkToUpdate != nullptr)
+            {
+                this->config.networks.emplace_back(
+                    networkName,
+                    ssid,
+                    password,
+                    *channel);
+            }
+            log_d("Updating wifi config");
+        }
+    }
+    else
+    {
+        //! push_back creates a copy of the object, so we need to use emplace_back
+        this->config.networks.emplace_back(
+            networkName,
+            ssid,
+            password,
+            *channel);
+        networkToUpdate = &this->config.networks[0];
     }
 
-    if (networkToUpdate != nullptr)
-    {
-        this->config.networks = {
-            {
-                (char *)networkName,
-                (char *)ssid,
-                (char *)password,
-                *channel,
-            },
-        };
-        if (shouldNotify)
-            this->notify(ObserverEvent::networksConfigUpdated);
-    }
-    log_d("Updating wifi config");
+    if (shouldNotify)
+        this->notify(ObserverEvent::networksConfigUpdated);
 }
 
-void ProjectConfig::setAPWifiConfig(const char *ssid, const char *password, uint8_t *channel, bool shouldNotify)
+void ProjectConfig::setAPWifiConfig(const std::string &ssid, const std::string &password, uint8_t *channel, bool shouldNotify)
 {
-    this->config.ap_network = {
-        (char *)ssid,
-        (char *)password,
-        *channel,
-    };
+    this->config.ap_network.ssid.assign(ssid);
+    this->config.ap_network.password.assign(password);
+    this->config.ap_network.channel = *channel;
 
     log_d("Updating access point config");
     if (shouldNotify)

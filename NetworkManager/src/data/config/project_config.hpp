@@ -2,11 +2,12 @@
 #ifndef PROJECT_CONFIG_HPP
 #define PROJECT_CONFIG_HPP
 #include <Arduino.h>
-#include <preferencesAPI.hpp>
+#include <Preferences.h>
 #include <vector>
 #include <string>
 
 #include "data/utilities/Observer.hpp"
+#include "data/utilities/helpers.hpp"
 
 namespace Project_Config
 {
@@ -18,13 +19,21 @@ namespace Project_Config
         bool data_json;
         bool config_json;
         bool settings_json;
-        String data_json_string;
-        String config_json_string;
-        String settings_json_string;
+        std::string data_json_string;
+        std::string config_json_string;
+        std::string settings_json_string;
     };
 
     struct WiFiConfig_t
     {
+        //! Constructor for WiFiConfig_t - allows us to use emplace_back
+        WiFiConfig_t(const std::string &name,
+                     const std::string &ssid,
+                     const std::string &password,
+                     uint8_t channel) : name(std::move(name)),
+                                        ssid(std::move(ssid)),
+                                        password(std::move(password)),
+                                        channel(channel) {}
         std::string name;
         std::string ssid;
         std::string password;
@@ -46,26 +55,25 @@ namespace Project_Config
     };
 }
 
-class ProjectConfig : public Config, public ISubject
+class ProjectConfig : public Preferences, public ISubject
 {
 public:
-    ProjectConfig(std::string name = "");
+    ProjectConfig(const std::string &name = std::string());
     virtual ~ProjectConfig();
     void load();
     void save();
-    void reset();
+    bool reset();
     void initConfig();
 
     Project_Config::DeviceConfig_t *getDeviceConfig() { return &this->config.device; }
     std::vector<Project_Config::WiFiConfig_t> *getWifiConfigs() { return &this->config.networks; }
     Project_Config::AP_WiFiConfig_t *getAPWifiConfig() { return &this->config.ap_network; }
 
-    void setDeviceConfig(const char *name, const char *OTAPassword, int *OTAPort, bool shouldNotify);
-    void setWifiConfig(const char *networkName, const char *ssid, const char *password, uint8_t *channel, bool shouldNotify);
-    void setAPWifiConfig(const char *ssid, const char *password, uint8_t *channel, bool shouldNotify);
+    void setDeviceConfig(const std::string &name, const std::string &OTAPassword, int *OTAPort, bool shouldNotify);
+    void setWifiConfig(const std::string &networkName, const std::string &ssid, const std::string &password, uint8_t *channel, bool shouldNotify);
+    void setAPWifiConfig(const std::string &ssid, const std::string &password, uint8_t *channel, bool shouldNotify);
 
 private:
-    const char *configFileName;
     Project_Config::ProjectConfig_t config;
     bool _already_loaded;
     std::string _name;
