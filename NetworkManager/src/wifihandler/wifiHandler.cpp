@@ -44,6 +44,7 @@ void WiFiHandler::setupWifi()
 	int count = 0;
 	unsigned long currentMillis = millis();
 	unsigned long _previousMillis = currentMillis;
+	int progress = 0;
 
 	for (auto networkIterator = networks->begin(); networkIterator != networks->end(); ++networkIterator)
 	{
@@ -52,10 +53,11 @@ void WiFiHandler::setupWifi()
 		count++;
 		while (WiFi.status() != WL_CONNECTED)
 		{
+			progress++;
 			stateManager->setState(ProgramStates::DeviceStates::WiFiState_e::WiFiState_Connecting);
 			currentMillis = millis();
-			Serial.print(".");
-			delay(300);
+			Helpers::update_progress_bar(progress, 100);
+			delay(301);
 			if (((currentMillis - _previousMillis) >= connection_timeout) && (count >= networks->size()))
 			{
 				log_e("Connection to %s timed out", networkIterator->ssid);
@@ -135,6 +137,7 @@ void WiFiHandler::iniSTA()
 	int connection_timeout = 30000; // 30 seconds
 	unsigned long currentMillis = millis();
 	unsigned long _previousMillis = currentMillis;
+	int progress = 0;
 
 	log_i("Trying to connect to the %s network", this->ssid.c_str());
 
@@ -153,10 +156,11 @@ void WiFiHandler::iniSTA()
 
 	while (WiFi.status() != WL_CONNECTED)
 	{
+		progress++;
 		stateManager->setState(ProgramStates::DeviceStates::WiFiState_e::WiFiState_Connecting);
 		currentMillis = millis();
-		Serial.print(".");
-		delay(300);
+		Helpers::update_progress_bar(progress, 100);
+		delay(301);
 		if ((currentMillis - _previousMillis) >= connection_timeout)
 		{
 			log_i("[INFO]: WiFi connection timed out.\n");

@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <iostream>
 
 /**
  * @brief The below Macros print data to the terminal during compilation.
@@ -31,4 +32,5 @@ namespace Helpers
     std::vector<std::string> split(const std::string &s, char delimiter);
     char *appendChartoChar(const char *hostname, const char *def_host);
     char *StringtoChar(const std::string &inputString);
+    void update_progress_bar(int progress, int total);
 }

@@ -98,3 +98,22 @@ char *Helpers::StringtoChar(const std::string &inputString)
     strcpy(outputString, inputString.c_str());
     return outputString;
 }
+
+void Helpers::update_progress_bar(int progress, int total)
+{
+    int barWidth = 70;
+
+    std::cout << "\r[";
+    int pos = barWidth * progress / total;
+    for (int i = 0; i < barWidth; ++i)
+    {
+        if (i < pos)
+            std::cout << "=";
+        else if (i == pos)
+            std::cout << ">";
+        else
+            std::cout << " ";
+    }
+    std::cout << "] " << int(progress * 100.0 / total) << " %\r";
+    std::cout.flush();
+}
