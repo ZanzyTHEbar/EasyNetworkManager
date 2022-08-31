@@ -50,8 +50,7 @@ To extend any of the config sections, simply create a namespace with the same na
 ```cpp
 namespace Project_Config {
 
-    struct NewConfig_t {
-        DeviceConfig_t device;
+    struct NewConfig_t : DeviceConfig_t {
         String newConfig;
         int newint;
         bool newbool;
