@@ -30,6 +30,5 @@ namespace Helpers
     void split(std::string str, std::string splitBy, std::vector<std::string> &tokens);
     std::vector<std::string> split(const std::string &s, char delimiter);
     char *appendChartoChar(const char *hostname, const char *def_host);
-    char *StringtoChar(std::string inputString);
-    
+    char *StringtoChar(const std::string &inputString);
 }

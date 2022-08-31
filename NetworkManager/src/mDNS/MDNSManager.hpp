@@ -18,11 +18,11 @@ private:
 public:
   MDNSHandler(StateManager<ProgramStates::DeviceStates::MDNSState_e> *stateManager,
               ProjectConfig *configManager,
-              std::string service_name,
-              std::string service_text,
-              std::string proto,
-              std::string key,
-              std::string value);
+              const std::string &service_name,
+              const std::string &service_text,
+              const std::string &proto,
+              const std::string &key,
+              const std::string &value);
   void startMDNS();
   void update(ObserverEvent::Event event);
 };

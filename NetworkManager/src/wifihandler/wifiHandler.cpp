@@ -3,9 +3,9 @@
 
 WiFiHandler::WiFiHandler(ProjectConfig *configManager,
 						 StateManager<WiFiState_e> *stateManager,
-						 std::string ssid,
-						 std::string password,
-						 std::string hostname,
+						 const std::string &ssid,
+						 const std::string &password,
+						 const std::string &hostname,
 						 uint8_t channel) : configManager(configManager),
 											stateManager(stateManager),
 											ssid(ssid),
@@ -30,11 +30,12 @@ void WiFiHandler::setupWifi()
 	std::vector<Project_Config::WiFiConfig_t> *networks = configManager->getWifiConfigs();
 
 	// check size of networks
+	log_i("Found %d networks", networks->size());
 	if (networks->size() == 0)
 	{
 		log_e("No networks found in config");
-		this->iniSTA();
 		stateManager->setState(WiFiState_e::WiFiState_Error);
+		this->iniSTA();
 		return;
 	}
 
@@ -46,21 +47,18 @@ void WiFiHandler::setupWifi()
 
 	for (auto networkIterator = networks->begin(); networkIterator != networks->end(); ++networkIterator)
 	{
-		log_i("Trying to connect to the %s network", networkIterator->ssid);
-		//WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
-		//WiFi.setHostname(_hostname.c_str());
+		log_i("Trying to connect to the %s network", networkIterator->ssid.c_str());
 		WiFi.begin(networkIterator->ssid.c_str(), networkIterator->password.c_str());
-		//WiFi.setTxPower(WIFI_POWER_11dBm);
 		count++;
-
 		while (WiFi.status() != WL_CONNECTED)
 		{
 			stateManager->setState(ProgramStates::DeviceStates::WiFiState_e::WiFiState_Connecting);
 			currentMillis = millis();
 			Serial.print(".");
 			delay(300);
-			if (((currentMillis - _previousMillis) >= connection_timeout) && count >= networks->size())
+			if (((currentMillis - _previousMillis) >= connection_timeout) && (count >= networks->size()))
 			{
+				log_e("Connection to %s timed out", networkIterator->ssid);
 				log_i("[INFO]: WiFi connection timed out.\n");
 				// we've tried all saved networks, none worked, let's error out
 				log_e("Could not connect to any of the saved networks, check your Wifi credentials");
@@ -151,7 +149,7 @@ void WiFiHandler::iniSTA()
 		return;
 	}
 	WiFi.begin(this->ssid.c_str(), this->password.c_str(), this->channel);
-	//WiFi.setTxPower(WIFI_POWER_11dBm);
+	// WiFi.setTxPower(WIFI_POWER_11dBm);
 
 	while (WiFi.status() != WL_CONNECTED)
 	{

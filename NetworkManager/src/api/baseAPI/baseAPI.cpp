@@ -3,20 +3,19 @@
 BaseAPI::BaseAPI(int CONTROL_PORT,
                  WiFiHandler *network,
                  DNSServer *dnsServer,
-                 std::string api_url,
-                 std::string wifimanager_url,
-                 std::string userCommands) : API_Utilities(CONTROL_PORT, 
-                 network, 
-                 dnsServer, 
-                 api_url, 
-                 wifimanager_url,
-                 userCommands) {}
+                 const std::string &api_url,
+                 const std::string &wifimanager_url,
+                 const std::string &userCommands) : API_Utilities(CONTROL_PORT,
+                                                                  network,
+                                                                  dnsServer,
+                                                                  api_url,
+                                                                  wifimanager_url,
+                                                                  userCommands) {}
 
 BaseAPI::~BaseAPI() {}
 
 void BaseAPI::begin()
 {
-    this->setupServer();
     //! i have changed this to use lambdas instead of std::bind to avoid the overhead. Lambdas are always more preferable.
     server->on("/", HTTP_GET, [&](AsyncWebServerRequest *request)
                { request->send(200); });
@@ -40,28 +39,8 @@ void BaseAPI::begin()
 
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
 
-    // std::bind(&BaseAPI::API_Utilities::notFound, &api_utilities, std::placeholders::_1);
     server->onNotFound([&](AsyncWebServerRequest *request)
                        { notFound(request); });
-}
-
-void BaseAPI::setupServer()
-{
-    localWifiConfig = {
-        .ssid = "",
-        .pass = "",
-        .channel = 0,
-    };
-
-    localAPWifiConfig = {
-        .ssid = "",
-        .pass = "",
-        .channel = 0,
-    };
-
-    // command_map_wifi_conf.emplace("ssid", &BaseAPI::setWiFi);
-    // command_map_method.emplace("reset_config", &BaseAPI::factoryReset);
-    // command_map_method.emplace("reboot_device", &BaseAPI::rebootDevice);
 }
 
 //*********************************************************************************************
@@ -73,27 +52,44 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
     {
     case POST:
     {
-        int params = request->params();
-        for (int i = 0; i < params; i++)
+        size_t params = request->params();
+
+        std::string ssid = std::string();
+        std::string password = std::string();
+        int channel = 0;
+
+        log_d("Number of Params: %d", params);
+        for (size_t i = 0; i < params; i++)
         {
             AsyncWebParameter *param = request->getParam(i);
-            if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
+            if (param->name() == "ssid")
             {
-                localAPWifiConfig.ssid = param->value().c_str();
-                localAPWifiConfig.pass = param->value().c_str();
-                localAPWifiConfig.channel = atoi(param->value().c_str());
+                ssid = param->value().c_str();
             }
-            else
+            else if (param->name() == "password")
             {
-                localWifiConfig.ssid = param->value().c_str();
-                localWifiConfig.pass = param->value().c_str();
-                localWifiConfig.channel = atoi(param->value().c_str());
+                password = param->value().c_str();
             }
+            else if (param->name() == "channel")
+            {
+                channel = atoi(param->value().c_str());
+            }
+            log_i("%s[%s]: %s\n", _networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
         }
-        ssid_write = true;
-        pass_write = true;
-        channel_write = true;
+
+        if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
+        {
+            network->configManager->setAPWifiConfig(ssid, password, (uint8_t *)channel, true);
+        }
+        else
+        {
+            network->configManager->setWifiConfig(ssid, ssid, password, (uint8_t *)channel, true);
+        }
+
+        network->configManager->save();
         request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Wifi Creds have been set.\"}");
+        delay(5000);
+        ESP.restart();
         break;
     }
     default:
@@ -105,28 +101,9 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
     }
 }
 
-/**
- * * Trigger in main loop to save config to flash
- * ? Should we force the users to update all config params before triggering a config write?
- */
-void BaseAPI::triggerWifiConfigWrite()
-{
-    if (ssid_write && pass_write && channel_write)
-    {
-        ssid_write = false;
-        pass_write = false;
-        channel_write = false;
-        if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
-            network->configManager->setWifiConfig(localAPWifiConfig.ssid.c_str(), localAPWifiConfig.ssid.c_str(), localAPWifiConfig.pass.c_str(), &localAPWifiConfig.channel, true);
-        else
-            network->configManager->setWifiConfig(localWifiConfig.ssid.c_str(), localWifiConfig.ssid.c_str(), localWifiConfig.pass.c_str(), &localWifiConfig.channel, true);
-        network->configManager->save();
-    }
-}
-
 void BaseAPI::handleJson(AsyncWebServerRequest *request)
 {
-    std::string type = request->pathArg(0).c_str();
+    const std::string &type = request->pathArg(0).c_str();
     switch (_networkMethodsMap_enum[request->method()])
     {
     case POST:
@@ -159,27 +136,27 @@ void BaseAPI::handleJson(AsyncWebServerRequest *request)
         {
             network->configManager->getDeviceConfig()->data_json = true;
             Network_Utilities::my_delay(1L);
-            String temp = network->configManager->getDeviceConfig()->data_json_string;
-            request->send(200, MIMETYPE_JSON, temp);
-            temp = "";
+            std::string temp = network->configManager->getDeviceConfig()->data_json_string;
+            request->send(200, MIMETYPE_JSON, temp.c_str());
+            temp = std::string();
             break;
         }
         case SETTINGS:
         {
             network->configManager->getDeviceConfig()->config_json = true;
             Network_Utilities::my_delay(1L);
-            String temp = network->configManager->getDeviceConfig()->config_json_string;
-            request->send(200, MIMETYPE_JSON, temp);
-            temp = "";
+            std::string temp = network->configManager->getDeviceConfig()->config_json_string;
+            request->send(200, MIMETYPE_JSON, temp.c_str());
+            temp = std::string();
             break;
         }
         case CONFIG:
         {
             network->configManager->getDeviceConfig()->settings_json = true;
             Network_Utilities::my_delay(1L);
-            String temp = network->configManager->getDeviceConfig()->settings_json_string;
-            request->send(200, MIMETYPE_JSON, temp);
-            temp = "";
+            std::string temp = network->configManager->getDeviceConfig()->settings_json_string;
+            request->send(200, MIMETYPE_JSON, temp.c_str());
+            temp = std::string();
             break;
         }
         default:
@@ -203,7 +180,6 @@ void BaseAPI::rebootDevice(AsyncWebServerRequest *request)
     {
     case GET:
     {
-        delay(20000);
         request->send(200, MIMETYPE_JSON, "{\"msg\":\"Rebooting Device\"}");
         ESP.restart();
     }
@@ -222,13 +198,52 @@ void BaseAPI::factoryReset(AsyncWebServerRequest *request)
     case GET:
     {
         log_d("Factory Reset");
-        network->configManager->reset();
-        request->send(200, MIMETYPE_JSON, "{\"msg\":\"Factory Reset\"}");
+        bool success = network->configManager->reset();
+        char buf[100];
+        snprintf(buf, sizeof(buf), "{\"msg\":\"Factory Reset - %s\"}", success ? "Done" : "Failed");
+        request->send(200, MIMETYPE_JSON, buf);
     }
     default:
     {
         request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Request\"}");
         break;
     }
+    }
+}
+
+/**
+ * @brief Remove a command handler from the API
+ *
+ * @param request
+ * @return \c void
+ */
+void BaseAPI::removeRoute(AsyncWebServerRequest *request)
+{
+    log_i("Request: %s", request->url().c_str());
+    int params = request->params();
+    auto it_map = route_map.find(request->pathArg(0).c_str());
+    log_i("Request: %s", request->pathArg(0).c_str());
+
+    auto it = it_map->second.find(request->pathArg(1).c_str());
+    if (it != it_map->second.end())
+    {
+        switch (_networkMethodsMap_enum[request->method()])
+        {
+        case DELETE:
+        {
+            it_map->second.erase(it);
+            request->send(200, MIMETYPE_JSON, "{\"msg\":\"Route Removed\"}");
+            break;
+        }
+        default:
+        {
+            request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Request\"}");
+            break;
+        }
+        }
+    }
+    else
+    {
+        request->send(400, MIMETYPE_JSON, "{\"msg\":\"Route Not Found\"}");
     }
 }

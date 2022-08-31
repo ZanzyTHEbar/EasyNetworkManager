@@ -21,14 +21,14 @@ bool API_Utilities::channel_write = false;
 API_Utilities::API_Utilities(int CONTROL_PORT,
                              WiFiHandler *network,
                              DNSServer *dnsServer,
-                             std::string api_url,
-                             std::string wifimanager_url,
-                             std::string userCommands) : server(new AsyncWebServer(CONTROL_PORT)),
-                                                         dnsServer(NULL),
-                                                         network(network),
-                                                         api_url(api_url),
-                                                         wifimanager_url(wifimanager_url),
-                                                         userCommands(userCommands)
+                             const std::string &api_url,
+                             const std::string &wifimanager_url,
+                             const std::string &userCommands) : server(new AsyncWebServer(CONTROL_PORT)),
+                                                                dnsServer(NULL),
+                                                                network(std::move(network)),
+                                                                api_url(std::move(api_url)),
+                                                                wifimanager_url(std::move(wifimanager_url)),
+                                                                userCommands(std::move(userCommands))
 {
     if (dnsServer != NULL)
     {

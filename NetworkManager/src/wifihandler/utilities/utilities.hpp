@@ -11,6 +11,5 @@ namespace Network_Utilities
     void my_delay(volatile long delay_time);
     int CheckWifiState();
     int getStrength(int points);
-    String generateDeviceID();
 }
 #endif // !UTILITIES_hpp
