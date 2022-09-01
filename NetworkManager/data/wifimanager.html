@@ -1,5 +1,5 @@
 <head>
-    <title>HBAT Wi-Fi Manager</title>
+    <title>Easy Network Manager Wifi Portal</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- <link rel="manifest" href="site.webmanifest" /> -->
@@ -140,6 +140,13 @@
             text-align: right;
         }
 
+        .ota label {
+            font-size: 1.2rem;
+            width: 100px;
+            display: inline-block;
+            text-align: right;
+        }
+
         .wificlient label {
             font-size: 1.2rem;
             width: 70px;
@@ -166,12 +173,69 @@
             text-align: right;
         }
 
-        input[type=checkbox] {
+        /*input[type=checkbox] {
             padding: 1px 2px;
             margin-left: 10px;
             text-align: right;
             width: auto;
             display: inline-block;
+        }*/
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        input[type="checkbox"]+label {
+            display: inline-block;
+            position: relative;
+            /*padding-left: 35px;*/
+            margin-bottom: 20px;
+            padding: 1px 2px;
+            margin-left: 10px;
+            text-align: right;
+            font: 14px/20px "Open Sans", Arial, sans-serif;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        input[type="checkbox"]:hover+label:hover {
+            color: rgb(23, 86, 228);
+        }
+
+        input[type="checkbox"]:hover+label:before {
+            border: 1px solid #343a3f;
+            box-shadow: 2px 1px 0 #343a3f;
+        }
+
+        input[type="checkbox"]+label:last-child {
+            margin-bottom: 0;
+        }
+
+        input[type="checkbox"]+label:before {
+            content: "";
+            display: block;
+            width: 1.4em;
+            height: 1.4em;
+            border: 1px solid #343a3f;
+            border-radius: 0.2em;
+            position: absolute;
+            left: 0;
+            top: 0;
+            -webkit-transition: all 0.2s, background 0.2s ease-in-out;
+            transition: all 0.2s, background 0.2s ease-in-out;
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: -2px -1px 0 #343a3f;
+            background: #f3f3f3;
+        }
+
+        input[type="checkbox"]:checked+label:before {
+            border: 2px solid #fff;
+            border-radius: 0.3em;
+            background: #16c60c;
+            box-shadow: 2px 1px 0 #50565a;
         }
 
         input[type=button] {
@@ -225,7 +289,7 @@
                             <large>Wifi Client Details</large>
                             <br>
                             <br>
-                            <input type="checkbox" id="dhcp" name="dhcp" onclick="myFunction()" checked><label
+                            <input type="checkbox" id="dhcp" name="dhcp" onclick="enableDHCP()" unchecked><label
                                 for="dhcp">Use DHCP</label>
                             <br>
                             <label for="ip">IP Address</label>
@@ -235,21 +299,21 @@
                             <label for="subnet">Subnet</label>
                             <input type="text" id="subnet" name="subnet" placeholder="255.255.255.0"><br>
                             <script>
-                                myFunction();
+                                enableDHCP();
 
-                                function myFunction() {
+                                function enableDHCP() {
                                     // Get the checkbox
-                                    var checkBox = document.getElementById("dhcp");
+                                    var dhcp_checkBox = document.getElementById("dhcp");
 
                                     // If the checkbox is checked
-                                    if (checkBox.checked == true) {
-                                        document.getElementById("ip").disabled = true;
-                                        document.getElementById("gateway").disabled = true;
-                                        document.getElementById("subnet").disabled = true;
-                                    } else {
+                                    if (dhcp_checkBox.checked == true) {
                                         document.getElementById("ip").disabled = false;
                                         document.getElementById("gateway").disabled = false;
                                         document.getElementById("subnet").disabled = false;
+                                    } else {
+                                        document.getElementById("ip").disabled = true;
+                                        document.getElementById("gateway").disabled = true;
+                                        document.getElementById("subnet").disabled = true;
                                     }
                                 }
                             </script>
@@ -262,16 +326,69 @@
                             <large>MDNS Settings</large>
                             <br>
                             <br>
+                            <input type="checkbox" id="mdns-check" name="mdns-check" onclick="enableMDNS()"
+                                unchecked><label for="mdns-check">Use MulticastDNS</label>
+                            <br>
                             <label for="url">mDNS URL</label><input type="button" id="url" name="url"><br>
+                            <br>
                             <label for="mdns">mDNS Address </label>
                             <input type="text" id="mdns" name="mdns" placeholder="hbathms"
                                 oninput='document.getElementById("url").value="http:/\/"+document.getElementById("mdns").value+".local";'><br>
                             <script>
                                 document.getElementById("url").value = "http://" + document.getElementById("mdns").value + ".local";
+
+                                enableMDNS();
+
+                                function enableMDNS() {
+                                    // Get the checkbox
+                                    var mdns_checkBox = document.getElementById("mdns-check");
+
+                                    // If the checkbox is checked
+                                    if (mdns_checkBox.checked == true) {
+                                        document.getElementById("url").disabled = false;
+                                        document.getElementById("mdns").disabled = false;
+                                    } else {
+                                        document.getElementById("url").disabled = true;
+                                        document.getElementById("mdns").disabled = true;
+                                    }
+                                }
                             </script>
                             <bold style="color:rgba(18, 14, 122, 0.751); font-size: large;">To see mDNS urls using an
                                 Android device, please use the <ins style="color:#ff0e01;">Bonjour Browser</ins> App.
                             </bold>
+                        </p>
+                    </section>
+                    <hr>
+                    <br>
+                    <section class="ota">
+                        <p>
+                            <large>OTA Settings</large>
+                            <br>
+                            <br>
+                            <input type="checkbox" id="ota" name="ota" onclick="enableOTA()" unchecked><label
+                                for="ota">Use OTA</label>
+                            <br>
+                            <label for="ota_password">Password</label>
+                            <input type="text" id="ota_password" name="ota_password" placeholder="12345678"><br>
+                            <label for="ota_port">OTA Port</label>
+                            <input type="text" id="ota_port" name="ota_port" placeholder="3232"><br>
+                            <script>
+                                    enableOTA();
+
+                                    function enableOTA() {
+                                        // Get the checkbox
+                                        var ota_checkBox = document.getElementById("ota");
+
+                                        // If the checkbox is checked
+                                        if (ota_checkBox.checked == true) {
+                                            document.getElementById("ota_port").disabled = false;
+                                            document.getElementById("ota_password").disabled = false;
+                                        } else {
+                                            document.getElementById("ota_port").disabled = true;
+                                            document.getElementById("ota_password").disabled = true;
+                                        }
+                                    }
+                            </script>
                         </p>
                     </section>
                     <br>
@@ -283,14 +400,15 @@
             </div>
         </div>
         <p>
-            OTA Updates are coming soon
+            Advanced OTA Updates are coming soon - For now, use <ins style="color:#ff0e01;">PlatformIO's OTA</ins> to
+            upload
             <br>
             <br>
-            <br>
+            <!-- <br>
             <a href="/upload">
                 <input type="submit" value="Upload">
             </a>
-            <br>
+            <br> -->
         </p>
     </div>
 </body>

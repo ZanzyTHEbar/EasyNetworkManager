@@ -16,9 +16,9 @@ MDNSHandler::MDNSHandler(StateManager<ProgramStates::DeviceStates::MDNSState_e> 
 
 void MDNSHandler::startMDNS()
 {
-  auto deviceConfig = configManager->getDeviceConfig();
-  log_d("%s", deviceConfig->name.c_str());
-  if (MDNS.begin(deviceConfig->name.c_str()))
+  auto mdnsConfig = configManager->getMDNSConfig();
+  log_d("%s", mdnsConfig->mdns.c_str());
+  if (MDNS.begin(mdnsConfig->mdns.c_str()))
   {
     stateManager->setState(MDNSState_e::MDNSState_Starting);
     MDNS.addService(service_name.c_str(), proto.c_str(), atoi(value.c_str()));
@@ -36,7 +36,7 @@ void MDNSHandler::startMDNS()
 
 void MDNSHandler::update(ObserverEvent::Event event)
 {
-  if (event == ObserverEvent::deviceConfigUpdated)
+  if (event == ObserverEvent::mdnsConfigUpdated)
   {
     MDNS.end();
     startMDNS();

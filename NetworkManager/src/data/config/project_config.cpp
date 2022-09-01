@@ -22,7 +22,6 @@ void ProjectConfig::initConfig()
     log_i("Config loaded: %s", successs ? "true" : "false");
 
     this->config.device = {
-        _name,
         "12345678",
         3232,
         false,
@@ -32,6 +31,8 @@ void ProjectConfig::initConfig()
         "",
         "",
     };
+
+    this->config.mdns = {"easynetwork"};
 
     this->config.ap_network = {
         "",
@@ -45,7 +46,7 @@ void ProjectConfig::save()
     log_d("Saving project config");
 
     /* Device Config */
-    putString("deviceName", this->config.device.name.c_str());
+    putString("mdnsName", this->config.mdns.mdns.c_str());
     putString("OTAPassword", this->config.device.OTAPassword.c_str());
     putInt("OTAPort", this->config.device.OTAPort);
     //! No need to save the JSON strings or bools, they are generated and used on the fly
@@ -98,7 +99,7 @@ void ProjectConfig::load()
     }
 
     /* Device Config */
-    this->config.device.name = getString("deviceName", "easynetwork").c_str();
+    this->config.mdns.mdns = getString("mdnsName", "easynetwork").c_str();
     this->config.device.OTAPassword = getString("OTAPassword", "12345678").c_str();
     this->config.device.OTAPort = getInt("OTAPort", 3232);
     //! No need to load the JSON strings or bools, they are generated and used on the fly
@@ -146,16 +147,26 @@ void ProjectConfig::load()
 //!                                                DeviceConfig
 //*
 //**********************************************************************************************************************
-void ProjectConfig::setDeviceConfig(const std::string &name, const std::string &OTAPassword, int *OTAPort, bool shouldNotify)
+void ProjectConfig::setDeviceConfig(const std::string &OTAPassword, int *OTAPort, bool shouldNotify)
 {
     log_d("Updating device config");
-    this->config.device.name.assign(name);
     this->config.device.OTAPassword.assign(OTAPassword);
     this->config.device.OTAPort = *OTAPort;
-    
+
     if (shouldNotify)
     {
         this->notify(ObserverEvent::deviceConfigUpdated);
+    }
+}
+
+void ProjectConfig::setMDNSConfig(const std::string &mdns, bool shouldNotify)
+{
+    log_d("Updating MDNS config");
+    this->config.mdns.mdns.assign(mdns);
+
+    if (shouldNotify)
+    {
+        this->notify(ObserverEvent::mdnsConfigUpdated);
     }
 }
 
@@ -207,6 +218,6 @@ void ProjectConfig::setAPWifiConfig(const std::string &ssid, const std::string &
     log_d("Updating access point config");
     if (shouldNotify)
     {
-        this->notify(ObserverEvent::networksConfigUpdated);
+        this->notify(ObserverEvent::apConfigUpdated);
     }
 }

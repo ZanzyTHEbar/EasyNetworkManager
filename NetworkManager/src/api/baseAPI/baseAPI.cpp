@@ -59,6 +59,9 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
         std::string mdns_url;
         uint8_t channel = 0;
 
+        int OTA_port = 0;
+        std::string OTA_password;
+
         log_d("Number of Params: %d", params);
         for (int i = 0; i < params; i++)
         {
@@ -79,15 +82,29 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
             {
                 mdns_url = param->value().c_str();
             }
+            else if (param->name() == "ota_port")
+            {
+                OTA_port = atoi(param->value().c_str());
+            }
+            else if (param->name() == "ota_password")
+            {
+                OTA_password = param->value().c_str();
+            }
             log_i("%s[%s]: %s\n", _networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
         }
 
         network->configManager->setWifiConfig(ssid, ssid, password, &channel, true);
 
+        // check if the ota and mdns are set
+        if (!OTA_password.empty())
+        {
+            int OTAPort = OTA_port > 0 ? OTA_port : 3232;
+            network->configManager->setDeviceConfig(OTA_password, &OTAPort, true);
+        }
+
         if (!mdns_url.empty())
         {
-            int OTAPort = 3232;
-            network->configManager->setDeviceConfig(mdns_url, "12345678", &OTAPort, true);
+            network->configManager->setMDNSConfig(mdns_url, true);
         }
 
         //! TODO: implement user-costumizable ADHOC network

@@ -13,7 +13,6 @@ namespace Project_Config
 {
     struct DeviceConfig_t
     {
-        std::string name;
         std::string OTAPassword;
         int OTAPort;
         bool data_json;
@@ -22,6 +21,11 @@ namespace Project_Config
         std::string data_json_string;
         std::string config_json_string;
         std::string settings_json_string;
+    };
+
+    struct MDNSConfig_t
+    {
+        std::string mdns;
     };
 
     struct WiFiConfig_t
@@ -50,6 +54,7 @@ namespace Project_Config
     struct ProjectConfig_t
     {
         DeviceConfig_t device;
+        MDNSConfig_t mdns;
         std::vector<WiFiConfig_t> networks;
         AP_WiFiConfig_t ap_network;
     };
@@ -66,10 +71,12 @@ public:
     void initConfig();
 
     Project_Config::DeviceConfig_t *getDeviceConfig() { return &this->config.device; }
+    Project_Config::MDNSConfig_t *getMDNSConfig() { return &this->config.mdns; }
     std::vector<Project_Config::WiFiConfig_t> *getWifiConfigs() { return &this->config.networks; }
     Project_Config::AP_WiFiConfig_t *getAPWifiConfig() { return &this->config.ap_network; }
 
-    void setDeviceConfig(const std::string &name, const std::string &OTAPassword, int *OTAPort, bool shouldNotify);
+    void setDeviceConfig(const std::string &OTAPassword, int *OTAPort, bool shouldNotify);
+    void setMDNSConfig(const std::string &mdns, bool shouldNotify);
     void setWifiConfig(const std::string &networkName, const std::string &ssid, const std::string &password, uint8_t *channel, bool shouldNotify);
     void setAPWifiConfig(const std::string &ssid, const std::string &password, uint8_t *channel, bool shouldNotify);
 
