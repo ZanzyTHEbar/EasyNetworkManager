@@ -56,6 +56,7 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
 
         std::string ssid;
         std::string password;
+        std::string mdns_url;
         uint8_t channel = 0;
 
         log_d("Number of Params: %d", params);
@@ -74,10 +75,20 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
             {
                 channel = (uint8_t)atoi(param->value().c_str());
             }
+            else if (param->name() == "mdns")
+            {
+                mdns_url = param->value().c_str();
+            }
             log_i("%s[%s]: %s\n", _networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
         }
 
         network->configManager->setWifiConfig(ssid, ssid, password, &channel, true);
+
+        if (!mdns_url.empty())
+        {
+            int OTAPort = 3232;
+            network->configManager->setDeviceConfig(mdns_url, "12345678", &OTAPort, true);
+        }
 
         //! TODO: implement user-costumizable ADHOC network
         /* if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
@@ -87,7 +98,7 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
         {
         } */
 
-        request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Wifi Creds have been set.\"}");
+        request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Device Wifi settings have been set.\"}");
         network->configManager->save();
         break;
     }
