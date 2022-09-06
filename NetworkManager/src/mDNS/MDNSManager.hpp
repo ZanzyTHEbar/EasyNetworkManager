@@ -26,7 +26,6 @@ public:
               const std::string &value);
   bool startMDNS();
   void update(ObserverEvent::Event event);
-  int DiscovermDNSBroker();
 };
 
 #endif // MDNS_HANDLER_HPP
