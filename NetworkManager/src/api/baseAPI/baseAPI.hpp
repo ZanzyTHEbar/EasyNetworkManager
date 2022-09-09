@@ -1,12 +1,32 @@
 #ifndef BASEAPI_HPP
 #define BASEAPI_HPP
-#include "wifihandler/wifiHandler.hpp"
+
+#include <unordered_map>
+#include <string>
+#include <sstream>
+
+#define WEBSERVER_H
+
+constexpr int HTTP_GET = 0b00000001;
+constexpr int HTTP_POST = 0b00000010;
+constexpr int HTTP_DELETE = 0b00000100;
+constexpr int HTTP_PUT = 0b00001000;
+constexpr int HTTP_PATCH = 0b00010000;
+constexpr int HTTP_HEAD = 0b00100000;
+constexpr int HTTP_OPTIONS = 0b01000000;
+constexpr int HTTP_ANY = 0b01111111;
+
+#include <DNSServer.h>
+#include <ESPAsyncWebServer.h>
+#include <AsyncTCP.h>
+
+#include "data/config/project_config.hpp"
+#include "data/utilities/helpers.hpp"
 #include "api/utilities/apiUtilities.hpp"
 
 class BaseAPI : public API_Utilities
 {
 protected:
-
     enum JSON_TYPES
     {
         CONFIG,
@@ -28,6 +48,34 @@ protected:
         {"wifiap", WIFIAP},
     };
 
+    std::unordered_map<WebRequestMethodComposite, std::string> _networkMethodsMap = {
+        {HTTP_GET, "GET"},
+        {HTTP_POST, "POST"},
+        {HTTP_PUT, "PUT"},
+        {HTTP_DELETE, "DELETE"},
+        {HTTP_PATCH, "PATCH"},
+        {HTTP_OPTIONS, "OPTIONS"},
+    };
+
+    enum RequestMethods
+    {
+        GET,
+        POST,
+        PUT,
+        DELETE,
+        PATCH,
+        OPTIONS
+    };
+
+    std::unordered_map<WebRequestMethodComposite, RequestMethods> _networkMethodsMap_enum = {
+        {HTTP_GET, GET},
+        {HTTP_POST, POST},
+        {HTTP_PUT, PUT},
+        {HTTP_DELETE, DELETE},
+        {HTTP_PATCH, PATCH},
+        {HTTP_OPTIONS, OPTIONS},
+    };
+
 protected:
     /* Commands */
     void setWiFi(AsyncWebServerRequest *request);
@@ -35,7 +83,9 @@ protected:
     void factoryReset(AsyncWebServerRequest *request);
     void rebootDevice(AsyncWebServerRequest *request);
     void removeRoute(AsyncWebServerRequest *request);
-    
+
+    /* Helpers */
+    void notFound(AsyncWebServerRequest *request) const;
 
     /* Route Command types */
     using route_method = void (BaseAPI::*)(AsyncWebServerRequest *);
@@ -45,17 +95,29 @@ protected:
     route_t routes;
     route_map_t route_map;
 
+protected:
+    AsyncWebServer *server;
+    ProjectConfig *configManager;
+    DNSServer *dnsServer;
+    typedef std::unordered_map<std::string, WebRequestMethodComposite> networkMethodsMap_t;
+
+    std::string api_url;
+    std::string wifimanager_url;
+    std::string userCommands;
+
+    static bool ssid_write;
+    static bool pass_write;
+    static bool channel_write;
+
 public:
     BaseAPI(int CONTROL_PORT,
-            WiFiHandler *network,
+            ProjectConfig *configManager,
             DNSServer *dnsServer,
             const std::string &api_url,
             const std::string &wifimanager_url,
             const std::string &userCommands);
     virtual ~BaseAPI();
     virtual void begin();
-    void loop();
-    void handle();
 
 public:
     typedef void (*stateFunction_t)(void);

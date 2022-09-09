@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MDNS_HANDLER_HPP
+#define MDNS_HANDLER_HPP
 #include <ESPmDNS.h>
 #include "data/StateManager/StateManager.hpp"
 #include "data/utilities/Observer.hpp"
@@ -23,6 +24,8 @@ public:
               const std::string &proto,
               const std::string &key,
               const std::string &value);
-  void startMDNS();
+  bool startMDNS();
   void update(ObserverEvent::Event event);
 };
+
+#endif // MDNS_HANDLER_HPP

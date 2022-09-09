@@ -11,7 +11,7 @@
 //#include <data/utilities/enuminheritance.hpp> // used for extending enums with new values
 //#include <data/utilities/makeunique.hpp> // used with smart pointers (unique_ptr) to create unique objects
 //#include <data/utilities/helpers.hpp> // various helper functions
-//#include <data/utilities/network_utilities.hpp> // various network utilities
+#include <data/utilities/network_utilities.hpp> // various network utilities
 //#include <wifihandler/utilities/utilities.hpp> // various wifi related utilities
 
 //! Required header files
@@ -23,7 +23,7 @@
 ProjectConfig configManager;
 WiFiHandler network(&configManager, &wifiStateManager, "", "", "_easynetwork", 1);
 
-APIServer server(80, &network, NULL, "/api/v1", "/wifimanager", "/userCommands");
+APIServer server(80, &configManager, NULL, "/api/v1", "/wifimanager", "/userCommands");
 OTA ota(&configManager);
 MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test", "_tcp", "_api_port", "80"); //! service name and service protocol have to be lowercase and begin with an underscore
 
@@ -35,9 +35,9 @@ void printHelloWorld()
 void blink()
 {
 	digitalWrite(27, HIGH);
-	delay(500);
+	Network_Utilities::my_delay(0.5); // delay for 500ms
 	digitalWrite(27, LOW);
-	delay(500);
+	Network_Utilities::my_delay(0.5); // delay for 500ms
 }
 
 void setup()

@@ -12,7 +12,7 @@ private:
 
 public:
     APIServer(int CONTROL_PORT,
-              WiFiHandler *network,
+              ProjectConfig *configManager,
               DNSServer *dnsServer,
               const std::string &api_url,
               const std::string &wifimanager_url,
