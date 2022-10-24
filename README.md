@@ -43,22 +43,7 @@ For basic usage please see the [examples](/NetworkManager/examples) folder.
 
 To use the provided wifi manager html page you need to move the `wifimanager.html` file into a `data` folder in the root of your `pio` project.
 
-To extend any of the enums please use the `data/utilities/enuminheritance.hpp` file.
-
-To extend any of the config sections, simply create a namespace with the same name as the config struct is in and add your own `struct` to it. For example, to extend the `DeviceConfig_t` `struct`, you would do the following:
-
-```cpp
-namespace Project_Config {
-
-    struct NewConfig_t : DeviceConfig_t {
-        String newConfig;
-        int newint;
-        bool newbool;
-    };
-}
-
 Project_Config::NewConfig_t newConfig; // this creates a new object of your config struct.
-```
 
 > **Warning**: It is **required** to add a build flag to your setup for the code to function properly.
 
@@ -100,6 +85,21 @@ compiler.cpp.extra_flags=-DASYNCWEBSERVER_REGEX=1
 This library is intended to be modified and extended. If you find any bugs, please make a new issue and I will fix it.
 
 If you have any questions, please ask in the [discussions](https://github.com/ZanzyTHEbar/EasyNetworkManager/discussions).
+
+To extend any of the enums please use the `data/utilities/enuminheritance.hpp` file.
+
+To extend any of the config sections, simply create a namespace with the same name as the config struct is in and add your own `struct` to it. For example, to extend the `DeviceConfig_t` `struct`, you would do the following:
+
+```cpp
+namespace Project_Config {
+
+    struct NewConfig_t : DeviceConfig_t {
+        String newConfig;
+        int newint;
+        bool newbool;
+    };
+}
+```
 
 ## Extras
 
