@@ -35,7 +35,6 @@ All dependencies _should_ be installed automatically. If not, please make a new 
 
 - [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer.git)
 - [AsyncTCP](https://github.com/me-no-dev/AsyncTCP.git)
-- [EasyPreferencesLibrary project](https://github.com/ZanzyTHEbar/EasyPreferencesLibrary)
 
 ## Usage
 
