@@ -5,6 +5,8 @@ This is an in-progress library for easy network management. It is not yet comple
 This library implements the following classes:
 
 - APIServer - A server that can be used to manage asynchronous REST API methods.
+    - has a `handleJSON` method for handling `POST` and `GET` requests. Can send and receive JSON. 
+	> **Note**: `POST` requests for `JSON` are still in development.
 - WiFiHandler - A class that can be used to manage WiFi connections.
 - OTA - A basic OTA handler.
 - MDNSHandler - A class that can be used to manage mDNS services.
