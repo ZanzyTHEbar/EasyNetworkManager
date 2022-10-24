@@ -1,6 +1,9 @@
 #include "project_config.hpp"
 
-ProjectConfig::ProjectConfig(const std::string &name) : _name(std::move(name)), _already_loaded(false) {}
+ProjectConfig::ProjectConfig(const std::string &configName,
+                             const std::string &mdnsName) : _configName(std::move(configName)),
+                                                            _mdnsName(std::move(mdnsName)),
+                                                            _already_loaded(false) {}
 
 ProjectConfig::~ProjectConfig() {}
 
@@ -10,15 +13,15 @@ ProjectConfig::~ProjectConfig() {}
  */
 void ProjectConfig::initConfig()
 {
-    if (_name.empty())
+    if (_configName.empty())
     {
         log_e("Config name is null\n");
-        _name = "easynetwork";
+        _configName = "easynetwork";
     }
 
-    bool successs = begin(_name.c_str());
+    bool successs = begin(_configName.c_str());
 
-    log_i("Config name: %s", _name.c_str());
+    log_i("Config name: %s", _configName.c_str());
     log_i("Config loaded: %s", successs ? "true" : "false");
 
     this->config.device = {
@@ -32,7 +35,16 @@ void ProjectConfig::initConfig()
         "",
     };
 
-    this->config.mdns = {"easynetwork"};
+    if (_mdnsName.empty())
+    {
+        log_e("MDNS name is null\n Autoassigning name to 'easynetwork'");
+        _mdnsName = "easynetwork";
+    }
+    this->config.mdns = {
+        _mdnsName,
+    };
+
+    log_i("MDNS name: %s", _mdnsName.c_str());
 
     this->config.ap_network = {
         "",
