@@ -63,7 +63,8 @@ namespace Project_Config
 class ProjectConfig : public Preferences, public ISubject
 {
 public:
-    ProjectConfig(const std::string &name = std::string());
+    ProjectConfig(const std::string &configName = std::string(),
+                  const std::string &mdnsName = std::string());
     virtual ~ProjectConfig();
     void load();
     void save();
@@ -83,7 +84,8 @@ public:
 private:
     Project_Config::ProjectConfig_t config;
     bool _already_loaded;
-    std::string _name;
+    std::string _configName;
+    std::string _mdnsName;
 };
 
 #endif // PROJECT_CONFIG_HPP
