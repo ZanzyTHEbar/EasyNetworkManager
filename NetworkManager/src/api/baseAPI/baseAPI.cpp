@@ -155,7 +155,9 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
 
 void BaseAPI::handleJson(AsyncWebServerRequest *request)
 {
-    const std::string &type = request->pathArg(0).c_str();
+    int params = request->params();
+    AsyncWebParameter *param = request->getParam(0);
+    const std::string &type = param->value().c_str();
     switch (_networkMethodsMap_enum[request->method()])
     {
     case POST:
