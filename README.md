@@ -1,6 +1,6 @@
 # EasyNetworkManager Library
 
-This is an in-progress library for easy network management. It is not yet complete, but it is a good start (and functional).
+This is an in-progress library for easy network management.
 
 This library implements the following classes:
 
@@ -17,6 +17,11 @@ This library implements the following classes:
 ## Installation
 
 #### Platformio (recommended)
+
+You can install via the `Platformio Registry` by navigating to the `Libraries` section of `Platformio`. 
+The library is called `EasyNetworkManager` by `zanzythebar`.
+
+You can also install via a github link:
 
 In your `platformio.ini` file add the following:
 
