@@ -7,7 +7,7 @@
 class OTA
 {
 public:
-    OTA(ProjectConfig *_deviceConfig);
+    OTA(ProjectConfig *_deviceConfig, const std::string &hostname);
     virtual ~OTA();
 
     void SetupOTA();
@@ -18,5 +18,6 @@ private:
     unsigned long _bootTimestamp = 0;
     bool _isOtaEnabled = true;
     ProjectConfig *_deviceConfig;
+    std::string _hostname;
 };
 #endif // OTA_HPP

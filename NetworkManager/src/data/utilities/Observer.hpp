@@ -7,8 +7,9 @@ namespace ObserverEvent
   {
     configLoaded = 1,
     deviceConfigUpdated = 2,
-    cameraConfigUpdated = 3,
+    mdnsConfigUpdated = 3,
     networksConfigUpdated = 4,
+    apConfigUpdated = 5,
   };
 }
 

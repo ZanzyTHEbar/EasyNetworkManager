@@ -45,7 +45,9 @@ void WiFiHandler::setupWifi()
 	unsigned long currentMillis = millis();
 	unsigned long _previousMillis = currentMillis;
 	int progress = 0;
-
+	WiFi.mode(WIFI_STA);
+	WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+	WiFi.setHostname(_hostname.c_str()); // define hostname
 	for (auto networkIterator = networks->begin(); networkIterator != networks->end(); ++networkIterator)
 	{
 		log_i("Trying to connect to the %s network", networkIterator->ssid.c_str());
@@ -140,9 +142,6 @@ void WiFiHandler::iniSTA()
 	int progress = 0;
 
 	log_i("Trying to connect to the %s network", this->ssid.c_str());
-
-	// WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
-	// WiFi.setHostname(_hostname.c_str());
 	//  check size of networks
 	if (this->ssid.size() == 0)
 	{

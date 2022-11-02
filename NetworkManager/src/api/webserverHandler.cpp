@@ -5,16 +5,14 @@
 //*********************************************************************************************
 
 APIServer::APIServer(int CONTROL_PORT,
-					 WiFiHandler *network,
-					 DNSServer *dnsServer,
+					 ProjectConfig *configManager,
 					 const std::string &api_url,
 					 const std::string &wifimanager_url,
 					 const std::string &userCommands) : BaseAPI(CONTROL_PORT,
-														 network,
-														 dnsServer,
-														 api_url,
-														 wifimanager_url,
-														 userCommands) {}
+																configManager,
+																api_url,
+																wifimanager_url,
+																userCommands) {}
 
 APIServer::~APIServer() {}
 
@@ -42,7 +40,7 @@ void APIServer::setupServer()
 {
 	// Set default routes
 	routes.emplace("wifi", &APIServer::setWiFi);
-	routes.emplace("setJson", &APIServer::handleJson);
+	routes.emplace("json", &APIServer::handleJson);
 	routes.emplace("resetConfig", &APIServer::factoryReset);
 	routes.emplace("deleteRoute", &APIServer::removeRoute);
 	routes.emplace("rebootDevice", &APIServer::rebootDevice);
@@ -82,7 +80,7 @@ void APIServer::addRouteMap(const std::string &index, route_t route, std::vector
 
 void APIServer::handleRequest(AsyncWebServerRequest *request)
 {
-	std::vector<std::string> temp = split(userCommands.c_str(), '/');
+	std::vector<std::string> temp = Helpers::split(userCommands.c_str(), '/');
 
 	if (strcmp(request->pathArg(0).c_str(), temp[1].c_str()) == 0)
 	{

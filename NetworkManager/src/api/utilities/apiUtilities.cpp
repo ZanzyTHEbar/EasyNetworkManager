@@ -10,31 +10,11 @@ const char *API_Utilities::MIMETYPE_HTML{"text/html"};
 // const char *BaseAPI::MIMETYPE_ICO{"image/x-icon"};
 const char *API_Utilities::MIMETYPE_JSON{"application/json"};
 
-bool API_Utilities::ssid_write = false;
-bool API_Utilities::pass_write = false;
-bool API_Utilities::channel_write = false;
-
 //*********************************************************************************************
 //!                                     API Utilities
 //*********************************************************************************************
 
-API_Utilities::API_Utilities(int CONTROL_PORT,
-                             WiFiHandler *network,
-                             DNSServer *dnsServer,
-                             const std::string &api_url,
-                             const std::string &wifimanager_url,
-                             const std::string &userCommands) : server(new AsyncWebServer(CONTROL_PORT)),
-                                                                dnsServer(NULL),
-                                                                network(std::move(network)),
-                                                                api_url(std::move(api_url)),
-                                                                wifimanager_url(std::move(wifimanager_url)),
-                                                                userCommands(std::move(userCommands))
-{
-    if (dnsServer != NULL)
-    {
-        this->dnsServer = dnsServer;
-    }
-}
+API_Utilities::API_Utilities() {}
 API_Utilities::~API_Utilities() {}
 std::string API_Utilities::shaEncoder(std::string data)
 {
@@ -65,21 +45,6 @@ std::string API_Utilities::shaEncoder(std::string data)
     return hash_string;
 }
 
-void API_Utilities::notFound(AsyncWebServerRequest *request) const
-{
-    if (_networkMethodsMap.find(request->method()) != _networkMethodsMap.end())
-    {
-        log_i("%s: http://%s%s/\n", _networkMethodsMap.at(request->method()).c_str(), request->host().c_str(), request->url().c_str());
-        char buffer[100];
-        snprintf(buffer, sizeof(buffer), "Request %s Not found: %s", _networkMethodsMap.at(request->method()).c_str(), request->url().c_str());
-        request->send(404, "text/plain", buffer);
-    }
-    else
-    {
-        request->send(404, "text/plain", "Request Not found using unknown method");
-    }
-}
-
 // Initialize SPIFFS
 bool API_Utilities::initSPIFFS()
 {
@@ -89,7 +54,7 @@ bool API_Utilities::initSPIFFS()
 }
 
 // Read File from SPIFFS
-String API_Utilities::readFile(fs::FS &fs, std::string path)
+std::string API_Utilities::readFile(fs::FS &fs, std::string path)
 {
     log_i("Reading file: %s\r\n", path.c_str());
 
@@ -97,13 +62,13 @@ String API_Utilities::readFile(fs::FS &fs, std::string path)
     if (!file || file.isDirectory())
     {
         log_e("[INFO]: Failed to open file for reading");
-        return String();
+        return std::string();
     }
 
-    String fileContent;
+    std::string fileContent;
     while (file.available())
     {
-        fileContent = file.readStringUntil('\n');
+        fileContent = file.readStringUntil('\n').c_str();
         break;
     }
     return fileContent;
@@ -129,16 +94,4 @@ void API_Utilities::writeFile(fs::FS &fs, std::string path, std::string message)
     {
         log_i("[Writing File]: file write failed");
     }
-}
-
-std::vector<std::string> API_Utilities::split(const std::string &s, char delimiter)
-{
-    std::vector<std::string> parts;
-    std::string part;
-    std::istringstream tokenStream(s);
-    while (std::getline(tokenStream, part, delimiter))
-    {
-        parts.push_back(part);
-    }
-    return parts;
 }

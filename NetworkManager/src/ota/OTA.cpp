@@ -1,6 +1,7 @@
 #include "OTA.hpp"
 
-OTA::OTA(ProjectConfig *_deviceConfig) : _deviceConfig(_deviceConfig) {}
+OTA::OTA(ProjectConfig *_deviceConfig, const std::string &hostname) : _deviceConfig(_deviceConfig),
+                                                                      _hostname(std::move(hostname)) {}
 
 OTA::~OTA() {}
 
@@ -53,6 +54,7 @@ void OTA::SetupOTA()
 
     log_i("Starting up basic OTA server");
     log_i("OTA will be live for 30s, after which it will be disabled until restart");
+    ArduinoOTA.setHostname(_hostname.c_str());
     ArduinoOTA.begin();
     _bootTimestamp = millis();
 }

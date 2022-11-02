@@ -1,16 +1,20 @@
 #include "baseAPI.hpp"
 
+bool BaseAPI::ssid_write = false;
+bool BaseAPI::pass_write = false;
+bool BaseAPI::channel_write = false;
+
 BaseAPI::BaseAPI(int CONTROL_PORT,
-                 WiFiHandler *network,
-                 DNSServer *dnsServer,
+                 ProjectConfig *configManager,
                  const std::string &api_url,
                  const std::string &wifimanager_url,
-                 const std::string &userCommands) : API_Utilities(CONTROL_PORT,
-                                                                  network,
-                                                                  dnsServer,
-                                                                  api_url,
-                                                                  wifimanager_url,
-                                                                  userCommands) {}
+                 const std::string &userCommands) : server(new AsyncWebServer(CONTROL_PORT)),
+                                                    configManager(configManager),
+                                                    api_url(std::move(api_url)),
+                                                    wifimanager_url(std::move(wifimanager_url)),
+                                                    userCommands(std::move(userCommands))
+{
+}
 
 BaseAPI::~BaseAPI() {}
 
@@ -43,6 +47,21 @@ void BaseAPI::begin()
                        { notFound(request); });
 }
 
+void BaseAPI::notFound(AsyncWebServerRequest *request) const
+{
+    if (_networkMethodsMap.find(request->method()) != _networkMethodsMap.end())
+    {
+        log_i("%s: http://%s%s/\n", _networkMethodsMap.at(request->method()).c_str(), request->host().c_str(), request->url().c_str());
+        char buffer[100];
+        snprintf(buffer, sizeof(buffer), "Request %s Not found: %s", _networkMethodsMap.at(request->method()).c_str(), request->url().c_str());
+        request->send(404, "text/plain", buffer);
+    }
+    else
+    {
+        request->send(404, "text/plain", "Request Not found using unknown method");
+    }
+}
+
 //*********************************************************************************************
 //!                                     Command Functions
 //*********************************************************************************************
@@ -56,7 +75,11 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
 
         std::string ssid;
         std::string password;
+        std::string mdns_url;
         uint8_t channel = 0;
+
+        int OTA_port = 0;
+        std::string OTA_password;
 
         log_d("Number of Params: %d", params);
         for (int i = 0; i < params; i++)
@@ -74,21 +97,45 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
             {
                 channel = (uint8_t)atoi(param->value().c_str());
             }
+            else if (param->name() == "mdns")
+            {
+                mdns_url = param->value().c_str();
+            }
+            else if (param->name() == "ota_port")
+            {
+                OTA_port = atoi(param->value().c_str());
+            }
+            else if (param->name() == "ota_password")
+            {
+                OTA_password = param->value().c_str();
+            }
             log_i("%s[%s]: %s\n", _networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
         }
 
-        network->configManager->setWifiConfig(ssid, ssid, password, &channel, true);
+        configManager->setWifiConfig(ssid, ssid, password, &channel, true);
+
+        // check if the ota and mdns are set
+        if (!OTA_password.empty())
+        {
+            int OTAPort = OTA_port > 0 ? OTA_port : 3232;
+            configManager->setDeviceConfig(OTA_password, &OTAPort, true);
+        }
+
+        if (!mdns_url.empty())
+        {
+            configManager->setMDNSConfig(mdns_url, true);
+        }
 
         //! TODO: implement user-costumizable ADHOC network
-        /* if (network->stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
+        /* if (stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
         {
         }
         else
         {
         } */
 
-        request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Wifi Creds have been set.\"}");
-        network->configManager->save();
+        request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Device Wifi settings have been set.\"}");
+        configManager->save();
         break;
     }
     default:
@@ -102,7 +149,9 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
 
 void BaseAPI::handleJson(AsyncWebServerRequest *request)
 {
-    const std::string &type = request->pathArg(0).c_str();
+    int params = request->params();
+    AsyncWebParameter *param = request->getParam(0);
+    const std::string &type = param->value().c_str();
     switch (_networkMethodsMap_enum[request->method()])
     {
     case POST:
@@ -133,27 +182,27 @@ void BaseAPI::handleJson(AsyncWebServerRequest *request)
         {
         case DATA:
         {
-            network->configManager->getDeviceConfig()->data_json = true;
+            configManager->getDeviceConfig()->data_json = true;
             Network_Utilities::my_delay(1L);
-            std::string temp = network->configManager->getDeviceConfig()->data_json_string;
+            std::string temp = configManager->getDeviceConfig()->data_json_string;
             request->send(200, MIMETYPE_JSON, temp.c_str());
             temp = std::string();
             break;
         }
         case SETTINGS:
         {
-            network->configManager->getDeviceConfig()->config_json = true;
+            configManager->getDeviceConfig()->config_json = true;
             Network_Utilities::my_delay(1L);
-            std::string temp = network->configManager->getDeviceConfig()->config_json_string;
+            std::string temp = configManager->getDeviceConfig()->config_json_string;
             request->send(200, MIMETYPE_JSON, temp.c_str());
             temp = std::string();
             break;
         }
         case CONFIG:
         {
-            network->configManager->getDeviceConfig()->settings_json = true;
+            configManager->getDeviceConfig()->settings_json = true;
             Network_Utilities::my_delay(1L);
-            std::string temp = network->configManager->getDeviceConfig()->settings_json_string;
+            std::string temp = configManager->getDeviceConfig()->settings_json_string;
             request->send(200, MIMETYPE_JSON, temp.c_str());
             temp = std::string();
             break;
@@ -197,7 +246,7 @@ void BaseAPI::factoryReset(AsyncWebServerRequest *request)
     case GET:
     {
         log_d("Factory Reset");
-        bool success = network->configManager->reset();
+        bool success = configManager->reset();
         char buf[100];
         snprintf(buf, sizeof(buf), "{\"msg\":\"Factory Reset - %s\"}", success ? "Done" : "Failed");
         request->send(200, MIMETYPE_JSON, buf);
