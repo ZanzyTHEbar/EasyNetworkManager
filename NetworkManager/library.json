@@ -1,0 +1,54 @@
+{
+    "name": "EasyNetworkManager",
+    "keywords": "network, mqtt, config, frontend",
+    "description": "An easy to use and extensible network manager for the ESP32",
+    "authors": [
+        {
+            "name": "ZanzyTHEbar",
+            "url": "https://github.com/ZanzyTHEbar"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ZanzyTHEbar/EasyNetworkManager.git"
+    },
+    "dependencies": [
+        {
+            "name": "ESPAsyncWebServer",
+            "version": "https://github.com/me-no-dev/ESPAsyncWebServer.git",
+            "platforms": [
+                "espressif32"
+            ]
+        },
+        {
+            "name": "AsyncTCP",
+            "version": "https://github.com/me-no-dev/AsyncTCP.git",
+            "platforms": [
+                "espressif32"
+            ]
+        },
+        {
+            "owner": "leftcoast",
+            "name": "LC_baseTools",
+            "version": "@^1.5"
+        },
+        {
+            "name": "ArduinoJSON",
+            "version": "https://github.com/bblanchon/ArduinoJson"
+        }
+    ],
+    "headers": [
+        "src/api/webserverHandler.hpp",
+        "src/data/config/project_config.hpp",
+        "src/data/StateManager/StateManager.hpp",
+        "src/data/utilities/enuminheritance.hpp",
+        "src/data/utilities/makeunique.hpp",
+        "src/data/utilities/Observer.hpp",
+        "src/mDNS/MDNSManager.hpp",
+        "src/ota/OTA.hpp",
+        "src/wifihandler/wifiHandler.hpp"
+    ],
+    "version": "0.0.1",
+    "frameworks": "arduino",
+    "platforms": "espressif32"
+}
