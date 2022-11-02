@@ -16,7 +16,6 @@ constexpr int HTTP_HEAD = 0b00100000;
 constexpr int HTTP_OPTIONS = 0b01000000;
 constexpr int HTTP_ANY = 0b01111111;
 
-#include <DNSServer.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 
@@ -98,7 +97,6 @@ protected:
 protected:
     AsyncWebServer *server;
     ProjectConfig *configManager;
-    DNSServer *dnsServer;
     typedef std::unordered_map<std::string, WebRequestMethodComposite> networkMethodsMap_t;
 
     std::string api_url;
@@ -112,7 +110,6 @@ protected:
 public:
     BaseAPI(int CONTROL_PORT,
             ProjectConfig *configManager,
-            DNSServer *dnsServer,
             const std::string &api_url,
             const std::string &wifimanager_url,
             const std::string &userCommands);

@@ -6,21 +6,13 @@ bool BaseAPI::channel_write = false;
 
 BaseAPI::BaseAPI(int CONTROL_PORT,
                  ProjectConfig *configManager,
-                 DNSServer *dnsServer,
                  const std::string &api_url,
                  const std::string &wifimanager_url,
                  const std::string &userCommands) : server(new AsyncWebServer(CONTROL_PORT)),
-                                                    dnsServer(NULL),
                                                     configManager(configManager),
                                                     api_url(std::move(api_url)),
                                                     wifimanager_url(std::move(wifimanager_url)),
-                                                    userCommands(std::move(userCommands))
-{
-    if (dnsServer != NULL)
-    {
-        this->dnsServer = dnsServer;
-    }
-}
+                                                    userCommands(std::move(userCommands)) {}
 
 BaseAPI::~BaseAPI() {}
 

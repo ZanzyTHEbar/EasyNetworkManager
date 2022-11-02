@@ -17,7 +17,6 @@ namespace ProgramStates
             Stopping,
             Stopped,
             Error
-
         };
 
         enum WiFiState_e

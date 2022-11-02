@@ -111,13 +111,13 @@ void ProjectConfig::load()
     }
 
     /* Device Config */
-    this->config.mdns.mdns = getString("mdnsName", "easynetwork").c_str();
-    this->config.device.OTAPassword = getString("OTAPassword", "12345678").c_str();
+    this->config.mdns.mdns.assign(getString("mdnsName", _mdnsName.c_str()).c_str());
+    this->config.device.OTAPassword.assign(getString("OTAPassword", "12345678").c_str());
     this->config.device.OTAPort = getInt("OTAPort", 3232);
     //! No need to load the JSON strings or bools, they are generated and used on the fly
 
     /* WiFi Config */
-    int networkCount = getInt("networkCount", 0);
+    int networkCount = getInt("networkCount");
     std::string name = "name";
     std::string ssid = "ssid";
     std::string password = "pass";
@@ -146,8 +146,8 @@ void ProjectConfig::load()
     }
 
     /* AP Config */
-    this->config.ap_network.ssid = getString("apSSID", "easynetwork").c_str();
-    this->config.ap_network.password = getString("apPass", "12345678").c_str();
+    this->config.ap_network.ssid.assign(getString("apSSID", _mdnsName.c_str()).c_str());
+    this->config.ap_network.password.assign(getString("apPass", "12345678").c_str());
     this->config.ap_network.channel = getUInt("apChannel", 1);
 
     this->_already_loaded = true;

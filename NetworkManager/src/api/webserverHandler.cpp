@@ -6,15 +6,13 @@
 
 APIServer::APIServer(int CONTROL_PORT,
 					 ProjectConfig *configManager,
-					 DNSServer *dnsServer,
 					 const std::string &api_url,
 					 const std::string &wifimanager_url,
 					 const std::string &userCommands) : BaseAPI(CONTROL_PORT,
-																configManager,
-																dnsServer,
-																api_url,
-																wifimanager_url,
-																userCommands) {}
+																                      configManager,
+																                      api_url,
+																                      wifimanager_url,
+																                      userCommands) {}
 
 APIServer::~APIServer() {}
 
@@ -42,7 +40,7 @@ void APIServer::setupServer()
 {
 	// Set default routes
 	routes.emplace("wifi", &APIServer::setWiFi);
-	routes.emplace("setJson", &APIServer::handleJson);
+	routes.emplace("json", &APIServer::handleJson);
 	routes.emplace("resetConfig", &APIServer::factoryReset);
 	routes.emplace("deleteRoute", &APIServer::removeRoute);
 	routes.emplace("rebootDevice", &APIServer::rebootDevice);
