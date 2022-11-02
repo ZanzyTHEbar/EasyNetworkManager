@@ -12,9 +12,7 @@ BaseAPI::BaseAPI(int CONTROL_PORT,
                                                     configManager(configManager),
                                                     api_url(std::move(api_url)),
                                                     wifimanager_url(std::move(wifimanager_url)),
-                                                    userCommands(std::move(userCommands))
-{
-}
+                                                    userCommands(std::move(userCommands)) {}
 
 BaseAPI::~BaseAPI() {}
 
