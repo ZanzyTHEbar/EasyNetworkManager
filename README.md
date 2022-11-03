@@ -2,6 +2,19 @@
 
 This is an in-progress library for easy network management.
 
+This library provides a WiFi Manager front-end on a customisable URL endpoint using a provided HTML file.
+
+It also provides numerous key features such as:
+
+- autodiscovery of saved networks
+- saving networks to memory
+- automatically creating an Access Point if connecting to a wifi network fails
+- mDNS
+- OTA
+- customisable REST API
+
+And much more :) See the classes below. 
+
 This library implements the following classes:
 
 - APIServer - A server that can be used to manage asynchronous REST API methods.
@@ -48,6 +61,8 @@ All dependencies _should_ be installed automatically. If not, please make a new 
 For basic usage please see the [examples](/NetworkManager/examples) folder.
 
 To use the provided wifi manager html page you need to move the `wifimanager.html` file into a `data` folder in the root of your `pio` project.
+
+For the ArduinoIDE you will need to follow a tutorial on `SPIFFS` and flash the provided html file using `SPIFFS`.
 
 > **Warning**: It is **required** to add a build flag to your setup for the code to function properly.
 
