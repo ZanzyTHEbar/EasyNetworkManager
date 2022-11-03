@@ -20,14 +20,12 @@
 #include <wifihandler/wifiHandler.hpp>		  //! (*)
 #include <api/webserverHandler.hpp>			  //! (*)
 
-//ProjectConfig configManager; // no custom names
-//ProjectConfig configManager("config", std::string(), ); // custom config name
-ProjectConfig configManager(std::string(), "app_name_here"); // custom MDNS name
-WiFiHandler network(&configManager, &wifiStateManager, "", "", "_easynetwork", 1);
+ProjectConfig configManager;
+WiFiHandler network(&configManager, &wifiStateManager, "", "", "easynetwork", 1);
 
 APIServer server(80, &configManager, "/api/v1", "/wifimanager", "/userCommands");
-OTA ota(&configManager);
-MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test", "_tcp", "api_port", "80"); //! service name and service protocol have to be lowercase and begin with an underscore
+OTA ota(&configManager, "easynetwork"); //! Second argument is the Hostname for OTA
+MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test", "_tcp", "_api_port", "80"); //! service name and service protocol have to be lowercase and begin with an underscore
 
 void printHelloWorld()
 {

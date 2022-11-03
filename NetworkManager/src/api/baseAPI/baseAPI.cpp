@@ -12,7 +12,10 @@ BaseAPI::BaseAPI(int CONTROL_PORT,
                                                     configManager(configManager),
                                                     api_url(std::move(api_url)),
                                                     wifimanager_url(std::move(wifimanager_url)),
-                                                    userCommands(std::move(userCommands)) {}
+                                                    userCommands(std::move(userCommands))
+
+{
+}
 
 BaseAPI::~BaseAPI() {}
 
@@ -24,9 +27,14 @@ void BaseAPI::begin()
 
     if (initSPIFFS())
     {
-        /* server->on(wifimanager_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest *request)
-                   { request->send(SPIFFS, "/wifimanager.html", MIMETYPE_HTML); }); */
-
+        if (userEndpointsVector.size() > 0)
+        {
+            for (auto &route : userEndpointsVector)
+            {
+                server->on(route.endpoint.c_str(), _networkMethodsMap_inv[route.method], [&](AsyncWebServerRequest *request)
+                           { request->send(SPIFFS, route.file.c_str(), MIMETYPE_HTML); });
+            }
+        }
         server->serveStatic(wifimanager_url.c_str(), SPIFFS, "/wifimanager.html").setCacheControl("max-age=600");
     }
 

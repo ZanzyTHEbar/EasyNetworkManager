@@ -23,6 +23,7 @@ public:
 
     void findParam(AsyncWebServerRequest *request, const char *param, String &value);
     void updateCommandHandlers(const std::string &url, stateFunction_t funct);
+    void updateCommandHandlers(const std::string &url, stateFunction_request_t funct);
     void addRouteMap(const std::string &index, route_t route, std::vector<std::string> &indexes);
 
 public:

@@ -9,10 +9,10 @@ APIServer::APIServer(int CONTROL_PORT,
 					 const std::string &api_url,
 					 const std::string &wifimanager_url,
 					 const std::string &userCommands) : BaseAPI(CONTROL_PORT,
-																                      configManager,
-																                      api_url,
-																                      wifimanager_url,
-																                      userCommands) {}
+																configManager,
+																api_url,
+																wifimanager_url,
+																userCommands) {}
 
 APIServer::~APIServer() {}
 
@@ -121,6 +121,11 @@ void APIServer::handleRequest(AsyncWebServerRequest *request)
 void APIServer::updateCommandHandlers(const std::string &url, stateFunction_t funct)
 {
 	stateFunctionMap.emplace(std::move(url), funct);
+}
+
+void APIServer::updateCommandHandlers(const std::string &url, stateFunction_request_t funct)
+{
+	stateFunctionMapRequest.emplace(std::move(url), funct);
 }
 
 /**

@@ -56,6 +56,15 @@ protected:
         {HTTP_OPTIONS, "OPTIONS"},
     };
 
+    std::unordered_map<std::string, WebRequestMethodComposite> _networkMethodsMap_inv = {
+        {"GET", HTTP_GET},
+        {"POST", HTTP_POST},
+        {"PUT", HTTP_PUT},
+        {"DELETE", HTTP_DELETE},
+        {"PATCH", HTTP_PATCH},
+        {"OPTIONS", HTTP_OPTIONS},
+    };
+
     enum RequestMethods
     {
         GET,
@@ -77,7 +86,8 @@ protected:
 
 protected:
     /* Commands */
-    void setWiFi(AsyncWebServerRequest *request);
+    void
+    setWiFi(AsyncWebServerRequest *request);
     void handleJson(AsyncWebServerRequest *request);
     void factoryReset(AsyncWebServerRequest *request);
     void rebootDevice(AsyncWebServerRequest *request);
@@ -118,7 +128,23 @@ public:
 
 public:
     typedef void (*stateFunction_t)(void);
+    typedef void (*stateFunction_request_t)(AsyncWebServerRequest *request);
     std::unordered_map<std::string, stateFunction_t> stateFunctionMap;
+    std::unordered_map<std::string, stateFunction_request_t> stateFunctionMapRequest;
+
+    struct userRoutes_t
+    {
+        // create a constructor to initialize the variables
+        userRoutes_t(const std::string &endpoint,
+                     const std::string &file,
+                     const std::string &method) : endpoint(std::move(endpoint)),
+                                                  file(std::move(file)),
+                                                  method(std::move(method)) {}
+        std::string endpoint;
+        std::string file;
+        std::string method;
+    };
+    std::vector<userRoutes_t> userEndpointsVector;
 };
 
 #endif // BASEAPI_HPP

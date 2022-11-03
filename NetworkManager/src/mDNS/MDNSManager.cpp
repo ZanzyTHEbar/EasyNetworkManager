@@ -7,12 +7,12 @@ MDNSHandler::MDNSHandler(StateManager<MDNSState_e> *stateManager,
 						 const std::string &proto,
 						 const std::string &key,
 						 const std::string &value) : stateManager(stateManager),
-													               configManager(configManager),
-													               service_name(service_name),
-													               service_text(service_text),
-													               proto(proto),
-													               key(key),
-													               value(value) {}
+													 configManager(configManager),
+													 service_name(service_name),
+													 service_text(service_text),
+													 proto(proto),
+													 key(key),
+													 value(value) {}
 
 bool MDNSHandler::startMDNS()
 {
