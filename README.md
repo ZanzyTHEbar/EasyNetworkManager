@@ -8,6 +8,7 @@ It also provides numerous key features such as:
 
 - autodiscovery of saved networks
 - saving networks to memory
+- automatically creating an Access Point if connecting to a wifi network fails
 - mDNS
 - OTA
 - customisable REST API
