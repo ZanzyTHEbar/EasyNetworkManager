@@ -84,6 +84,7 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
         uint8_t channel = 0;
         uint8_t power = 0;
         uint8_t adhoc = 0;
+        bool reboot = false;
 
         log_d("Number of Params: %d", params);
         for (int i = 0; i < params; i++)
@@ -113,13 +114,28 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
             {
                 adhoc = (uint8_t)atoi(param->value().c_str());
             }
+            else if (param->name() == "reboot")
+            {
+                if (param->value() == "true")
+                {
+                    reboot = true;
+                }
+            }
 
             log_i("%s[%s]: %s\n", _networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
         }
         // note: We're passing empty params by design, this is done to reset specific fields
-        configManager->setWifiConfig(networkName, ssid, password, &channel, &power, adhoc, true);
+        configManager->setWifiConfig(networkName, ssid, password, channel, power, adhoc, true);
 
-        request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Wifi Creds have been set.\"}");
+        if (reboot)
+        {
+            request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Wifi Creds have been set. Rebooting\"}");
+            this->save(request);
+        }
+        else
+        {
+            request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Wifi Creds have been set.\"}");
+        }
         break;
     }
     default:
@@ -154,7 +170,7 @@ void BaseAPI::setWiFiTXPower(AsyncWebServerRequest *request)
                 txPower = atoi(param->value().c_str());
             }
         }
-        configManager->setWiFiTxPower(&txPower, true);
+        configManager->setWiFiTxPower(txPower, true);
         configManager->wifiTxPowerConfigSave();
         request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. TX Power has been set.\"}");
     }

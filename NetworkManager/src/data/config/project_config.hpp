@@ -102,12 +102,12 @@ public:
     Project_Config::WiFiTxPower_t *getWifiTxPowerConfig();
     Project_Config::DeviceDataJson_t *getDeviceDataJson();
 
-    void setDeviceConfig(const std::string &OTAPassword, int *OTAPort, bool shouldNotify);
+    void setDeviceConfig(const std::string &OTAPassword, int OTAPort, bool shouldNotify);
     void setDeviceDataJson(const std::string &deviceJson, bool shouldNotify);
     void setMDNSConfig(const std::string &mdns, const std::string &service, bool shouldNotify);
-    void setWifiConfig(const std::string &networkName, const std::string &ssid, const std::string &password, uint8_t *channel, uint8_t *power, bool adhoc, bool shouldNotify);
-    void setAPWifiConfig(const std::string &ssid, const std::string &password, uint8_t *channel, bool adhoc, bool shouldNotify);
-    void setWiFiTxPower(uint8_t *power, bool shouldNotify);
+    void setWifiConfig(const std::string &networkName, const std::string &ssid, const std::string &password, uint8_t channel, uint8_t power, bool adhoc, bool shouldNotify);
+    void setAPWifiConfig(const std::string &ssid, const std::string &password, uint8_t channel, bool adhoc, bool shouldNotify);
+    void setWiFiTxPower(uint8_t power, bool shouldNotify);
 
 private:
     Project_Config::ProjectConfig_t config;

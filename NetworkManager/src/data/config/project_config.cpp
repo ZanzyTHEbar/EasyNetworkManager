@@ -5,7 +5,6 @@ ProjectConfig::ProjectConfig(const std::string &configName,
                                                             _mdnsName(std::move(mdnsName)),
                                                             _already_loaded(false)
 {
-    
 }
 
 ProjectConfig::~ProjectConfig() {}
@@ -192,11 +191,11 @@ void ProjectConfig::load()
 //!                                                DeviceConfig
 //*
 //**********************************************************************************************************************
-void ProjectConfig::setDeviceConfig(const std::string &OTAPassword, int *OTAPort, bool shouldNotify)
+void ProjectConfig::setDeviceConfig(const std::string &OTAPassword, int OTAPort, bool shouldNotify)
 {
     log_d("Updating device config");
     this->config.device.OTAPassword.assign(OTAPassword);
-    this->config.device.OTAPort = *OTAPort;
+    this->config.device.OTAPort = OTAPort;
 
     if (shouldNotify)
     {
@@ -214,7 +213,13 @@ void ProjectConfig::setMDNSConfig(const std::string &hostname, const std::string
         this->notify(ObserverEvent::mdnsConfigUpdated);
 }
 
-void ProjectConfig::setWifiConfig(const std::string &networkName, const std::string &ssid, const std::string &password, uint8_t *channel, uint8_t *power, bool adhoc, bool shouldNotify)
+void ProjectConfig::setWifiConfig(const std::string &networkName,
+                                  const std::string &ssid,
+                                  const std::string &password,
+                                  uint8_t channel,
+                                  uint8_t power,
+                                  bool adhoc,
+                                  bool shouldNotify)
 {
     // we store the ADHOC flag as false because the networks we store in the config are the ones we want the esp to connect to, rather than host as AP, and here we're just updating them
     size_t size = this->config.networks.size();
@@ -227,8 +232,8 @@ void ProjectConfig::setWifiConfig(const std::string &networkName, const std::str
             networkName,
             ssid,
             password,
-            *channel,
-            *power,
+            channel,
+            power,
             false);
     }
 
@@ -248,8 +253,8 @@ void ProjectConfig::setWifiConfig(const std::string &networkName, const std::str
         this->config.networks[networkToUpdate].name = networkName;
         this->config.networks[networkToUpdate].ssid = ssid;
         this->config.networks[networkToUpdate].password = password;
-        this->config.networks[networkToUpdate].channel = *channel;
-        this->config.networks[networkToUpdate].power = *power;
+        this->config.networks[networkToUpdate].channel = channel;
+        this->config.networks[networkToUpdate].power = power;
     }
     else if (size < 3)
     {
@@ -260,8 +265,8 @@ void ProjectConfig::setWifiConfig(const std::string &networkName, const std::str
             networkName,
             ssid,
             password,
-            *channel,
-            *power,
+            channel,
+            power,
             false);
     }
 
@@ -269,11 +274,11 @@ void ProjectConfig::setWifiConfig(const std::string &networkName, const std::str
         this->notify(ObserverEvent::networksConfigUpdated);
 }
 
-void ProjectConfig::setAPWifiConfig(const std::string &ssid, const std::string &password, uint8_t *channel, bool adhoc, bool shouldNotify)
+void ProjectConfig::setAPWifiConfig(const std::string &ssid, const std::string &password, uint8_t channel, bool adhoc, bool shouldNotify)
 {
     this->config.ap_network.ssid.assign(ssid);
     this->config.ap_network.password.assign(password);
-    this->config.ap_network.channel = *channel;
+    this->config.ap_network.channel = channel;
     this->config.ap_network.adhoc = adhoc;
 
     log_d("Updating access point config");
@@ -283,9 +288,9 @@ void ProjectConfig::setAPWifiConfig(const std::string &ssid, const std::string &
     }
 }
 
-void ProjectConfig::setWiFiTxPower(uint8_t *power, bool shouldNotify)
+void ProjectConfig::setWiFiTxPower(uint8_t power, bool shouldNotify)
 {
-    this->config.wifi_tx_power.power = *power;
+    this->config.wifi_tx_power.power = power;
 
     log_d("Updating wifi tx power");
     if (shouldNotify)
