@@ -26,27 +26,6 @@ constexpr int HTTP_ANY = 0b01111111;
 class BaseAPI : public API_Utilities
 {
 protected:
-    enum JSON_TYPES
-    {
-        CONFIG,
-        SETTINGS,
-        DATA,
-        STATUS,
-        COMMANDS,
-        WIFI,
-        WIFIAP,
-    };
-
-    std::unordered_map<std::string, JSON_TYPES> json_TypesMap = {
-        {"config", CONFIG},
-        {"settings", SETTINGS},
-        {"data", DATA},
-        {"status", STATUS},
-        {"commands", COMMANDS},
-        {"wifi", WIFI},
-        {"wifiap", WIFIAP},
-    };
-
     std::unordered_map<WebRequestMethodComposite, std::string> _networkMethodsMap = {
         {HTTP_GET, "GET"},
         {HTTP_POST, "POST"},
