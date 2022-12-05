@@ -21,10 +21,10 @@
 #include <api/webserverHandler.hpp>			  //! (*)
 
 ProjectConfig configManager;
-WiFiHandler network(&configManager, &wifiStateManager, "", "", "easynetwork", 1);
+WiFiHandler network(&configManager, &wifiStateManager, "", "", 1);
 
 APIServer server(80, &configManager, "/api/v1", "/wifimanager", "/userCommands");
-OTA ota(&configManager, "easynetwork"); //! Second argument is the Hostname for OTA
+OTA ota(&configManager);
 MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test", "_tcp", "_api_port", "80"); //! service name and service protocol have to be lowercase and begin with an underscore
 
 void printHelloWorld()
@@ -46,8 +46,9 @@ void setup()
 	Serial.println("Hello, EasyNetworkManager!");
 
 	Serial.setDebugOutput(true);
-	configManager.initConfig(); // call before load to initialise the structs
-	configManager.load();		// load the config from flash
+	configManager.initConfig();	 // call before load to initialise the structs
+	configManager.attach(&mDNS); // attach the config manager to the mdns object - this will update the config when mdns hostname changes
+	configManager.load();		 // load the config from flash
 
 	network.setupWifi(); // setup wifi connection
 	mDNS.startMDNS();	 // start mDNS service (optional)

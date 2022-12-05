@@ -5,14 +5,14 @@
 //! Optional header files
 #include <mDNS/MDNSManager.hpp>
 #include <ota/OTA.hpp>
-//#include <memory>
-//#include <data/utilities/Observer.hpp>
-//#include <api/utilities/apiUtilities.hpp>
-//#include <data/utilities/enuminheritance.hpp> // used for extending enums with new values
-//#include <data/utilities/makeunique.hpp> // used with smart pointers (unique_ptr) to create unique objects
-//#include <data/utilities/helpers.hpp> // various helper functions
+// #include <memory>
+// #include <data/utilities/Observer.hpp>
+// #include <api/utilities/apiUtilities.hpp>
+// #include <data/utilities/enuminheritance.hpp> // used for extending enums with new values
+// #include <data/utilities/makeunique.hpp> // used with smart pointers (unique_ptr) to create unique objects
+// #include <data/utilities/helpers.hpp> // various helper functions
 #include <data/utilities/network_utilities.hpp> // various network utilities
-//#include <wifihandler/utilities/utilities.hpp> // various wifi related utilities
+// #include <wifihandler/utilities/utilities.hpp> // various wifi related utilities
 
 //! Required header files
 #include <data/config/project_config.hpp>     //! (*)
@@ -21,10 +21,10 @@
 #include <api/webserverHandler.hpp>           //! (*)
 
 ProjectConfig configManager;
-WiFiHandler network(&configManager, &wifiStateManager, "", "", "easynetwork", 1);
+WiFiHandler network(&configManager, &wifiStateManager, "", "", 1);
 
 APIServer server(80, &configManager, "/api/v1", "/wifimanager", "/userCommands");
-OTA ota(&configManager, "easynetwork");                                                                 //! Second argument is the Hostname for OTA
+OTA ota(&configManager);                                                                                //! Second argument is the Hostname for OTA
 MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test", "_tcp", "_api_port", "80"); //! service name and service protocol have to be lowercase and begin with an underscore
 
 APIServer::userRoutes_t userRoutes; // create a struct object to hold our user routes
@@ -48,8 +48,9 @@ void setup()
     Serial.println("Hello, EasyNetworkManager!");
 
     Serial.setDebugOutput(true);
-    configManager.initConfig(); // call before load to initialise the structs
-    configManager.load();       // load the config from flash
+    configManager.initConfig();  // call before load to initialise the struct
+    configManager.attach(&mDNS); // attach the config manager to the mdns object - this will update the config when mdns hostname changes
+    configManager.load(); // load the config from flash
 
     network.setupWifi(); // setup wifi connection
     mDNS.startMDNS();    // start mDNS service (optional)
@@ -88,7 +89,7 @@ void setup()
 
         server.updateCommandHandlers("blink", blink);                // add a command handler to the API server - you can add as many as you want - you can also add methods.
         server.updateCommandHandlers("helloWorld", printHelloWorld); // add a second command handler to the API server
-        server.begin();                                             // start the API server
+        server.begin();                                              // start the API server
         log_d("[SETUP]: Starting API Server");
         break;
     }
