@@ -86,13 +86,15 @@ protected:
 
 protected:
     /* Commands */
-    void
-    setWiFi(AsyncWebServerRequest *request);
+    void setWiFi(AsyncWebServerRequest *request);
+    void setWiFiTXPower(AsyncWebServerRequest *request);
     void handleJson(AsyncWebServerRequest *request);
     void factoryReset(AsyncWebServerRequest *request);
     void rebootDevice(AsyncWebServerRequest *request);
     void removeRoute(AsyncWebServerRequest *request);
-
+    void getJsonConfig(AsyncWebServerRequest *request);
+    void ping(AsyncWebServerRequest *request);
+    void save(AsyncWebServerRequest *request);
     /* Helpers */
     void notFound(AsyncWebServerRequest *request) const;
 

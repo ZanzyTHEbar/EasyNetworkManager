@@ -17,8 +17,8 @@ MDNSHandler::MDNSHandler(StateManager<MDNSState_e> *stateManager,
 bool MDNSHandler::startMDNS()
 {
 	auto mdnsConfig = configManager->getMDNSConfig();
-	log_d("%s", mdnsConfig->mdns.c_str());
-	if (!MDNS.begin(mdnsConfig->mdns.c_str()))
+	log_d("%s", mdnsConfig->hostname.c_str());
+	if (!MDNS.begin(mdnsConfig->hostname.c_str()))
 	{
 		stateManager->setState(MDNSState_e::MDNSState_Error);
 		log_e("Error initializing MDNS");

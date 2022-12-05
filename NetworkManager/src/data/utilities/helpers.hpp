@@ -1,6 +1,9 @@
+#ifndef HELPERS_HPP
+#define HELPERS_HPP
 #include <strTools.h>
 #include <string>
 #include <sstream>
+#include <memory>
 #include <vector>
 #include <iostream>
 
@@ -33,4 +36,26 @@ namespace Helpers
     char *appendChartoChar(const char *hostname, const char *def_host);
     char *StringtoChar(const std::string &inputString);
     void update_progress_bar(int progress, int total);
+
+    /// @brief
+    /// @tparam ...Args
+    /// @param format
+    /// @param ...args
+    /// @return
+    template <typename... Args>
+    std::string format_string(const std::string &format, Args... args)
+    {
+        int size_s = std::snprintf(nullptr, 0, format.c_str(), args...) + 1; // Extra space for '\0'
+        if (size_s <= 0)
+        {
+            std::cout << "Error during formatting.";
+            return "";
+        }
+        auto size = static_cast<size_t>(size_s);
+        std::unique_ptr<char[]> buf(new char[size]);
+        std::snprintf(buf.get(), size, format.c_str(), args...);
+        return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+    }
 }
+
+#endif // HELPERS_HPP

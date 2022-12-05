@@ -1,4 +1,6 @@
 #pragma once
+#ifndef OBSERVER_HPP
+#define OBSERVER_HPP
 #include <set>
 
 namespace ObserverEvent
@@ -10,13 +12,15 @@ namespace ObserverEvent
     mdnsConfigUpdated = 3,
     networksConfigUpdated = 4,
     apConfigUpdated = 5,
+    wifiTxPowerUpdated = 6,
+    deviceDataJsonUpdated = 7,
   };
 }
 
 class IObserver
 {
 public:
-  void update(ObserverEvent::Event event){};
+  virtual void update(ObserverEvent::Event event) = 0;
 };
 
 class ISubject
@@ -37,12 +41,11 @@ public:
 
   void notify(ObserverEvent::Event event)
   {
-    std::set<IObserver *>::iterator iterator = observers.begin();
-
-    while (iterator != observers.end())
+    for (auto observer : this->observers)
     {
-      (*iterator)->update(event);
-      ++iterator;
+      observer->update(event);
     }
   }
 };
+
+#endif // OBSERVER_HPP

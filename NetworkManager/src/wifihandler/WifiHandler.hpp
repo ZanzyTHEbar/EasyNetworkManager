@@ -11,11 +11,10 @@
 class WiFiHandler
 {
 public:
-  WiFiHandler(ProjectConfig *configManager, 
+  WiFiHandler(ProjectConfig *configManager,
               StateManager<WiFiState_e> *stateManager,
               const std::string &ssid,
               const std::string &password,
-              const std::string &hostname,
               uint8_t channel);
   virtual ~WiFiHandler();
   void setupWifi();
@@ -23,17 +22,17 @@ public:
 
   ProjectConfig *configManager;
   StateManager<WiFiState_e> *stateManager;
+  Project_Config::WiFiTxPower_t *txpower;
 
 private:
   void setUpADHOC();
-  void adhoc(const char *ssid, const char *password, uint8_t channel);
-  void iniSTA();
+  void adhoc(const char *ssid, uint8_t channel, const char *password = NULL);
+  bool iniSTA(const char *ssid, const char *password, uint8_t channel, wifi_power_t power);
 
   std::string ssid;
   std::string password;
-  std::string _hostname;
   uint8_t channel;
-
+  uint8_t power;
   bool _enable_adhoc;
 };
 #endif // WIFIHANDLER_HPP

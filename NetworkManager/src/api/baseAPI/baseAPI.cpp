@@ -78,20 +78,22 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
     case POST:
     {
         int params = request->params();
-
+        std::string networkName;
         std::string ssid;
         std::string password;
-        std::string mdns_url;
         uint8_t channel = 0;
-
-        int OTA_port = 0;
-        std::string OTA_password;
+        uint8_t power = 0;
+        uint8_t adhoc = 0;
 
         log_d("Number of Params: %d", params);
         for (int i = 0; i < params; i++)
         {
             AsyncWebParameter *param = request->getParam(i);
-            if (param->name() == "ssid")
+            if (param->name() == "networkName")
+            {
+                networkName = param->value().c_str();
+            }
+            else if (param->name() == "ssid")
             {
                 ssid = param->value().c_str();
             }
@@ -103,45 +105,21 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
             {
                 channel = (uint8_t)atoi(param->value().c_str());
             }
-            else if (param->name() == "mdns")
+            else if (param->name() == "power")
             {
-                mdns_url = param->value().c_str();
+                power = (uint8_t)atoi(param->value().c_str());
             }
-            else if (param->name() == "ota_port")
+            else if (param->name() == "adhoc")
             {
-                OTA_port = atoi(param->value().c_str());
+                adhoc = (uint8_t)atoi(param->value().c_str());
             }
-            else if (param->name() == "ota_password")
-            {
-                OTA_password = param->value().c_str();
-            }
+
             log_i("%s[%s]: %s\n", _networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
         }
+        // note: We're passing empty params by design, this is done to reset specific fields
+        configManager->setWifiConfig(networkName, ssid, password, &channel, &power, adhoc, true);
 
-        configManager->setWifiConfig(ssid, ssid, password, &channel, true);
-
-        // check if the ota and mdns are set
-        if (!OTA_password.empty())
-        {
-            int OTAPort = OTA_port > 0 ? OTA_port : 3232;
-            configManager->setDeviceConfig(OTA_password, &OTAPort, true);
-        }
-
-        if (!mdns_url.empty())
-        {
-            configManager->setMDNSConfig(mdns_url, true);
-        }
-
-        //! TODO: implement user-costumizable ADHOC network
-        /* if (stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC)
-        {
-        }
-        else
-        {
-        } */
-
-        request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Device Wifi settings have been set.\"}");
-        configManager->save();
+        request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Wifi Creds have been set.\"}");
         break;
     }
     default:
@@ -153,71 +131,92 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
     }
 }
 
-void BaseAPI::handleJson(AsyncWebServerRequest *request)
+void BaseAPI::setWiFiTXPower(AsyncWebServerRequest *request)
 {
-    int params = request->params();
-    AsyncWebParameter *param = request->getParam(0);
-    const std::string &type = param->value().c_str();
     switch (_networkMethodsMap_enum[request->method()])
     {
+    case GET:
+    {
+        request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Request\"}");
+        break;
+    }
     case POST:
     {
-        switch (json_TypesMap.at(type))
+        int params = request->params();
+
+        uint8_t txPower = 0;
+
+        for (int i = 0; i < params; i++)
         {
-        case DATA:
-        {
-            break;
+            AsyncWebParameter *param = request->getParam(i);
+            if (param->name() == "txPower")
+            {
+                txPower = atoi(param->value().c_str());
+            }
         }
-        case SETTINGS:
+        configManager->setWiFiTxPower(&txPower, true);
+        configManager->wifiTxPowerConfigSave();
+        request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. TX Power has been set.\"}");
+    }
+    }
+}
+
+void BaseAPI::handleJson(AsyncWebServerRequest *request)
+{
+    switch (_networkMethodsMap_enum[request->method()])
+    {
+    case GET:
+    {
+        request->send(200, MIMETYPE_JSON, configManager->getDeviceDataJson()->deviceJson.c_str());
+        break;
+    }
+    case POST:
+    {
+        if (request->hasParam("json", true))
         {
-            break;
+            AsyncWebParameter *param = request->getParam("json", true);
+            log_i("%s[%s]: %s\n", _networkMethodsMap[request->method()].c_str(), param->name().c_str(), param->value().c_str());
+            // configManager->setJsonConfig(param->value().c_str());
+            request->send(200, MIMETYPE_JSON, "{\"msg\":\"Done. Config has been set.\"}");
         }
-        case CONFIG:
+        else
         {
-            break;
-        }
-        default:
             request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Request\"}");
-            break;
         }
         break;
     }
+    default:
+    {
+        request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Request\"}");
+        request->redirect("/");
+        break;
+    }
+    }
+}
+
+void BaseAPI::getJsonConfig(AsyncWebServerRequest *request)
+{
+    // returns the current stored config in case it get's deleted on the PC.
+    switch (_networkMethodsMap_enum[request->method()])
+    {
     case GET:
     {
-        switch (json_TypesMap.at(type))
+        std::string wifiConfigSerialized = "\"wifi_config\": [";
+        auto networksConfigs = configManager->getWifiConfigs();
+        for (auto networkIterator = networksConfigs->begin(); networkIterator != networksConfigs->end(); networkIterator++)
         {
-        case DATA:
-        {
-            configManager->getDeviceConfig()->data_json = true;
-            Network_Utilities::my_delay(1L);
-            std::string temp = configManager->getDeviceConfig()->data_json_string;
-            request->send(200, MIMETYPE_JSON, temp.c_str());
-            temp = std::string();
-            break;
+            wifiConfigSerialized += networkIterator->toRepresentation() + (std::next(networkIterator) != networksConfigs->end() ? "," : "");
         }
-        case SETTINGS:
-        {
-            configManager->getDeviceConfig()->config_json = true;
-            Network_Utilities::my_delay(1L);
-            std::string temp = configManager->getDeviceConfig()->config_json_string;
-            request->send(200, MIMETYPE_JSON, temp.c_str());
-            temp = std::string();
-            break;
-        }
-        case CONFIG:
-        {
-            configManager->getDeviceConfig()->settings_json = true;
-            Network_Utilities::my_delay(1L);
-            std::string temp = configManager->getDeviceConfig()->settings_json_string;
-            request->send(200, MIMETYPE_JSON, temp.c_str());
-            temp = std::string();
-            break;
-        }
-        default:
-            request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Request\"}");
-            break;
-        }
+        wifiConfigSerialized += "]";
 
+        std::string json = Helpers::format_string(
+            "{%s, %s, %s, %s, %s}",
+            configManager->getDeviceConfig()->toRepresentation().c_str(),
+            configManager->getWifiTxPowerConfig()->toRepresentation().c_str(),
+            wifiConfigSerialized.c_str(),
+            configManager->getMDNSConfig()->toRepresentation().c_str(),
+            configManager->getAPWifiConfig()->toRepresentation().c_str());
+        request->send(200, MIMETYPE_JSON, json.c_str());
         break;
     }
     default:
@@ -300,4 +299,15 @@ void BaseAPI::removeRoute(AsyncWebServerRequest *request)
     {
         request->send(400, MIMETYPE_JSON, "{\"msg\":\"Route Not Found\"}");
     }
+}
+
+void BaseAPI::ping(AsyncWebServerRequest *request)
+{
+    request->send(200, MIMETYPE_JSON, "{\"msg\": \"ok\" }");
+}
+
+void BaseAPI::save(AsyncWebServerRequest *request)
+{
+    configManager->save();
+    request->send(200, MIMETYPE_JSON, "{\"msg\": \"ok\" }");
 }
