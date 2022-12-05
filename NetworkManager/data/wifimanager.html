@@ -410,16 +410,23 @@
                                         alert("Settings Saved");
                                         if (document.getElementById("reboot").checked == true) {
                                             alert("Rebooting Device");
-                                            reboot();
+                                            // get request to reboot device
+                                            var xhr = new XMLHttpRequest();
+                                            xhr.open("GET", "/wifimanager/builtin/command/save");
+                                            xhr.send();
+                                            xhr.onload = () => {
+                                                if (xhr.status == 200) {
+                                                    alert("Device Rebooted");
+                                                } else {
+                                                    alert("Error Rebooting Device");
+                                                }
+                                            };
                                         }
                                     } else {
                                         alert("Error Saving Settings");
                                     }
                                 };
                             };
-                            function reboot() {
-                                fetch("/wifimanager/builtin/command/save");
-                            }
                         </script>
                         <br>
                     </p>
