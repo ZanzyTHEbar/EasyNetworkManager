@@ -3,7 +3,13 @@
 #define WIFIHANDLER_HPP
 #include <memory>
 #include <string>
+
+#ifdef ESP32
 #include <WiFi.h>
+#elif defined(ESP8266)
+#include <ESP8266WiFi.h>
+#endif
+
 #include "data/StateManager/StateManager.hpp"
 #include "data/config/project_config.hpp"
 #include "data/utilities/helpers.hpp"
