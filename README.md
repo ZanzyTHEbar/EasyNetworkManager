@@ -23,7 +23,7 @@ This library implements the following classes:
 - WiFiHandler - A class that can be used to manage WiFi connections.
 - OTA - A basic OTA handler.
 - MDNSHandler - A class that can be used to manage mDNS services.
-- Config - A class that can be used to manage configuration files - uses my [EasyPreferencesLibrary project](https://github.com/ZanzyTHEbar/EasyPreferencesLibrary).
+- Config - A class that can be used to manage configuration files.
 - StateManager - A class that can be used to manage the state of your project (very easy to extend).
 - Utilities - A folder that has various template files that can be used to manage various utilities.
 
