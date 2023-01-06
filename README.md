@@ -34,7 +34,7 @@ This library implements the following classes:
 You can install via the `Platformio Registry` by navigating to the `Libraries` section of `Platformio`. 
 The library is called `EasyNetworkManager` by `ZanzyTHEbar`.
 
-You can also install via a github link:
+You can also install via a github link (for now this method is recommened - registry version needs to be updated):
 
 In your `platformio.ini` file add the following:
 
