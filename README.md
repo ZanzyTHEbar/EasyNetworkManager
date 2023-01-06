@@ -62,6 +62,8 @@ For basic usage please see the [examples](/NetworkManager/examples) folder.
 
 To use the provided wifi manager html page you need to move the `wifimanager.html` file into a `data` folder in the root of your `pio` project.
 
+Then, build and flash the SPIFFS image as normal.
+
 For the ArduinoIDE you will need to follow a tutorial on `SPIFFS` and flash the provided html file using `SPIFFS`.
 
 > **Warning**: It is **required** to add a build flag to your setup for the code to function properly.
