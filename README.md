@@ -132,6 +132,7 @@ To see any of the `log` statements - you need to add this to your `platformio.in
 
 ```ini
 build_flags = 
+  -DASYNCWEBSERVER_REGEX ; add regex support to AsyncWebServer
   -DCORE_DEBUG_LEVEL=4 ; add verbose debug logging in serial monitor
 
 ; other build parameters
