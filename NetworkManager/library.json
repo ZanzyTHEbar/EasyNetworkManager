@@ -1,6 +1,6 @@
 {
     "name": "EasyNetworkManager",
-    "keywords": "network, mqtt, config, frontend",
+    "keywords": "network, wifi, config, frontend",
     "description": "An easy to use and extensible network manager for the ESP32",
     "authors": [
         {
