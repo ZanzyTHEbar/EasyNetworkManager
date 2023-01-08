@@ -19,6 +19,7 @@ jobs:
       - run: npm install -g semantic-release@v19.0.5
       - run: npm install -g @semantic-release/exec
       - run: npm install -g @semantic-release/git
+      - run: npm install -g @semantic-release/release-notes-generator
       - name: Cache pip
         uses: actions/cache@v2
         with:

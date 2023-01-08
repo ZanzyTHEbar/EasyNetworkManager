@@ -27,7 +27,7 @@
                 },
                 {
                     "type": "ci",
-                    "scope": "actions",
+                    "scope": "actions-*",
                     "release": "patch"
                 },
                 {
