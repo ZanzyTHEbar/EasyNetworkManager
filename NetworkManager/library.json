@@ -1,6 +1,6 @@
 {
     "name": "EasyNetworkManager",
-    "keywords": "network, wifi, config, frontend",
+    "keywords": "network, wifi, REST API, OTA, mDNS, MDNS, custom config, wifi manager, ESP32, ESP8266, frontend",
     "description": "An easy to use and extensible network manager for the ESP32 and ESP8266",
     "authors": [
         {
