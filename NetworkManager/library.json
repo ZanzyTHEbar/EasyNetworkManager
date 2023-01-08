@@ -48,7 +48,7 @@
         "src/ota/OTA.hpp",
         "src/wifihandler/wifiHandler.hpp"
     ],
-    "version": "0.0.3",
+    "version": "1.0.0",
     "frameworks": "arduino",
     "platforms": "espressif32"
 }
