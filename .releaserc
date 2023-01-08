@@ -4,6 +4,38 @@
     ],
     "plugins": [
         "@semantic-release/commit-analyzer",
+        {
+            "preset": "angular",
+            "releaseRules": [
+                {
+                    "type": "docs",
+                    "scope": "README",
+                    "release": "patch"
+                },
+                {
+                    "type": "refactor",
+                    "scope": "core-*",
+                    "release": "minor"
+                },
+                {
+                    "type": "update",
+                    "release": "minor"
+                },
+                {
+                    "type": "refactor",
+                    "release": "patch"
+                },
+                {
+                    "type": "ci",
+                    "scope": "actions",
+                    "release": "patch"
+                },
+                {
+                    "scope": "no-release",
+                    "release": false
+                }
+            ]
+        },
         [
             "@semantic-release/exec",
             {
@@ -20,6 +52,7 @@
                 ],
                 "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
             }
-        ]
+        ],
+        "@semantic-release/release-notes-generator"
     ]
 }
