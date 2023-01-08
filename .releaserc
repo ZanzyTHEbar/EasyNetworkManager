@@ -28,6 +28,11 @@
                         "release": "patch"
                     },
                     {
+                        "type": "ci",
+                        "scope": "ci-*",
+                        "release": "patch"
+                    },
+                    {
                         "scope": "no-release",
                         "release": false
                     }
