@@ -8,7 +8,7 @@ BaseAPI::BaseAPI(int CONTROL_PORT,
                  ProjectConfig *configManager,
                  const std::string &api_url,
                  const std::string &wifimanager_url,
-                 const std::string &userCommands) : server(new AsyncWebServer(CONTROL_PORT)),
+                 const std::string &userCommands) : server(CONTROL_PORT),
                                                     configManager(configManager),
                                                     api_url(std::move(api_url)),
                                                     wifimanager_url(std::move(wifimanager_url)),
@@ -22,7 +22,7 @@ BaseAPI::~BaseAPI() {}
 void BaseAPI::begin()
 {
     //! i have changed this to use lambdas instead of std::bind to avoid the overhead. Lambdas are always more preferable.
-    server->on("/", HTTP_GET, [&](AsyncWebServerRequest *request)
+    server.on("/", HTTP_GET, [&](AsyncWebServerRequest *request)
                { request->send(200); });
 
     if (initSPIFFS())
@@ -31,15 +31,15 @@ void BaseAPI::begin()
         {
             for (auto &route : userEndpointsVector)
             {
-                server->on(route.endpoint.c_str(), _networkMethodsMap_inv[route.method], [&](AsyncWebServerRequest *request)
+                server.on(route.endpoint.c_str(), _networkMethodsMap_inv[route.method], [&](AsyncWebServerRequest *request)
                            { request->send(SPIFFS, route.file.c_str(), MIMETYPE_HTML); });
             }
         }
-        server->serveStatic(wifimanager_url.c_str(), SPIFFS, "/wifimanager.html").setCacheControl("max-age=600");
+        server.serveStatic(wifimanager_url.c_str(), SPIFFS, "/wifimanager.html").setCacheControl("max-age=600");
     }
 
     // preflight cors check
-    server->on("/", HTTP_OPTIONS, [&](AsyncWebServerRequest *request)
+    server.on("/", HTTP_OPTIONS, [&](AsyncWebServerRequest *request)
                {
         		AsyncWebServerResponse* response = request->beginResponse(204);
         		response->addHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
@@ -49,7 +49,7 @@ void BaseAPI::begin()
 
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
 
-    server->onNotFound([&](AsyncWebServerRequest *request)
+    server.onNotFound([&](AsyncWebServerRequest *request)
                        { notFound(request); });
 }
 

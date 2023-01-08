@@ -11,12 +11,11 @@ public:
     virtual ~OTA();
 
     void SetupOTA();
-
     void HandleOTAUpdate();
 
 private:
-    unsigned long _bootTimestamp = 0;
-    bool _isOtaEnabled = true;
+    unsigned long _bootTimestamp;
+    bool _isOtaEnabled;
     ProjectConfig *_deviceConfig;
 };
 #endif // OTA_HPP

@@ -24,7 +24,6 @@ constexpr int HTTP_ANY = 0b01111111;
 
 #include <ESPAsyncWebServer.h>
 
-
 #include "data/config/project_config.hpp"
 #include "data/utilities/helpers.hpp"
 #include "api/utilities/apiUtilities.hpp"
@@ -92,7 +91,8 @@ protected:
     route_map_t route_map;
 
 protected:
-    AsyncWebServer *server;
+    /// @brief Local instance of the AsyncWebServer - so that we dont need to use new and delete
+    AsyncWebServer server;
     ProjectConfig *configManager;
     typedef std::unordered_map<std::string, WebRequestMethodComposite> networkMethodsMap_t;
 

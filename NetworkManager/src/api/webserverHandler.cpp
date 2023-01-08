@@ -25,14 +25,14 @@ void APIServer::begin()
 	char buffer[1000];
 	snprintf(buffer, sizeof(buffer), "^\\%s\\/([a-zA-Z0-9]+)\\/command\\/([a-zA-Z0-9]+)$", this->api_url.c_str());
 	log_d("API URL: %s", buffer);
-	server->on(buffer, HTTP_ANY, [&](AsyncWebServerRequest *request)
+	server.on(buffer, HTTP_ANY, [&](AsyncWebServerRequest *request)
 			   { handleRequest(request); });
 
 	char buf[1000];
 	snprintf(buf, sizeof(buf), "^\\%s\\/([a-zA-Z0-9]+)\\/command\\/([a-zA-Z0-9]+)$", this->wifimanager_url.c_str());
-	server->on(buf, HTTP_ANY, [&](AsyncWebServerRequest *request)
+	server.on(buf, HTTP_ANY, [&](AsyncWebServerRequest *request)
 			   { handleRequest(request); });
-	server->begin();
+	server.begin();
 }
 
 void APIServer::setupServer()
@@ -44,6 +44,7 @@ void APIServer::setupServer()
 	routes.emplace("getConfig", &APIServer::getJsonConfig);
 	routes.emplace("deleteRoute", &APIServer::removeRoute);
 	routes.emplace("rebootDevice", &APIServer::rebootDevice);
+	routes.emplace("ping", &APIServer::ping);
 	routes.emplace("save", &APIServer::save);
 
 	//! reserve enough memory for all routes - must be called after adding routes and before adding routes to route_map

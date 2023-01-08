@@ -2,7 +2,18 @@
 
 This is an in-progress library for easy network management.
 
+This project supports the following boards:
+
+- ESP8266
+- ESP32
+  
+> **Note**: Full ESP32C3 support is still in development, please report any bugs in the issues section.
+> Of note, this has been successfully tested onall boards except for the ESP32C3.
+> This library fully supports M5Stack devices.
+
 This library provides a WiFi Manager front-end on a customisable URL endpoint using a provided HTML file.
+
+![WiFi Manager](/assets/images/wifimanager.png)
 
 It also provides numerous key features such as:
 
@@ -13,13 +24,15 @@ It also provides numerous key features such as:
 - OTA
 - customisable REST API
 
-And much more :) See the classes below. 
+And much more :smile: See the classes below.
 
 This library implements the following classes:
 
 - APIServer - A server that can be used to manage asynchronous REST API methods.
-    - has a `handleJSON` method for handling `POST` and `GET` requests. Can send and receive JSON. 
-	> **Note**: `POST` requests for `JSON` are still in development.
+  - has a `handleJSON` method for handling `POST` and `GET` requests. Can send and receive JSON.
+  
+ > **Note**: `POST` requests for `JSON` are still in development.
+
 - WiFiHandler - A class that can be used to manage WiFi connections.
 - OTA - A basic OTA handler.
 - MDNSHandler - A class that can be used to manage mDNS services.
@@ -31,10 +44,8 @@ This library implements the following classes:
 
 #### Platformio (recommended)
 
-You can install via the `Platformio Registry` by navigating to the `Libraries` section of `Platformio`. 
+You can install via the `Platformio Registry` by navigating to the `Libraries` section of `Platformio`.
 The library is called `EasyNetworkManager` by `ZanzyTHEbar`.
-
-You can also install via a github link (for now this method is recommened - registry version needs to be updated):
 
 In your `platformio.ini` file add the following:
 
@@ -51,20 +62,35 @@ To install this library in your Arduino IDE, you must add all dependencies (sorr
 
 All dependencies _should_ be installed automatically. If not, please make a new issue and I will fix it.
 
+> **Note**: `ESP8266` support is still in beta, for now you manually have to install the dependancies listed below.
+> `ESPAsyncTCP`
+> You _may_ need to install `ESP8266WiFi` if the compiler complains about it, but you shouldn't need to.
+
 #### Dependencies used in this project
 
 - [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer.git)
+
+`ESP32`
+
 - [AsyncTCP](https://github.com/me-no-dev/AsyncTCP.git)
+
+`ESP8266`
+
+- [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP)
 
 ## Usage
 
 For basic usage please see the [examples](/NetworkManager/examples) folder.
 
-To use the provided wifi manager html page you need to move the `wifimanager.html` file into a `data` folder in the root of your `pio` project.
+To use the provided [wifi manager html](/NetworkManager/data/wifimanager.html) page you need to move the `wifimanager.html` file into a `data` folder in the root of your `pio` project.
 
 Then, build and flash the SPIFFS image as normal.
 
 For the ArduinoIDE you will need to follow a tutorial on `SPIFFS` and flash the provided html file using `SPIFFS`.
+
+> **Warning**: SPIFFS tools **do not** work yet in the ArduinoIDE 2.0. Support is coming soon.
+
+## Configuration
 
 > **Warning**: It is **required** to add a build flag to your setup for the code to function properly.
 
@@ -75,19 +101,19 @@ build_flags =
   -DASYNCWEBSERVER_REGEX ; add regex support to AsyncWebServer
 ```
 
-For the Arduino IDE:
+For `ArduinoIDE`:
 
 Create, if missing, or update the `platform.local.txt` file.
 
 The paths are:
 
->Windows
+> Windows
 
 ```bash
 Windows: C:\Users\(username)\AppData\Local\Arduino15\packages\espxxxx\hardware\espxxxx\{version}\platform.local.txt
 ```
 
->Linux
+> Linux
 
 ```bash
 Linux: ~/.arduino15/packages/espxxxx/hardware/espxxxx/{version}/platform.local.txt
@@ -124,8 +150,6 @@ namespace Project_Config {
 Project_Config::NewConfig_t newConfig; // this creates a new object of your config struct.
 ```
 
-
-
 ## Extras
 
 To see any of the `log` statements - you need to add this to your `platformio.ini`:
@@ -137,7 +161,7 @@ build_flags =
 
 ; other build parameters
 monitor_filters = 
-	esp32_exception_decoder
+ esp32_exception_decoder
 build_type = debug
 lib_ldf_mode = deep+
 board_build.partitions = min_spiffs.csv ; use min_spiffs partition table for a large WebServer App - or huge_app.csv for a large Code-based App
