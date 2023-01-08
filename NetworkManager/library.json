@@ -44,18 +44,31 @@
             "version": "https://github.com/bblanchon/ArduinoJson"
         }
     ],
-    "headers": [
-        "src/api/webserverHandler.hpp",
-        "src/data/config/project_config.hpp",
-        "src/data/StateManager/StateManager.hpp",
-        "src/data/utilities/enuminheritance.hpp",
-        "src/data/utilities/makeunique.hpp",
-        "src/data/utilities/Observer.hpp",
-        "src/mDNS/MDNSManager.hpp",
-        "src/ota/OTA.hpp",
-        "src/wifihandler/wifiHandler.hpp"
+    "includeDirs": [
+        "src/api",
+        "src/api/baseAPI",
+        "src/api/utilities",
+        "src/data",
+        "src/data/config",
+        "src/data/StateManager",
+        "src/data/utilities",
+        "src/mDNS",
+        "src/ota",
+        "src/wifihandler",
+        "src/wifihandler/utilities"
     ],
-    "version": "1.0.1",
+    "headers": [
+        "webserverHandler.hpp",
+        "project_config.hpp",
+        "StateManager.hpp",
+        "enuminheritance.hpp",
+        "makeunique.hpp",
+        "Observer.hpp",
+        "MDNSManager.hpp",
+        "OTA.hpp",
+        "wifiHandler.hpp"
+    ],
+    "version": "1.0.2",
     "frameworks": "arduino",
     "platforms": [
         "espressif32",
