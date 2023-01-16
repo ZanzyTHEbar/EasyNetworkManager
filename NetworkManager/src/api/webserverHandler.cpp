@@ -122,9 +122,8 @@ void APIServer::handleUserCommands(AsyncWebServerRequest *request) {
     auto it = stateFunctionMap.find(url);
     if (it != stateFunctionMap.end()) {
         (*it->second)();
-    } else {
-        return;
     }
+    return;
 }
 
 void APIServer::handleUserRequestCommands(AsyncWebServerRequest *request) {
@@ -132,7 +131,6 @@ void APIServer::handleUserRequestCommands(AsyncWebServerRequest *request) {
     auto it = stateFunctionMapRequest.find(url);
     if (it != stateFunctionMapRequest.end()) {
         (*it->second)(request);
-    } else {
-        return;
     }
+    return;
 }
