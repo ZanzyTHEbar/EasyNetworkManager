@@ -3,19 +3,16 @@
 #define XWEBSERVERHANDLER_HPP
 #include "api/baseAPI/baseAPI.hpp"
 
-class APIServer : public BaseAPI
-{
-private:
+class APIServer : public BaseAPI {
+   private:
     /* Handlers */
     void handleRequest(AsyncWebServerRequest *request);
     void handleUserCommands(AsyncWebServerRequest *request);
+    void handleUserRequestCommands(AsyncWebServerRequest *request);
 
-public:
-    APIServer(int CONTROL_PORT,
-              ProjectConfig *configManager,
-              const std::string &api_url,
-              const std::string &wifimanager_url,
-              const std::string &userCommands);
+   public:
+    APIServer(int CONTROL_PORT, ProjectConfig *configManager, const std::string &api_url,
+              const std::string &wifimanager_url, const std::string &userCommands);
 
     virtual ~APIServer();
     void begin();
@@ -26,7 +23,7 @@ public:
     void updateCommandHandlers(const std::string &url, stateFunction_request_t funct);
     void addRouteMap(const std::string &index, route_t route, std::vector<std::string> &indexes);
 
-public:
+   public:
     std::vector<std::string> indexes;
 };
-#endif // WEBSERVERHANDLER_HPP
+#endif  // WEBSERVERHANDLER_HPP
