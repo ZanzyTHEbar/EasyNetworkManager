@@ -38,7 +38,7 @@ void WiFiHandler::setupWifi() {
     ETH.begin(ETH_PHY_ADDR, ETH_PHY_POWER);
     ETH.config(ethIP, ethGW, ethSN, ethDNS);
     ethernetHandler.WT32_ETH01_waitForConnect();
-    if (WT32_ETH01_isConnected()) {
+    if (ethernetHandler.WT32_ETH01_isConnected()) {
         stateManager->setState(
             WiFiState_e::WiFiState_Connected);
         return;
