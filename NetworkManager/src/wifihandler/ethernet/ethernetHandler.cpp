@@ -1,32 +1,24 @@
 #include "ethernetHandler.hpp"
 
-EthernetHandler::EthernetHandler(
-    const std::string &hostName)
-    : _WT32_ETH01_eth_connected(false),
-      hostName(std::move(hostName)) {}
+EthernetHandler::EthernetHandler(const std::string &hostName)
+    : _WT32_ETH01_eth_connected(false), hostName(std::move(hostName)) {}
 
 EthernetHandler::~EthernetHandler() {}
 
 void EthernetHandler::WT32_ETH01_onEvent() {
-    WiFi.onEvent(std::bind(&EthernetHandler::WT32_ETH01_event,
-                           this,
-                           std::placeholders::_1));
+    WiFi.onEvent(std::bind(&EthernetHandler::WT32_ETH01_event, this, std::placeholders::_1));
 }
 
 void EthernetHandler::WT32_ETH01_waitForConnect() {
     while (!_WT32_ETH01_eth_connected) delay(100);
 }
 
-bool EthernetHandler::WT32_ETH01_isConnected() {
-    return _WT32_ETH01_eth_connected;
-}
+bool EthernetHandler::WT32_ETH01_isConnected() { return _WT32_ETH01_eth_connected; }
 
 void EthernetHandler::WT32_ETH01_event(WiFiEvent_t event) {
     switch (event) {
         // #if USING_CORE_ESP32_CORE_V200_PLUS
-#if ((defined(ESP_ARDUINO_VERSION_MAJOR) && \
-      (ESP_ARDUINO_VERSION_MAJOR >= 2)) &&  \
-     (ARDUINO_ESP32_GIT_VER != 0x46d5afb1))
+#if ((defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 2)) && (ARDUINO_ESP32_GIT_VER != 0x46d5afb1))
         // For breaking core v2.0.0
         // Why so strange to define a breaking enum
         // arduino_event_id_t in WiFiGeneric.h compared to
@@ -44,11 +36,8 @@ void EthernetHandler::WT32_ETH01_event(WiFiEvent_t event) {
             break;
         case ARDUINO_EVENT_ETH_GOT_IP:
             if (!_WT32_ETH01_eth_connected) {
-                log_i("ETH MAC: %s, IPv4: %s",
-                      ETH.macAddress().c_str(),
-                      ETH.localIP().c_str());
-                log_i(ETH.fullDuplex() ? "HALF_DUPLEX, "
-                                       : "FULL_DUPLEX, ");
+                log_i("ETH MAC: %s, IPv4: %s", ETH.macAddress().c_str(), ETH.localIP().toString().c_str());
+                log_i(ETH.fullDuplex() ? "HALF_DUPLEX, " : "FULL_DUPLEX, ");
                 log_i("%d Mbps", ETH.linkSpeed());
                 _WT32_ETH01_eth_connected = true;
             }
@@ -82,11 +71,8 @@ void EthernetHandler::WT32_ETH01_event(WiFiEvent_t event) {
             break;
         case SYSTEM_EVENT_ETH_GOT_IP:
             if (!_WT32_ETH01_eth_connected) {
-                log_i("ETH MAC: %s, IPv4: %s",
-                      ETH.macAddress().c_str(),
-                      ETH.localIP().c_str());
-                log_i(ETH.fullDuplex() ? "HALF_DUPLEX, "
-                                       : "FULL_DUPLEX, ");
+                log_i("ETH MAC: %s, IPv4: %s", ETH.macAddress().c_str(), ETH.localIP().toString().c_str());
+                log_i(ETH.fullDuplex() ? "HALF_DUPLEX, " : "FULL_DUPLEX, ");
                 log_i("%d Mbps", ETH.linkSpeed());
                 _WT32_ETH01_eth_connected = true;
             }
