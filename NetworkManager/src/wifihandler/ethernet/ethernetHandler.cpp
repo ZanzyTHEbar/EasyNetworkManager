@@ -8,7 +8,7 @@ EthernetHandler::EthernetHandler(
 EthernetHandler::~EthernetHandler() {}
 
 void EthernetHandler::WT32_ETH01_onEvent() {
-    WiFi.onEvent(std::bind(&WT32_ETH01_event,
+    WiFi.onEvent(std::bind(&EthernetHandler::WT32_ETH01_event,
                            this,
                            std::placeholders::_1));
 }
