@@ -16,13 +16,14 @@ constexpr int HTTP_HEAD = 0b00100000;
 constexpr int HTTP_OPTIONS = 0b01000000;
 constexpr int HTTP_ANY = 0b01111111;
 
+
+#include <ESPAsyncWebServer.h>
+
 #ifdef ESP32
 #include <AsyncTCP.h>
 #elif defined(ESP8266)
 #include <ESPAsyncTCP.h>
 #endif
-
-#include <ESPAsyncWebServer.h>
 
 #include "data/config/project_config.hpp"
 #include "data/utilities/helpers.hpp"

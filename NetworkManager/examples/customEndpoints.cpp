@@ -27,8 +27,6 @@ APIServer server(80, &configManager, "/api/v1", "/wifimanager", "/userCommands")
 OTA ota(&configManager);                                                                                //! Second argument is the Hostname for OTA
 MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test", "_tcp", "_api_port", "80"); //! service name and service protocol have to be lowercase and begin with an underscore
 
-APIServer::userRoutes_t userRoutes; // create a struct object to hold our user routes
-
 void printHelloWorld()
 {
     Serial.println("Hello World!");
