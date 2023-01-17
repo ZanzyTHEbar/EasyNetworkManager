@@ -110,7 +110,7 @@ class EthernetHandler {
     void WT32_ETH01_onEvent();
     void WT32_ETH01_waitForConnect();
     bool WT32_ETH01_isConnected();
-    static void WT32_ETH01_event(WiFiEvent_t event);
+    void WT32_ETH01_event(WiFiEvent_t event);
 };
 
 #endif  // ETHERNETHANDLER_WT32_ETH01_H

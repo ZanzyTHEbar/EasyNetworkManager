@@ -22,14 +22,11 @@
 
 class WiFiHandler {
    public:
-    WiFiHandler(ProjectConfig *configManager,
-                StateManager<WiFiState_e> *stateManager,
-                const std::string &ssid,
+    WiFiHandler(ProjectConfig *configManager, StateManager<WiFiState_e> *stateManager, const std::string &ssid,
                 const std::string &password, uint8_t channel
 #ifdef USE_ETHERNET
                 ,
-                IPAddress *ethIP, IPAddress *ethGW,
-                IPAddress *ethSN, IPAddress *ethDNS
+                IPAddress *ethIP, IPAddress *ethGW, IPAddress *ethSN, IPAddress *ethDNS
 #endif
     );
 
@@ -43,11 +40,8 @@ class WiFiHandler {
 
    private:
     void setUpADHOC();
-    void adhoc(const std::string &ssid, uint8_t channel,
-               const std::string &password = std::string());
-    bool iniSTA(const std::string &ssid,
-                const std::string &password,
-                uint8_t channel, wifi_power_t power);
+    void adhoc(const std::string &ssid, uint8_t channel, const std::string &password = std::string());
+    bool iniSTA(const std::string &ssid, const std::string &password, uint8_t channel, wifi_power_t power);
 
     std::string ssid;
     std::string password;
