@@ -37,7 +37,7 @@ void EthernetHandler::WT32_ETH01_event(WiFiEvent_t event) {
         case ARDUINO_EVENT_ETH_GOT_IP:
             if (!_WT32_ETH01_eth_connected) {
                 log_i("ETH MAC: %s, IPv4: %s", ETH.macAddress().c_str(), ETH.localIP().toString().c_str());
-                log_i(ETH.fullDuplex() ? "HALF_DUPLEX, " : "FULL_DUPLEX, ");
+                log_i("%s", ETH.fullDuplex() ? "HALF_DUPLEX, " : "FULL_DUPLEX, ");
                 log_i("%d Mbps", ETH.linkSpeed());
                 _WT32_ETH01_eth_connected = true;
             }
@@ -72,7 +72,7 @@ void EthernetHandler::WT32_ETH01_event(WiFiEvent_t event) {
         case SYSTEM_EVENT_ETH_GOT_IP:
             if (!_WT32_ETH01_eth_connected) {
                 log_i("ETH MAC: %s, IPv4: %s", ETH.macAddress().c_str(), ETH.localIP().toString().c_str());
-                log_i(ETH.fullDuplex() ? "HALF_DUPLEX, " : "FULL_DUPLEX, ");
+                log_i("%s", ETH.fullDuplex() ? "HALF_DUPLEX, " : "FULL_DUPLEX, ");
                 log_i("%d Mbps", ETH.linkSpeed());
                 _WT32_ETH01_eth_connected = true;
             }
