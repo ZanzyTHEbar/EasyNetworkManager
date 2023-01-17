@@ -1,9 +1,9 @@
 #ifndef BASEAPI_HPP
 #define BASEAPI_HPP
 
-#include <unordered_map>
-#include <string>
 #include <sstream>
+#include <string>
+#include <unordered_map>
 
 #define WEBSERVER_H
 
@@ -16,7 +16,6 @@ constexpr int HTTP_HEAD = 0b00100000;
 constexpr int HTTP_OPTIONS = 0b01000000;
 constexpr int HTTP_ANY = 0b01111111;
 
-
 #include <ESPAsyncWebServer.h>
 
 #ifdef ESP32
@@ -25,51 +24,30 @@ constexpr int HTTP_ANY = 0b01111111;
 #include <ESPAsyncTCP.h>
 #endif
 
+#include "api/utilities/apiUtilities.hpp"
 #include "data/config/project_config.hpp"
 #include "data/utilities/helpers.hpp"
-#include "api/utilities/apiUtilities.hpp"
 
-class BaseAPI : public API_Utilities
-{
-protected:
+class BaseAPI : public API_Utilities {
+   protected:
     std::unordered_map<WebRequestMethodComposite, std::string> _networkMethodsMap = {
-        {HTTP_GET, "GET"},
-        {HTTP_POST, "POST"},
-        {HTTP_PUT, "PUT"},
-        {HTTP_DELETE, "DELETE"},
-        {HTTP_PATCH, "PATCH"},
-        {HTTP_OPTIONS, "OPTIONS"},
+        {HTTP_GET, "GET"},       {HTTP_POST, "POST"},   {HTTP_PUT, "PUT"},
+        {HTTP_DELETE, "DELETE"}, {HTTP_PATCH, "PATCH"}, {HTTP_OPTIONS, "OPTIONS"},
     };
 
     std::unordered_map<std::string, WebRequestMethodComposite> _networkMethodsMap_inv = {
-        {"GET", HTTP_GET},
-        {"POST", HTTP_POST},
-        {"PUT", HTTP_PUT},
-        {"DELETE", HTTP_DELETE},
-        {"PATCH", HTTP_PATCH},
-        {"OPTIONS", HTTP_OPTIONS},
+        {"GET", HTTP_GET},       {"POST", HTTP_POST},   {"PUT", HTTP_PUT},
+        {"DELETE", HTTP_DELETE}, {"PATCH", HTTP_PATCH}, {"OPTIONS", HTTP_OPTIONS},
     };
 
-    enum RequestMethods
-    {
-        GET,
-        POST,
-        PUT,
-        DELETE,
-        PATCH,
-        OPTIONS
-    };
+    enum RequestMethods { GET, POST, PUT, DELETE, PATCH, OPTIONS };
 
     std::unordered_map<WebRequestMethodComposite, RequestMethods> _networkMethodsMap_enum = {
-        {HTTP_GET, GET},
-        {HTTP_POST, POST},
-        {HTTP_PUT, PUT},
-        {HTTP_DELETE, DELETE},
-        {HTTP_PATCH, PATCH},
-        {HTTP_OPTIONS, OPTIONS},
+        {HTTP_GET, GET},       {HTTP_POST, POST},   {HTTP_PUT, PUT},
+        {HTTP_DELETE, DELETE}, {HTTP_PATCH, PATCH}, {HTTP_OPTIONS, OPTIONS},
     };
 
-protected:
+   protected:
     /* Commands */
     void setWiFi(AsyncWebServerRequest *request);
     void setWiFiTXPower(AsyncWebServerRequest *request);
@@ -91,7 +69,7 @@ protected:
     route_t routes;
     route_map_t route_map;
 
-protected:
+   protected:
     /// @brief Local instance of the AsyncWebServer - so that we dont need to use new and delete
     AsyncWebServer server;
     ProjectConfig *configManager;
@@ -105,29 +83,22 @@ protected:
     static bool pass_write;
     static bool channel_write;
 
-public:
-    BaseAPI(int CONTROL_PORT,
-            ProjectConfig *configManager,
-            const std::string &api_url,
-            const std::string &wifimanager_url,
-            const std::string &userCommands);
+   public:
+    BaseAPI(int CONTROL_PORT, ProjectConfig *configManager, const std::string &api_url,
+            const std::string &wifimanager_url, const std::string &userCommands);
     virtual ~BaseAPI();
     virtual void begin();
 
-public:
+   public:
     typedef void (*stateFunction_t)(void);
     typedef void (*stateFunction_request_t)(AsyncWebServerRequest *request);
     std::unordered_map<std::string, stateFunction_t> stateFunctionMap;
     std::unordered_map<std::string, stateFunction_request_t> stateFunctionMapRequest;
 
-    struct userRoutes_t
-    {
+    struct userRoutes_t {
         // create a constructor to initialize the variables
-        userRoutes_t(const std::string &endpoint,
-                     const std::string &file,
-                     const std::string &method) : endpoint(std::move(endpoint)),
-                                                  file(std::move(file)),
-                                                  method(std::move(method)) {}
+        userRoutes_t(const std::string &endpoint, const std::string &file, const std::string &method)
+            : endpoint(std::move(endpoint)), file(std::move(file)), method(std::move(method)) {}
         std::string endpoint;
         std::string file;
         std::string method;
@@ -135,4 +106,4 @@ public:
     std::vector<userRoutes_t> userEndpointsVector;
 };
 
-#endif // BASEAPI_HPP
+#endif  // BASEAPI_HPP

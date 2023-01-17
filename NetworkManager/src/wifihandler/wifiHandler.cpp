@@ -70,7 +70,7 @@ void WiFiHandler::setupWifi()
 	}
 }
 
-void WiFiHandler::adhoc(const std::string &ssid, uint8_t channel, const std::String &password)
+void WiFiHandler::adhoc(const std::string &ssid, uint8_t channel, const std::string &password)
 {
 	stateManager->setState(WiFiState_e::WiFiState_ADHOC);
 	log_i("\n[INFO]: Setting Access Point...\n");
