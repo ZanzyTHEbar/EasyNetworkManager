@@ -2,14 +2,15 @@
 #ifndef UTILITIES_hpp
 #define UTILITIES_hpp
 #include <Arduino.h>
-#include "wifihandler/WifiHandler.hpp"
+
 #include <unordered_map>
-namespace Network_Utilities
-{
-    bool LoopWifiScan();
-    void SetupWifiScan();
-    void my_delay(volatile long delay_time);
-    int CheckWifiState();
-    int getStrength(int points);
-}
-#endif // !UTILITIES_hpp
+
+#include "wifihandler/WifiHandler.hpp"
+namespace Network_Utilities {
+bool LoopWifiScan();
+void SetupWifiScan();
+void my_delay(volatile long delay_time);
+int CheckWifiState();
+int getStrength(int points);
+}  // namespace Network_Utilities
+#endif  // !UTILITIES_hpp

@@ -1,5 +1,5 @@
 ---
 Language: Cpp
 BasedOnStyle:  Google
-ColumnLimit: 120
+ColumnLimit: 60
 IndentWidth: 4

@@ -16,8 +16,7 @@ const char *API_Utilities::MIMETYPE_JSON{"application/json"};
 
 API_Utilities::API_Utilities() {}
 API_Utilities::~API_Utilities() {}
-std::string API_Utilities::shaEncoder(std::string data)
-{
+std::string API_Utilities::shaEncoder(std::string data) {
     const char *data_c = data.c_str();
     int size = 64;
     uint8_t hash[size];
@@ -33,11 +32,9 @@ std::string API_Utilities::shaEncoder(std::string data)
     mbedtls_md_free(&ctx);
 
     std::string hash_string = "";
-    for (uint16_t i = 0; i < size; i++)
-    {
+    for (uint16_t i = 0; i < size; i++) {
         std::string hex = String(hash[i], HEX).c_str();
-        if (hex.length() < 2)
-        {
+        if (hex.length() < 2) {
             hex = "0" + hex;
         }
         hash_string += hex;
@@ -46,28 +43,24 @@ std::string API_Utilities::shaEncoder(std::string data)
 }
 
 // Initialize SPIFFS
-bool API_Utilities::initSPIFFS()
-{
+bool API_Utilities::initSPIFFS() {
     bool init_spiffs = SPIFFS.begin(false);
     log_e("[SPIFFS]: SPIFFS Initialized: %s", init_spiffs ? "true" : "false");
     return init_spiffs;
 }
 
 // Read File from SPIFFS
-std::string API_Utilities::readFile(fs::FS &fs, std::string path)
-{
+std::string API_Utilities::readFile(fs::FS &fs, std::string path) {
     log_i("Reading file: %s\r\n", path.c_str());
 
     File file = fs.open(path.c_str());
-    if (!file || file.isDirectory())
-    {
+    if (!file || file.isDirectory()) {
         log_e("[INFO]: Failed to open file for reading");
         return std::string();
     }
 
     std::string fileContent;
-    while (file.available())
-    {
+    while (file.available()) {
         fileContent = file.readStringUntil('\n').c_str();
         break;
     }
@@ -75,23 +68,18 @@ std::string API_Utilities::readFile(fs::FS &fs, std::string path)
 }
 
 // Write file to SPIFFS
-void API_Utilities::writeFile(fs::FS &fs, std::string path, std::string message)
-{
+void API_Utilities::writeFile(fs::FS &fs, std::string path, std::string message) {
     log_i("[Writing File]: Writing file: %s\r\n", path);
     Network_Utilities::my_delay(0.1L);
 
     File file = fs.open(path.c_str(), FILE_WRITE);
-    if (!file)
-    {
+    if (!file) {
         log_i("[Writing File]: failed to open file for writing");
         return;
     }
-    if (file.print(message.c_str()))
-    {
+    if (file.print(message.c_str())) {
         log_i("[Writing File]: file written");
-    }
-    else
-    {
+    } else {
         log_i("[Writing File]: file write failed");
     }
 }

@@ -1,18 +1,14 @@
 #include "OTA.hpp"
 
-OTA::OTA(ProjectConfig *deviceConfig) : _deviceConfig(deviceConfig),
-                                        _bootTimestamp(0),
-                                        _isOtaEnabled(true) {}
+OTA::OTA(ProjectConfig *deviceConfig) : _deviceConfig(deviceConfig), _bootTimestamp(0), _isOtaEnabled(true) {}
 
 OTA::~OTA() {}
 
-void OTA::SetupOTA()
-{
+void OTA::SetupOTA() {
     log_e("Setting up OTA updates");
     auto localConfig = _deviceConfig->getDeviceConfig();
     auto mdnsConfig = _deviceConfig->getMDNSConfig();
-    if (strcmp(localConfig->OTAPassword.c_str(), "") == 0)
-    {
+    if (strcmp(localConfig->OTAPassword.c_str(), "") == 0) {
         log_e("THE PASSWORD IS REQUIRED, [[ABORTING]]");
         return;
     }
@@ -20,22 +16,20 @@ void OTA::SetupOTA()
     ArduinoOTA.setPort(localConfig->OTAPort);
 
     ArduinoOTA
-        .onStart([]()
-                 {
-                String type;
-                if (ArduinoOTA.getCommand() == U_FLASH)
-                    type = "sketch";
-                else // U_SPIFFS
-                    type = "filesystem"; })
-        .onEnd([]()
-               { Serial.println("OTA updated finished successfully!"); })
-        .onProgress([](unsigned int progress, unsigned int total)
-                    { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); })
-        .onError([](ota_error_t error)
-                 {
-                log_e("Error[%u]: ", error);
-                switch (error)
-                {
+        .onStart([]() {
+            String type;
+            if (ArduinoOTA.getCommand() == U_FLASH)
+                type = "sketch";
+            else  // U_SPIFFS
+                type = "filesystem";
+        })
+        .onEnd([]() { Serial.println("OTA updated finished successfully!"); })
+        .onProgress([](unsigned int progress, unsigned int total) {
+            Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+        })
+        .onError([](ota_error_t error) {
+            log_e("Error[%u]: ", error);
+            switch (error) {
                 case OTA_AUTH_ERROR:
                     log_e("Auth Failed");
                     break;
@@ -51,7 +45,8 @@ void OTA::SetupOTA()
                 case OTA_END_ERROR:
                     log_e("End Failed");
                     break;
-                } });
+            }
+        });
 
     log_i("Starting up basic OTA server");
     log_i("OTA will be live for 5mins, after which it will be disabled until restart");
@@ -60,12 +55,9 @@ void OTA::SetupOTA()
     _bootTimestamp = millis();
 }
 
-void OTA::HandleOTAUpdate()
-{
-    if (_isOtaEnabled)
-    {
-        if (_bootTimestamp + (60000 * 5) < millis())
-        {
+void OTA::HandleOTAUpdate() {
+    if (_isOtaEnabled) {
+        if (_bootTimestamp + (60000 * 5) < millis()) {
             // we're disabling ota after first 5 minutes so that nothing bad happens during runtime
             _isOtaEnabled = false;
             log_i("From now on, OTA is disabled");
