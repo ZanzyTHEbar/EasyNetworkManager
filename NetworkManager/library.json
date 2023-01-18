@@ -68,7 +68,7 @@
         "OTA.hpp",
         "wifiHandler.hpp"
     ],
-    "version": "1.4.12",
+    "version": "1.4.13",
     "frameworks": "arduino",
     "platforms": [
         "espressif32",
