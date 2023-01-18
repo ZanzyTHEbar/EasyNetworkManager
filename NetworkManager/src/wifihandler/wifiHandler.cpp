@@ -3,13 +3,7 @@
 WiFiHandler::WiFiHandler(ProjectConfig* configManager,
                          StateManager<WiFiState_e>* stateManager,
                          const std::string& ssid, const std::string& password,
-                         uint8_t channel
-#ifdef USE_ETHERNET
-                         ,
-                         IPAddress* ethIP, IPAddress* ethGW, IPAddress* ethSN,
-                         IPAddress* ethDNS
-#endif
-                         )
+                         uint8_t channel)
     : configManager(configManager),
       stateManager(stateManager),
       txpower(NULL),
@@ -17,35 +11,11 @@ WiFiHandler::WiFiHandler(ProjectConfig* configManager,
       password(password),
       channel(channel),
       power(0),
-      _enable_adhoc(false)
-#ifdef USE_ETHERNET
-      ,
-      ethIP(ethIP),
-      ethGW(ethGW),
-      ethSN(ethSN),
-      ethDNS(ethDNS)
-#endif
-{
-}
+      _enable_adhoc(false) {}
 
 WiFiHandler::~WiFiHandler() {}
 
-void WiFiHandler::setupWifi() {
-#ifdef USE_ETHERNET
-    auto mdnsConfig = configManager->getMDNSConfig();
-    EthernetHandler ethernetHandler(mdnsConfig->hostname);
-    ethernetHandler.WT32_ETH01_onEvent();
-    ETH.begin(ETH_PHY_ADDR, ETH_PHY_POWER);
-    ETH.config(*ethIP, *ethGW, *ethSN, *ethDNS);
-    ethernetHandler.WT32_ETH01_waitForConnect();
-    if (ethernetHandler.WT32_ETH01_isConnected()) {
-        stateManager->setState(WiFiState_e::WiFiState_Connected);
-        return;
-    }
-    log_e("Ethernet connection failed!");
-    return;
-#endif
-
+void WiFiHandler::begin() {
     if (this->_enable_adhoc ||
         stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC) {
         this->setUpADHOC();

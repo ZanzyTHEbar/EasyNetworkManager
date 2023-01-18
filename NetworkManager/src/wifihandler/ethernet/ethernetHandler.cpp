@@ -1,25 +1,33 @@
 #include "ethernetHandler.hpp"
 
-EthernetHandler::EthernetHandler(const std::string& hostName)
-    : _WT32_ETH01_eth_connected(false), hostName(std::move(hostName)) {}
+EthernetManager::EthernetManager(StateManager<WiFiState_e>* stateManager,
+                                 const std::string& hostName, IPAddress* ethIP,
+                                 IPAddress* ethGW, IPAddress* ethSN,
+                                 IPAddress* ethDNS)
+    : _WT32_ETH01_eth_connected(false),
+      hostName(std::move(hostName)),
+      ethIP(ethIP),
+      ethGW(ethGW),
+      ethSN(ethSN),
+      ethDNS(ethDNS) {}
 
-EthernetHandler::~EthernetHandler() {}
+EthernetManager::~EthernetManager() {}
 
-void EthernetHandler::WT32_ETH01_onEvent() {
-    WiFi.onEvent(std::bind(&EthernetHandler::WT32_ETH01_event, this,
+void EthernetManager::WT32_ETH01_onEvent() {
+    WiFi.onEvent(std::bind(&EthernetManager::WT32_ETH01_event, this,
                            std::placeholders::_1));
 }
 
-void EthernetHandler::WT32_ETH01_waitForConnect() {
+void EthernetManager::WT32_ETH01_waitForConnect() {
     while (!_WT32_ETH01_eth_connected)
         delay(100);
 }
 
-bool EthernetHandler::WT32_ETH01_isConnected() {
+bool EthernetManager::WT32_ETH01_isConnected() {
     return _WT32_ETH01_eth_connected;
 }
 
-void EthernetHandler::WT32_ETH01_event(WiFiEvent_t event) {
+void EthernetManager::WT32_ETH01_event(WiFiEvent_t event) {
     switch (event) {
         // #if USING_CORE_ESP32_CORE_V200_PLUS
 #if ((defined(ESP_ARDUINO_VERSION_MAJOR) && \
@@ -44,7 +52,8 @@ void EthernetHandler::WT32_ETH01_event(WiFiEvent_t event) {
             if (!_WT32_ETH01_eth_connected) {
                 log_i("ETH MAC: %s, IPv4: %s", ETH.macAddress().c_str(),
                       ETH.localIP().toString().c_str());
-                log_i("%s", ETH.fullDuplex() ? "FULL_DUPLEX, " : "HALF_DUPLEX, ");
+                log_i("%s",
+                      ETH.fullDuplex() ? "FULL_DUPLEX, " : "HALF_DUPLEX, ");
                 log_i("%d Mbps", ETH.linkSpeed());
                 _WT32_ETH01_eth_connected = true;
             }
@@ -78,8 +87,10 @@ void EthernetHandler::WT32_ETH01_event(WiFiEvent_t event) {
             break;
         case SYSTEM_EVENT_ETH_GOT_IP:
             if (!_WT32_ETH01_eth_connected) {
-                log_i("ETH MAC: %s, IPv4: %s", ETH.macAddress().c_str(), ETH.localIP().toString().c_str());
-                log_i("%s", ETH.fullDuplex() ? "FULL_DUPLEX, " : "HALF_DUPLEX, ");
+                log_i("ETH MAC: %s, IPv4: %s", ETH.macAddress().c_str(),
+                      ETH.localIP().toString().c_str());
+                log_i("%s",
+                      ETH.fullDuplex() ? "FULL_DUPLEX, " : "HALF_DUPLEX, ");
                 log_i("%d Mbps", ETH.linkSpeed());
                 _WT32_ETH01_eth_connected = true;
             }
@@ -96,4 +107,17 @@ void EthernetHandler::WT32_ETH01_event(WiFiEvent_t event) {
         default:
             break;
     }
+}
+
+void EthernetManager::EthernetHandler::begin() {
+    WT32_ETH01_onEvent();
+    ETH.begin(ETH_PHY_ADDR, ETH_PHY_POWER);
+    ETH.config(*ethIP, *ethGW, *ethSN, *ethDNS);
+    WT32_ETH01_waitForConnect();
+    if (WT32_ETH01_isConnected()) {
+        stateManager->setState(WiFiState_e::WiFiState_Connected);
+        return;
+    }
+    log_e("Ethernet connection failed!");
+    return;
 }

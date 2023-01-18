@@ -22,10 +22,10 @@
 // wifi related utilities
 
 //! Required header files
-#include <api/webserverHandler.hpp>            //! (*)
-#include <data/StateManager/StateManager.hpp>  //! (*)
-#include <data/config/project_config.hpp>      //! (*)
-#include <wifihandler/wifiHandler.hpp>         //! (*)
+#include <api/webserverHandler.hpp>                  //! (*)
+#include <data/StateManager/StateManager.hpp>        //! (*)
+#include <data/config/project_config.hpp>            //! (*)
+#include <wifihandler/ethernet/ethernetHandler.hpp>  //! (*)
 
 // setup the ethernet connection variables
 
@@ -37,15 +37,20 @@ IPAddress mySN(255, 255, 255, 0);
 IPAddress myDNS(8, 8, 8, 8);
 
 ProjectConfig configManager;
-WiFiHandler network(&configManager, &wifiStateManager, "", "", 1, &myIP, &myGW, &mySN, &myDNS);
+EthernetManager network(&wifiStateManager, "some_hostname", &myIP, &myGW, &mySN,
+                        &myDNS);
 
-APIServer server(80, &configManager, "/api/v1", "/wifimanager", "/userCommands");
+APIServer server(80, &configManager, "/api/v1", "/wifimanager",
+                 "/userCommands");
 OTA ota(&configManager);
-MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test", "_tcp", "_api_port",
+MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test",
+                 "_tcp", "_api_port",
                  "80");  //! service name and service protocol have to be
                          //! lowercase and begin with an underscore
 
-void printHelloWorld() { Serial.println("Hello World!"); }
+void printHelloWorld() {
+    Serial.println("Hello World!");
+}
 
 void blink() {
     digitalWrite(27, HIGH);
@@ -56,7 +61,7 @@ void blink() {
 
 void setup() {
     Serial.begin(115200);
-    Serial.println("Hello, EasyNetworkManager!");
+    Serial.println("\nHello, EasyNetworkManager!");
 
     Serial.setDebugOutput(true);
     configManager.initConfig();   // call before load to
@@ -66,8 +71,8 @@ void setup() {
                                   // when mdns hostname changes
     configManager.load();         // load the config from flash
 
-    network.setupWifi();  // setup wifi or ethernet connection
-    mDNS.startMDNS();     // start mDNS service (optional)
+    network.begin();   // setup wifi or ethernet connection
+    mDNS.startMDNS();  // start mDNS service (optional)
 
     // handle the WiFi connection state changes
     switch (wifiStateManager.getCurrentState()) {
@@ -81,16 +86,17 @@ void setup() {
             // only start the API server if we have wifi
             // connection
             server.updateCommandHandlers("blink",
-                                         blink);  // add a command handler to the API
-                                                  // server - you can add as many as
-                                                  // you want - you can also add
-                                                  // methods.
-            server.updateCommandHandlers("helloWorld",
-                                         printHelloWorld);  // add a command handler
-                                                            // to the API server -
-                                                            // you can add as many as
-                                                            // you want - you can
-                                                            // also add methods.
+                                         blink);  // add a command handler to
+                                                  // the API server - you can
+                                                  // add as many as you want -
+                                                  // you can also add methods.
+            server.updateCommandHandlers(
+                "helloWorld",
+                printHelloWorld);  // add a command handler
+                                   // to the API server -
+                                   // you can add as many as
+                                   // you want - you can
+                                   // also add methods.
             server.begin();
             log_d("[SETUP]: Starting API Server");
             break;
@@ -99,16 +105,17 @@ void setup() {
             // only start the API server if we have wifi
             // connection
             server.updateCommandHandlers("blink",
-                                         blink);  // add a command handler to the API
-                                                  // server - you can add as many as
-                                                  // you want - you can also add
-                                                  // methods.
-            server.updateCommandHandlers("helloWorld",
-                                         printHelloWorld);  // add a command handler
-                                                            // to the API server -
-                                                            // you can add as many as
-                                                            // you want - you can
-                                                            // also add methods.
+                                         blink);  // add a command handler to
+                                                  // the API server - you can
+                                                  // add as many as you want -
+                                                  // you can also add methods.
+            server.updateCommandHandlers(
+                "helloWorld",
+                printHelloWorld);  // add a command handler
+                                   // to the API server -
+                                   // you can add as many as
+                                   // you want - you can
+                                   // also add methods.
             server.begin();
             log_d("[SETUP]: Starting API Server");
             break;
@@ -123,4 +130,6 @@ void setup() {
     ota.SetupOTA();
 }
 
-void loop() { ota.HandleOTAUpdate(); }
+void loop() {
+    ota.HandleOTAUpdate();
+}

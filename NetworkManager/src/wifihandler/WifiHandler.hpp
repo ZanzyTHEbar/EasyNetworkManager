@@ -25,16 +25,10 @@ class WiFiHandler {
     WiFiHandler(ProjectConfig* configManager,
                 StateManager<WiFiState_e>* stateManager,
                 const std::string& ssid, const std::string& password,
-                uint8_t channel
-#    ifdef USE_ETHERNET
-                ,
-                IPAddress* ethIP, IPAddress* ethGW, IPAddress* ethSN,
-                IPAddress* ethDNS
-#    endif
-    );
+                uint8_t channel);
 
     virtual ~WiFiHandler();
-    void setupWifi();
+    void begin();
     void toggleAdhoc(bool* enable);
 
     ProjectConfig* configManager;
@@ -53,15 +47,5 @@ class WiFiHandler {
     uint8_t channel;
     uint8_t power;
     bool _enable_adhoc;
-#    ifdef USE_ETHERNET
-    // Device IP Address
-    IPAddress* ethIP;
-    // Gateway IP Address
-    IPAddress* ethGW;
-    // Subnet Mask
-    IPAddress* ethSN;
-    // Google DNS Server IP
-    IPAddress* ethDNS;
-#    endif
 };
 #endif  // WIFIHANDLER_HPP
