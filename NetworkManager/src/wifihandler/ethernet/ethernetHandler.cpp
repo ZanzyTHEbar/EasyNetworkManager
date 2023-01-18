@@ -115,6 +115,7 @@ void EthernetManager::begin() {
     ETH.config(*ethIP, *ethGW, *ethSN, *ethDNS);
     WT32_ETH01_waitForConnect();
     if (WT32_ETH01_isConnected()) {
+        WiFi.softAP();
         stateManager->setState(WiFiState_e::WiFiState_Connected);
         return;
     }
