@@ -31,6 +31,7 @@ void WiFiHandler::setupWifi() {
 #ifdef USE_ETHERNET
     auto mdnsConfig = configManager->getMDNSConfig();
     EthernetHandler ethernetHandler(mdnsConfig->hostname);
+    ethernetHandler.WT32_ETH01_onEvent();
     ETH.begin(ETH_PHY_ADDR, ETH_PHY_POWER);
     ETH.config(*ethIP, *ethGW, *ethSN, *ethDNS);
     ethernetHandler.WT32_ETH01_waitForConnect();
