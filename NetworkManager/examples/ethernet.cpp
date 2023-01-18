@@ -1,6 +1,3 @@
-#define USE_ETHERNET  // comment this line to use WiFi
-                      // instead of Ethernet
-
 #include <Arduino.h>
 
 //? Here is a list of all the library header files -
