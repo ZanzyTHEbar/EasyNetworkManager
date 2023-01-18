@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 //? Here is a list of all the library header files -
-//required ones are marked with an asterisk (*)
+// required ones are marked with an asterisk (*)
 
 //! Optional header files
 #include <mDNS/MDNSManager.hpp>
@@ -37,17 +37,13 @@ IPAddress mySN(255, 255, 255, 0);
 IPAddress myDNS(8, 8, 8, 8);
 
 ProjectConfig configManager;
-WiFiHandler network(&configManager, &wifiStateManager, "",
-                    "", 1, &myIP, &myGW, &mySN, &myDNS);
+WiFiHandler network(&configManager, &wifiStateManager, "", "", 1, &myIP, &myGW, &mySN, &myDNS);
 
-APIServer server(80, &configManager, "/api/v1",
-                 "/wifimanager", "/userCommands");
+APIServer server(80, &configManager, "/api/v1", "/wifimanager", "/userCommands");
 OTA ota(&configManager);
-MDNSHandler mDNS(
-    &mdnsStateManager, &configManager, "_easynetwork",
-    "test", "_tcp", "_api_port",
-    "80");  //! service name and service protocol have to be
-            //! lowercase and begin with an underscore
+MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test", "_tcp", "_api_port",
+                 "80");  //! service name and service protocol have to be
+                         //! lowercase and begin with an underscore
 
 void printHelloWorld() { Serial.println("Hello World!"); }
 
@@ -63,13 +59,12 @@ void setup() {
     Serial.println("Hello, EasyNetworkManager!");
 
     Serial.setDebugOutput(true);
-    configManager.initConfig();  // call before load to
-                                 // initialise the structs
-    configManager.attach(
-        &mDNS);  // attach the config manager to the mdns
-                 // object - this will update the config
-                 // when mdns hostname changes
-    configManager.load();  // load the config from flash
+    configManager.initConfig();   // call before load to
+                                  // initialise the structs
+    configManager.attach(&mDNS);  // attach the config manager to the mdns
+                                  // object - this will update the config
+                                  // when mdns hostname changes
+    configManager.load();         // load the config from flash
 
     network.setupWifi();  // setup wifi or ethernet connection
     mDNS.startMDNS();     // start mDNS service (optional)
@@ -85,19 +80,17 @@ void setup() {
         case WiFiState_e::WiFiState_ADHOC: {
             // only start the API server if we have wifi
             // connection
-            server.updateCommandHandlers(
-                "blink",
-                blink);  // add a command handler to the API
-                         // server - you can add as many as
-                         // you want - you can also add
-                         // methods.
-            server.updateCommandHandlers(
-                "helloWorld",
-                printHelloWorld);  // add a command handler
-                                   // to the API server -
-                                   // you can add as many as
-                                   // you want - you can
-                                   // also add methods.
+            server.updateCommandHandlers("blink",
+                                         blink);  // add a command handler to the API
+                                                  // server - you can add as many as
+                                                  // you want - you can also add
+                                                  // methods.
+            server.updateCommandHandlers("helloWorld",
+                                         printHelloWorld);  // add a command handler
+                                                            // to the API server -
+                                                            // you can add as many as
+                                                            // you want - you can
+                                                            // also add methods.
             server.begin();
             log_d("[SETUP]: Starting API Server");
             break;
@@ -105,19 +98,17 @@ void setup() {
         case WiFiState_e::WiFiState_Connected: {
             // only start the API server if we have wifi
             // connection
-            server.updateCommandHandlers(
-                "blink",
-                blink);  // add a command handler to the API
-                         // server - you can add as many as
-                         // you want - you can also add
-                         // methods.
-            server.updateCommandHandlers(
-                "helloWorld",
-                printHelloWorld);  // add a command handler
-                                   // to the API server -
-                                   // you can add as many as
-                                   // you want - you can
-                                   // also add methods.
+            server.updateCommandHandlers("blink",
+                                         blink);  // add a command handler to the API
+                                                  // server - you can add as many as
+                                                  // you want - you can also add
+                                                  // methods.
+            server.updateCommandHandlers("helloWorld",
+                                         printHelloWorld);  // add a command handler
+                                                            // to the API server -
+                                                            // you can add as many as
+                                                            // you want - you can
+                                                            // also add methods.
             server.begin();
             log_d("[SETUP]: Starting API Server");
             break;
