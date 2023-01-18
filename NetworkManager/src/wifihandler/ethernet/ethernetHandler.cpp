@@ -109,7 +109,7 @@ void EthernetManager::WT32_ETH01_event(WiFiEvent_t event) {
     }
 }
 
-void EthernetManager::EthernetHandler::begin() {
+void EthernetManager::begin() {
     WT32_ETH01_onEvent();
     ETH.begin(ETH_PHY_ADDR, ETH_PHY_POWER);
     ETH.config(*ethIP, *ethGW, *ethSN, *ethDNS);

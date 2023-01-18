@@ -122,10 +122,7 @@ class EthernetManager {
     void WT32_ETH01_waitForConnect();
     bool WT32_ETH01_isConnected();
     void WT32_ETH01_event(WiFiEvent_t event);
-
-    struct EthernetHandler {
-        void begin();
-    };
+    void begin();
 };
 
 #endif  // ETHERNETHANDLER_WT32_ETH01_H
