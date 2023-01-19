@@ -77,7 +77,6 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
     {
     case POST:
     {
-        int params = request->params();
         std::string networkName;
         std::string ssid;
         std::string password;
@@ -89,6 +88,7 @@ void BaseAPI::setWiFi(AsyncWebServerRequest *request)
         uint8_t power = 0;
         uint8_t adhoc = 0;
 
+        int params = request->params();
         log_d("Number of Params: %d", params);
         for (int i = 0; i < params; i++)
         {
