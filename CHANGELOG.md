@@ -3,6 +3,14 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.4.18](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.4.17...v1.4.18) (2023-01-19)
+
+
+### 🧑‍💻 Code Refactoring
+
+* added new more verbose example ([f6f7581](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/f6f7581c58d2433cdf6ecf35bcad0d517679b623))
+* rename example to customHTML ([9f6dc77](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/9f6dc77b10ee90af711103b27f6f81b861cee5f7))
+
 ## [1.4.17](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.4.16...v1.4.17) (2023-01-18)
 
 
