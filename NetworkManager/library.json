@@ -50,6 +50,9 @@
     "network/ota/OTA.hpp",
     "network/wifihandler/wifiHandler.hpp"
   ],
+  "export": {
+    "include": ["data/*", "src/*", "examples/*", "include/*"]
+  },
   "version": "1.4.20",
   "frameworks": "arduino",
   "platforms": ["espressif32", "espressif8266"]
