@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.4.19](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.4.18...v1.4.19) (2023-02-13)
+
+
+### 🐛 Bug Fixes
+
+* create a platformio project using the lib structure ([3553ab1](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/3553ab19172f3a0f02d44ca159c3fe814983c6aa))
+
 ## [1.4.18](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.4.17...v1.4.18) (2023-01-19)
 
 
