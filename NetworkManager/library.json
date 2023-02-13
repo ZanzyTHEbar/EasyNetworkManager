@@ -37,23 +37,18 @@
       "version": "https://github.com/bblanchon/ArduinoJson"
     }
   ],
-  "scripts": {
-    "postinstall": "python3 ./scripts/spiffs.py",
-    "preuninstall": "python3 ./scripts/uninstall.py"
-  },
-  "build": {
-    "includeDir": ["lib/src"]
-  },
   "headers": [
-    "webserverHandler.hpp",
-    "project_config.hpp",
-    "StateManager.hpp",
-    "enuminheritance.hpp",
-    "makeunique.hpp",
-    "Observer.hpp",
-    "MDNSManager.hpp",
-    "OTA.hpp",
-    "wifiHandler.hpp"
+    "EasyNetworkManager.hpp",
+    "EasyNetworkManager.h",
+    "api/webserverHandler.hpp",
+    "data/config/project_config.hpp",
+    "data/statemanager/StateManager.hpp",
+    "utilities/enuminheritance.hpp",
+    "utilities/makeunique.hpp",
+    "utilities/Observer.hpp",
+    "network/mDNS/MDNSManager.hpp",
+    "network/ota/OTA.hpp",
+    "network/wifihandler/wifiHandler.hpp"
   ],
   "version": "1.4.19",
   "frameworks": "arduino",

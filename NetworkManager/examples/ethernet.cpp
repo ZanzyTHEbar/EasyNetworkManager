@@ -1,28 +1,23 @@
 #include <Arduino.h>
 
-//? Here is a list of all the library header files -
-// required ones are marked with an asterisk (*)
+//? Here is a list of all the library header files - required ones are marked
+// with an asterisk (*)
 
 //! Optional header files
-#include <mDNS/MDNSManager.hpp>
-#include <ota/OTA.hpp>
-// #include <memory>
-// #include <data/utilities/Observer.hpp>
-// #include <api/utilities/apiUtilities.hpp>
-// #include <data/utilities/enuminheritance.hpp> // used for
-// extending enums with new values #include
-// <data/utilities/makeunique.hpp> // used with smart
-// pointers (unique_ptr) to create unique objects #include
-// <data/utilities/helpers.hpp> // various helper functions
-#include <data/utilities/network_utilities.hpp>  // various network utilities
-// #include <wifihandler/utilities/utilities.hpp> // various
-// wifi related utilities
+#include <network/mDNS/MDNSManager.hpp>
+#include <network/ota/OTA.hpp>
+#include <utilities/network_utilities.hpp>  // various network utilities
+// #include <utilities/Observer.hpp>
+// #include <utilities/api_utilities.hpp>
+// #include <utilities/enuminheritance.hpp> // used for extending enums with new
+// values
+// #include <utilities/makeunique.hpp> // used with smart pointers (unique_ptr)
+// to create unique objects
+// #include <utilities/helpers.hpp> // various helper functions
 
 //! Required header files
-#include <api/webserverHandler.hpp>                  //! (*)
-#include <data/StateManager/StateManager.hpp>        //! (*)
-#include <data/config/project_config.hpp>            //! (*)
-#include <wifihandler/ethernet/ethernetHandler.hpp>  //! (*)
+#define ENABLE_ETHERNET 1        // enable ethernet support
+#include <EasyNetworkManager.h>  // (*)
 
 // setup the ethernet connection variables
 
