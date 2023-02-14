@@ -12,6 +12,7 @@ struct DeviceStates {
 
     enum WiFiState_e {
         WiFiState_None,
+        WiFiState_Idle,
         WiFiState_Connecting,
         WiFiState_Connected,
         WiFiState_Disconnected,
