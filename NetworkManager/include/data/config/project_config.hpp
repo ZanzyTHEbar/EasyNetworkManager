@@ -76,14 +76,14 @@ class ProjectConfig : public Preferences, public ISubject {
     ProjectConfig(const std::string& configName = std::string(),
                   const std::string& mdnsName = std::string());
     virtual ~ProjectConfig();
-    void load();
-    void save();
+    virtual void load();
+    virtual void save();
+    virtual void initConfig();
     void wifiConfigSave();
     void deviceConfigSave();
     void mdnsConfigSave();
     void wifiTxPowerConfigSave();
     bool reset();
-    void initConfig();
 
     Project_Config::DeviceConfig_t* getDeviceConfig();
     Project_Config::MDNSConfig_t* getMDNSConfig();
