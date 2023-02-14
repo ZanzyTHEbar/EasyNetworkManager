@@ -49,8 +49,14 @@ class StateManager {
    public:
     StateManager() {}
 
-    virtual ~StateManager() {}
+    virtual ~StateManager() {
+        this->_current_state = static_cast<T>(0);
+    }
 
+    /*
+     * @brief Sets the  state of the stateManager
+     * @param T state - the state to be set
+     */
     void setState(T state) {
         _current_state = state;
     }

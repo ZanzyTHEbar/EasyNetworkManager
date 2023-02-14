@@ -5,14 +5,15 @@
 
 #    include <unordered_map>
 
-#    include "network/wifihandler/WifiHandler.hpp"
+#    include <WiFi.h>
+#    include <data/statemanager/StateManager.hpp>
 
 namespace Network_Utilities {
-bool LoopWifiScan();
-void SetupWifiScan();
+bool loopWifiScan();
+void setupWifiScan();
 void my_delay(volatile long delay_time);
-int CheckWifiState();
 int getStrength(int points);
 std::string generateDeviceID();
+void checkWiFiState();
 }  // namespace Network_Utilities
 #endif  // !UTILITIES_hpp
