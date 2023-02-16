@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.4.27](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.4.26...v1.4.27) (2023-02-16)
+
+
+### 🐛 Bug Fixes
+
+* make network maps public ([abfb7ee](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/abfb7ee407372c554a44f6f0a2b7fb8f9d4dee1a))
+
 ## [1.4.26](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.4.25...v1.4.26) (2023-02-16)
 
 
