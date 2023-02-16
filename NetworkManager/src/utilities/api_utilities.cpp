@@ -3,11 +3,11 @@
 //! These have to be called before the constructor of the class because they are
 //! static C++ 11 does not have inline variables, sadly. So we have to do this.
 const char* API_Utilities::MIMETYPE_HTML{"text/html"};
-// const char *BaseAPI::MIMETYPE_CSS{"text/css"};
-// const char *BaseAPI::MIMETYPE_JS{"application/javascript"};
-// const char *BaseAPI::MIMETYPE_PNG{"image/png"};
-// const char *BaseAPI::MIMETYPE_JPG{"image/jpeg"};
-// const char *BaseAPI::MIMETYPE_ICO{"image/x-icon"};
+const char* API_Utilities::MIMETYPE_CSS{"text/css"};
+const char* API_Utilities::MIMETYPE_JS{"application/javascript"};
+const char* API_Utilities::MIMETYPE_PNG{"image/png"};
+const char* API_Utilities::MIMETYPE_JPG{"image/jpeg"};
+const char* API_Utilities::MIMETYPE_ICO{"image/x-icon"};
 const char* API_Utilities::MIMETYPE_JSON{"application/json"};
 
 //*********************************************************************************************

@@ -19,13 +19,13 @@ class API_Utilities {
     bool initSPIFFS();
     std::string shaEncoder(std::string data);
 
-   protected:
+   public:
     static const char* MIMETYPE_HTML;
-    /* static const char *MIMETYPE_CSS; */
-    /* static const char *MIMETYPE_JS; */
-    /* static const char *MIMETYPE_PNG; */
-    /* static const char *MIMETYPE_JPG; */
-    /* static const char *MIMETYPE_ICO; */
+    static const char* MIMETYPE_CSS;
+    static const char* MIMETYPE_JS;
+    static const char* MIMETYPE_PNG;
+    static const char* MIMETYPE_JPG;
+    static const char* MIMETYPE_ICO;
     static const char* MIMETYPE_JSON;
 };
 
