@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.5.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.4.29...v1.5.0) (2023-02-16)
+
+
+### 🍕 Features
+
+* add detachAll method to obersevers ([ff13bf8](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/ff13bf8c697f811da81b472499e47c1d5d84065c))
+
 ## [1.4.29](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.4.28...v1.4.29) (2023-02-16)
 
 
