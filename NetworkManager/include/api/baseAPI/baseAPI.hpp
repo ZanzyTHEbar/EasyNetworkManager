@@ -98,11 +98,7 @@ class BaseAPI : public API_Utilities {
     virtual void begin();
 
    public:
-    typedef void (*stateFunction_t)(void);
-    typedef void (*stateFunction_request_t)(AsyncWebServerRequest* request);
-    std::unordered_map<std::string, stateFunction_t> stateFunctionMap;
-    std::unordered_map<std::string, stateFunction_request_t>
-        stateFunctionMapRequest;
+    std::unordered_map<std::string, ArRequestHandlerFunction> stateFunctionMap;
 
     struct userRoutes_t {
         // create a constructor to initialize the variables

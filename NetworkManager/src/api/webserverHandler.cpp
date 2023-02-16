@@ -115,13 +115,8 @@ void APIServer::handleRequest(AsyncWebServerRequest* request) {
 }
 
 void APIServer::updateCommandHandlers(const std::string& url,
-                                      stateFunction_t funct) {
+                                      ArRequestHandlerFunction funct) {
     stateFunctionMap.emplace(std::move(url), funct);
-}
-
-void APIServer::updateCommandHandlers(const std::string& url,
-                                      stateFunction_request_t funct) {
-    stateFunctionMapRequest.emplace(std::move(url), funct);
 }
 
 /**
@@ -135,20 +130,15 @@ void APIServer::updateCommandHandlers(const std::string& url,
  *
  */
 void APIServer::handleUserCommands(AsyncWebServerRequest* request) {
-    this->handleUserRequestCommands(request);
     std::string url = request->pathArg(1).c_str();
     auto it = stateFunctionMap.find(url);
     if (it != stateFunctionMap.end()) {
-        (*it->second)();
-    }
-    return;
-}
-
-void APIServer::handleUserRequestCommands(AsyncWebServerRequest* request) {
-    std::string url = request->pathArg(1).c_str();
-    auto it = stateFunctionMapRequest.find(url);
-    if (it != stateFunctionMapRequest.end()) {
-        (*it->second)(request);
+        log_d("We are trying to execute the function");
+        it->second(request);
+    } else {
+        log_e("Invalid Command");
+        request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Command\"}");
+        return;
     }
     return;
 }
