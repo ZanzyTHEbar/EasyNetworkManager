@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.5.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.5.0...v1.5.1) (2023-02-16)
+
+
+### 🐛 Bug Fixes
+
+* bug in detachAll ([3c0de59](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/3c0de59b2bc8a2bb9a57a3e18ffe5479ac1d2b04))
+
 ## [1.5.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.4.29...v1.5.0) (2023-02-16)
 
 
