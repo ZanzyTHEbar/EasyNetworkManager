@@ -30,21 +30,6 @@ constexpr int HTTP_ANY = 0b01111111;
 
 class BaseAPI : public API_Utilities {
    protected:
-    std::unordered_map<WebRequestMethodComposite, std::string>
-        _networkMethodsMap = {
-            {HTTP_GET, "GET"},     {HTTP_POST, "POST"},
-            {HTTP_PUT, "PUT"},     {HTTP_DELETE, "DELETE"},
-            {HTTP_PATCH, "PATCH"}, {HTTP_OPTIONS, "OPTIONS"},
-        };
-
-    std::unordered_map<std::string, WebRequestMethodComposite>
-        _networkMethodsMap_inv = {
-            {"GET", HTTP_GET},     {"POST", HTTP_POST},
-            {"PUT", HTTP_PUT},     {"DELETE", HTTP_DELETE},
-            {"PATCH", HTTP_PATCH}, {"OPTIONS", HTTP_OPTIONS},
-        };
-
-   protected:
     /* Commands */
     void setWiFi(AsyncWebServerRequest* request);
     void setWiFiTXPower(AsyncWebServerRequest* request);
@@ -79,6 +64,20 @@ class BaseAPI : public API_Utilities {
         networkMethodsMap_t;
 
    public:
+    std::unordered_map<std::string, WebRequestMethodComposite>
+        _networkMethodsMap_inv = {
+            {"GET", HTTP_GET},     {"POST", HTTP_POST},
+            {"PUT", HTTP_PUT},     {"DELETE", HTTP_DELETE},
+            {"PATCH", HTTP_PATCH}, {"OPTIONS", HTTP_OPTIONS},
+        };
+        
+    std::unordered_map<WebRequestMethodComposite, std::string>
+        _networkMethodsMap = {
+            {HTTP_GET, "GET"},     {HTTP_POST, "POST"},
+            {HTTP_PUT, "PUT"},     {HTTP_DELETE, "DELETE"},
+            {HTTP_PATCH, "PATCH"}, {HTTP_OPTIONS, "OPTIONS"},
+        };
+
     enum RequestMethods { GET, POST, PUT, DELETE, PATCH, OPTIONS };
 
     std::unordered_map<WebRequestMethodComposite, RequestMethods>
