@@ -15,25 +15,27 @@ enum Event {
 };
 }
 
+template <typename EnumT>
 class IObserver {
    public:
-    virtual void update(ObserverEvent::Event event) = 0;
+    virtual void update(EnumT event) = 0;
 };
 
+template <typename EnumT>
 class ISubject {
    private:
-    std::set<IObserver*> observers;
+    std::set<IObserver<EnumT>*> observers;
 
    public:
-    void attach(IObserver* observer) {
+    void attach(IObserver<EnumT>* observer) {
         this->observers.insert(observer);
     }
 
-    void detach(IObserver* observer) {
+    void detach(IObserver<EnumT>* observer) {
         this->observers.erase(observer);
     }
 
-    void notify(ObserverEvent::Event event) {
+    void notify(EnumT event) {
         for (auto observer : this->observers) {
             observer->update(event);
         }

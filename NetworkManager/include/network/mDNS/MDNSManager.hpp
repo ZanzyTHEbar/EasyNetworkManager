@@ -6,7 +6,7 @@
 #include "data/statemanager/StateManager.hpp"
 #include "utilities/Observer.hpp"
 
-class MDNSHandler : public IObserver {
+class MDNSHandler : public IObserver<ObserverEvent::Event> {
    private:
     StateManager<MDNSState_e>* stateManager;
     ProjectConfig* configManager;
