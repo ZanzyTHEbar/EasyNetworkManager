@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.5.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.5.1...v1.5.2) (2023-02-16)
+
+
+### 🐛 Bug Fixes
+
+* bug in helpers util ([e28117f](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/e28117f385334ac0491b048492a16bf7217ce6fa))
+
 ## [1.5.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.5.0...v1.5.1) (2023-02-16)
 
 
