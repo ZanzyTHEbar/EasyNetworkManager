@@ -35,7 +35,7 @@ class ISubject {
         this->observers.erase(observer);
     }
 
-    void detachAll(IObserver<EnumT>* observer) {
+    void detachAll() {
         this->observers.clear();
     }
 
