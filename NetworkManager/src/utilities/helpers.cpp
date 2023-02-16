@@ -30,7 +30,7 @@ char* Helpers::itoa(int value, char* result, int base) {
     return result;
 }
 
-void split(const std::string& str, const std::string& splitBy,
+void Helpers::split(const std::string& str, const std::string& splitBy,
            std::vector<std::string>& tokens) {
     /* Store the original string in the array, so we can loop the rest
      * of the algorithm. */

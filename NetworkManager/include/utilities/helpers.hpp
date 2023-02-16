@@ -32,7 +32,7 @@
 
 namespace Helpers {
 char* itoa(int value, char* result, int base);
-void split(std::string str, std::string splitBy,
+void split(const std::string& str, const std::string& splitBy,
            std::vector<std::string>& tokens);
 std::vector<std::string> split(const std::string& s, char delimiter);
 char* appendChartoChar(const char* hostname, const char* def_host);
