@@ -35,6 +35,10 @@ class ISubject {
         this->observers.erase(observer);
     }
 
+    void detachAll(IObserver<EnumT>* observer) {
+        this->observers.clear();
+    }
+
     void notify(EnumT event) {
         for (auto observer : this->observers) {
             observer->update(event);
