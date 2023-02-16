@@ -1,9 +1,5 @@
 #include <api/baseAPI/baseAPI.hpp>
 
-bool BaseAPI::ssid_write = false;
-bool BaseAPI::pass_write = false;
-bool BaseAPI::channel_write = false;
-
 BaseAPI::BaseAPI(int CONTROL_PORT, ProjectConfig* configManager,
                  const std::string& api_url, const std::string& wifimanager_url,
                  const std::string& userCommands)

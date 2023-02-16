@@ -44,14 +44,6 @@ class BaseAPI : public API_Utilities {
             {"PATCH", HTTP_PATCH}, {"OPTIONS", HTTP_OPTIONS},
         };
 
-    enum RequestMethods { GET, POST, PUT, DELETE, PATCH, OPTIONS };
-
-    std::unordered_map<WebRequestMethodComposite, RequestMethods>
-        _networkMethodsMap_enum = {
-            {HTTP_GET, GET},       {HTTP_POST, POST},   {HTTP_PUT, PUT},
-            {HTTP_DELETE, DELETE}, {HTTP_PATCH, PATCH}, {HTTP_OPTIONS, OPTIONS},
-        };
-
    protected:
     /* Commands */
     void setWiFi(AsyncWebServerRequest* request);
@@ -79,16 +71,21 @@ class BaseAPI : public API_Utilities {
     /// use new and delete
     AsyncWebServer server;
     ProjectConfig* configManager;
-    typedef std::unordered_map<std::string, WebRequestMethodComposite>
-        networkMethodsMap_t;
 
     std::string api_url;
     std::string wifimanager_url;
     std::string userCommands;
+    typedef std::unordered_map<std::string, WebRequestMethodComposite>
+        networkMethodsMap_t;
 
-    static bool ssid_write;
-    static bool pass_write;
-    static bool channel_write;
+   public:
+    enum RequestMethods { GET, POST, PUT, DELETE, PATCH, OPTIONS };
+
+    std::unordered_map<WebRequestMethodComposite, RequestMethods>
+        _networkMethodsMap_enum = {
+            {HTTP_GET, GET},       {HTTP_POST, POST},   {HTTP_PUT, PUT},
+            {HTTP_DELETE, DELETE}, {HTTP_PATCH, PATCH}, {HTTP_OPTIONS, OPTIONS},
+        };
 
    public:
     BaseAPI(int CONTROL_PORT, ProjectConfig* configManager,
