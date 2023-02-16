@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.4.26](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.4.25...v1.4.26) (2023-02-16)
+
+
+### 🐛 Bug Fixes
+
+* update Observer as template class ([c1447ef](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/c1447ef66f7755cbb81043358df8c5ce411a19de))
+
 ## [1.4.25](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.4.24...v1.4.25) (2023-02-16)
 
 
