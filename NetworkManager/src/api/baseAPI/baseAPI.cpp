@@ -79,6 +79,7 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
             std::string password;
             std::string ota_password;
             std::string mdns;
+            std::string service;
             int ota_port = 0;
             bool reboot = false;
             uint8_t channel = 0;
@@ -90,21 +91,23 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
             for (int i = 0; i < params; i++) {
                 AsyncWebParameter* param = request->getParam(i);
                 if (param->name() == "networkName") {
-                    networkName = param->value().c_str();
+                    networkName.assign(param->value().c_str());
                 } else if (param->name() == "ssid") {
-                    ssid = param->value().c_str();
+                    ssid.assign(param->value().c_str());
                 } else if (param->name() == "password") {
-                    password = param->value().c_str();
+                    password.assign(param->value().c_str());
                 } else if (param->name() == "channel") {
                     channel = (uint8_t)atoi(param->value().c_str());
                 } else if (param->name() == "power") {
                     power = (uint8_t)atoi(param->value().c_str());
                 } else if (param->name() == "ota_password") {
-                    ota_password = param->value().c_str();
+                    ota_password.assign(param->value().c_str());
                 } else if (param->name() == "ota_port") {
                     ota_port = atoi(param->value().c_str());
                 } else if (param->name() == "mdns") {
-                    mdns = param->value().c_str();
+                    mdns.assign(param->value().c_str());
+                } else if (param->name() == "service") {
+                    service.assign(param->value().c_str());
                 } else if (param->name() == "adhoc") {
                     adhoc = (uint8_t)atoi(param->value().c_str());
                 } else if (param->name() == "reboot") {
@@ -120,6 +123,11 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
             // specific fields
             configManager->setWifiConfig(networkName, ssid, password, channel,
                                          power, adhoc, true);
+
+            if (!mdns.empty()) {
+                configManager->setMDNSConfig(
+                    mdns, service.empty() ? "esp32_thing" : service, true);
+            }
 
             if (reboot) {
                 request->send(
