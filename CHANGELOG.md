@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.6.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.5.2...v1.6.0) (2023-02-18)
+
+
+### 🍕 Features
+
+* add proper mdns support ([78afaa4](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/78afaa48ff15fe0a4c7b96989ee005841af4a1ab))
+
 ## [1.5.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.5.1...v1.5.2) (2023-02-16)
 
 
