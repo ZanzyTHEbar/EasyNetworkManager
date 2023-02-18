@@ -334,8 +334,6 @@
                             <label for="mdns">mDNS Address </label>
                             <input type="text" id="mdns" name="mdns" placeholder="esp32device"
                                 oninput='document.getElementById("url").value="http:/\/"+document.getElementById("mdns").value+".local";'><br>
-                            <label for="label">mDNS Address </label>
-                            <input type="text" id="service" name="service" placeholder="esp32_thing"><br>
                             <script>
                                 document.getElementById("url").value = "http://" + document.getElementById("mdns").value + ".local";
 
@@ -349,11 +347,9 @@
                                     if (mdns_checkBox.checked == true) {
                                         document.getElementById("url").disabled = false;
                                         document.getElementById("mdns").disabled = false;
-                                        document.getElementById("service").disabled = false;
                                     } else {
                                         document.getElementById("url").disabled = true;
                                         document.getElementById("mdns").disabled = true;
-                                        document.getElementById("service").disabled = true;
                                     }
                                 }
                             </script>

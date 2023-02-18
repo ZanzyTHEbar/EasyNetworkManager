@@ -35,7 +35,6 @@ void ProjectConfig::initConfig() {
     }
     this->config.mdns = {
         _mdnsName,
-        "",
     };
 
     log_i("MDNS name: %s", _mdnsName.c_str());
@@ -59,7 +58,6 @@ void ProjectConfig::deviceConfigSave() {
 void ProjectConfig::mdnsConfigSave() {
     /* MDNS Config */
     putString("hostname", this->config.mdns.hostname.c_str());
-    putString("service", this->config.mdns.service.c_str());
 }
 
 void ProjectConfig::wifiConfigSave() {
@@ -125,7 +123,6 @@ void ProjectConfig::load() {
     /* MDNS Config */
     this->config.mdns.hostname.assign(
         getString("hostname", _mdnsName.c_str()).c_str());
-    this->config.mdns.service.assign(getString("service").c_str());
     /* Device Config */
     this->config.device.OTAPassword.assign(
         getString("OTAPassword", "12345678").c_str());
@@ -195,11 +192,9 @@ void ProjectConfig::setDeviceConfig(const std::string& OTAPassword, int OTAPort,
 }
 
 void ProjectConfig::setMDNSConfig(const std::string& hostname,
-                                  const std::string& service,
                                   bool shouldNotify) {
     log_d("Updating MDNS config");
     this->config.mdns.hostname.assign(hostname);
-    this->config.mdns.service.assign(service);
 
     if (shouldNotify)
         this->notify(ObserverEvent::mdnsConfigUpdated);
@@ -292,8 +287,7 @@ std::string Project_Config::DeviceConfig_t::toRepresentation() {
 
 std::string Project_Config::MDNSConfig_t::toRepresentation() {
     std::string json = Helpers::format_string(
-        "\"mdns_config\": {\"hostname\": \"%s\", \"service\": \"%s\"}",
-        this->hostname.c_str(), this->service.c_str());
+        "\"mdns_config\": {\"hostname\": \"%s\"}", this->hostname.c_str());
     return json;
 }
 
