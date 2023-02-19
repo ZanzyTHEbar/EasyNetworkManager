@@ -122,7 +122,13 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
                                          power, adhoc, true);
 
             if (!mdns.empty()) {
-                configManager->setMDNSConfig(mdns, true);
+                configManager->setMDNSConfig(mdns, true)
+                    ? request->send(
+                          200, MIMETYPE_JSON,
+                          "{\"msg\":\"Done. MDNS Creds have been set.\"}")
+                    : request->send(400, MIMETYPE_JSON,
+                                    "{\"msg\":\"Error. MDNS Name is not a "
+                                    "valid alpha numeric string.\"}");
             }
 
             if (reboot) {

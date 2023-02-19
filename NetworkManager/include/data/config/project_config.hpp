@@ -81,7 +81,7 @@ class ProjectConfig : public Preferences,
     virtual void initConfig();
     void wifiConfigSave();
     void deviceConfigSave();
-    void mdnsConfigSave();
+    bool mdnsConfigSave();
     void wifiTxPowerConfigSave();
     bool reset();
 
@@ -95,7 +95,7 @@ class ProjectConfig : public Preferences,
     void setDeviceConfig(const std::string& OTAPassword, int OTAPort,
                          bool shouldNotify);
     void setDeviceDataJson(const std::string& deviceJson, bool shouldNotify);
-    void setMDNSConfig(const std::string& mdns, bool shouldNotify);
+    bool setMDNSConfig(const std::string& mdns, bool shouldNotify);
     void setWifiConfig(const std::string& networkName, const std::string& ssid,
                        const std::string& password, uint8_t channel,
                        uint8_t power, bool adhoc, bool shouldNotify);

@@ -55,7 +55,7 @@ void ProjectConfig::deviceConfigSave() {
     //! on the fly
 }
 
-void ProjectConfig::mdnsConfigSave() {
+bool ProjectConfig::mdnsConfigSave() {
     /* MDNS Config */
     putString("hostname", this->config.mdns.hostname.c_str());
 }
@@ -191,13 +191,32 @@ void ProjectConfig::setDeviceConfig(const std::string& OTAPassword, int OTAPort,
     }
 }
 
-void ProjectConfig::setMDNSConfig(const std::string& hostname,
+bool ProjectConfig::setMDNSConfig(const std::string& hostname,
                                   bool shouldNotify) {
     log_d("Updating MDNS config");
+    for (int i = 0; i < this->config.mdns.hostname.size(); i++) {
+        if (this->config.mdns.hostname[i] == '-' ||
+            this->config.mdns.hostname[i] == '.')
+            continue;
+        else if (this->config.mdns.hostname[i] >= '0' &&
+                 this->config.mdns.hostname[i] <= '9')
+            continue;
+        else if (this->config.mdns.hostname[i] >= 'A' &&
+                 this->config.mdns.hostname[i] <= 'Z')
+            continue;
+        else if (this->config.mdns.hostname[i] >= 'a' &&
+                 this->config.mdns.hostname[i] <= 'z')
+            continue;
+        else if (this->config.mdns.hostname[i] == 0 && i > 0)
+            break;
+        log_i("Invalid hostname, please use only alphanumeric characters");
+        return false;
+    }
     this->config.mdns.hostname.assign(hostname);
 
     if (shouldNotify)
         this->notify(ObserverEvent::mdnsConfigUpdated);
+    return true;
 }
 
 void ProjectConfig::setWifiConfig(const std::string& networkName,
