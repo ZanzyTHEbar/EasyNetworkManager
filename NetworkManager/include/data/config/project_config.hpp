@@ -9,6 +9,7 @@
 
 #    include "utilities/Observer.hpp"
 #    include "utilities/helpers.hpp"
+#    include "utilities/network_utilities.hpp"
 
 namespace Project_Config {
 struct DeviceConfig_t {
@@ -81,7 +82,7 @@ class ProjectConfig : public Preferences,
     virtual void initConfig();
     void wifiConfigSave();
     void deviceConfigSave();
-    bool mdnsConfigSave();
+    void mdnsConfigSave();
     void wifiTxPowerConfigSave();
     bool reset();
 

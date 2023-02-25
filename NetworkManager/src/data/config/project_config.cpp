@@ -55,7 +55,7 @@ void ProjectConfig::deviceConfigSave() {
     //! on the fly
 }
 
-bool ProjectConfig::mdnsConfigSave() {
+void ProjectConfig::mdnsConfigSave() {
     /* MDNS Config */
     putString("hostname", this->config.mdns.hostname.c_str());
 }
@@ -105,6 +105,7 @@ void ProjectConfig::save() {
     mdnsConfigSave();
     end();
     log_i("Project config saved and system is rebooting");
+    Network_Utilities::my_delay(5L);
     ESP.restart();
 }
 

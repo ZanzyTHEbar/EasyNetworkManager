@@ -130,7 +130,7 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
     int progress = 0;
 
     stateManager->setState(WiFiState_e::WiFiState_Connecting);
-    log_i("Trying to connect to: %s \n\r", ssid);
+    log_i("Trying to connect to: %s \n\r", ssid.c_str());
     auto mdnsConfig = configManager->getMDNSConfig();
     WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE,
                 INADDR_NONE);  // need to call before

@@ -32,6 +32,8 @@ void BaseAPI::begin() {
         }
         server.serveStatic(wifimanager_url.c_str(), SPIFFS, "/wifimanager.html")
             .setCacheControl("max-age=600");
+    }else {
+        log_e("SPIFFS not initialized - no user defined html files available \n");
     }
 
     // preflight cors check
