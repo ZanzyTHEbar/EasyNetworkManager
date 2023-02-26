@@ -53,7 +53,7 @@
   "export": {
     "include": ["data/*", "src/*", "examples/*", "include/*"]
   },
-  "version": "1.8.1",
+  "version": "1.8.2",
   "frameworks": "arduino",
   "platforms": ["espressif32", "espressif8266"]
 }
