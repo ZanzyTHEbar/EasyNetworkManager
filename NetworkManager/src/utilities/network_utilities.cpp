@@ -76,7 +76,7 @@ std::string Network_Utilities::generateDeviceID() {
  *
  * @brief Call this function in the loop() function
  */
-static void Network_Utilities::checkWiFiState() {
+void Network_Utilities::checkWiFiState() {
     if (wifiStateManager.getCurrentState() == WiFiState_e::WiFiState_ADHOC) {
         return;
     }
