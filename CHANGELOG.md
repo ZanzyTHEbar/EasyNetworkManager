@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.8.3](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.8.2...v1.8.3) (2023-02-26)
+
+
+### 🐛 Bug Fixes
+
+* fix static issue with checkWifiState() ([46ab85c](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/46ab85c2194b5bd0de2b316146c69d1767203730))
+
 ## [1.8.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.8.1...v1.8.2) (2023-02-26)
 
 
