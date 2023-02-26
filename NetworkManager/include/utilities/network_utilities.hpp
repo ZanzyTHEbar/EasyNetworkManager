@@ -15,7 +15,7 @@ void setupWifiScan();
 void my_delay(volatile long delay_time);
 int getStrength(int points);
 std::string generateDeviceID();
-static void checkWiFiState();
+void checkWiFiState();
 std::string shaEncoder(const std::string& data);
 }  // namespace Network_Utilities
 #endif  // !UTILITIES_hpp
