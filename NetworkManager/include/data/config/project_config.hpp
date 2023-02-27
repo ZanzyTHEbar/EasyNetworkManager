@@ -103,6 +103,7 @@ class ProjectConfig : public Preferences,
     void setAPWifiConfig(const std::string& ssid, const std::string& password,
                          uint8_t channel, bool adhoc, bool shouldNotify);
     void setWiFiTxPower(uint8_t power, bool shouldNotify);
+    void deleteWifiConfig(const std::string& networkName, bool shouldNotify);
 
    private:
     Project_Config::ProjectConfig_t config;

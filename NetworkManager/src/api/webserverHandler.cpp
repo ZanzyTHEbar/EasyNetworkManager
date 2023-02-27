@@ -45,6 +45,7 @@ void APIServer::setupServer() {
     routes.emplace("rebootDevice", &APIServer::rebootDevice);
     routes.emplace("ping", &APIServer::ping);
     routes.emplace("save", &APIServer::save);
+    routes.emplace("wifiStrength", &APIServer::rssi);
 
     //! reserve enough memory for all routes - must be called after adding
     //! routes and before adding routes to route_map

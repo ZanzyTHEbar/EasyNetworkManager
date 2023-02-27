@@ -32,8 +32,9 @@ void BaseAPI::begin() {
         }
         server.serveStatic(wifimanager_url.c_str(), SPIFFS, "/wifimanager.html")
             .setCacheControl("max-age=600");
-    }else {
-        log_e("SPIFFS not initialized - no user defined html files available \n");
+    } else {
+        log_e(
+            "SPIFFS not initialized - no user defined html files available \n");
     }
 
     // preflight cors check
@@ -142,6 +143,13 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
                 request->send(200, MIMETYPE_JSON,
                               "{\"msg\":\"Done. Wifi Creds have been set.\"}");
             }
+            break;
+        }
+        case DELETE: {
+            configManager->deleteWifiConfig(request->arg("networkName").c_str(),
+                                            true);
+            request->send(200, MIMETYPE_JSON,
+                          "{\"msg\":\"Done. Wifi Creds have been deleted.\"}");
             break;
         }
         default: {
@@ -311,4 +319,12 @@ void BaseAPI::ping(AsyncWebServerRequest* request) {
 void BaseAPI::save(AsyncWebServerRequest* request) {
     configManager->save();
     request->send(200, MIMETYPE_JSON, "{\"msg\": \"ok\" }");
+}
+
+void BaseAPI::rssi(AsyncWebServerRequest* request) {
+    int rssi = Network_Utilities::getStrength(
+        request->getParam("points")->value().toInt());
+    char _rssiBuffer[20];
+    snprintf(_rssiBuffer, sizeof(_rssiBuffer), "{\"rssi\": %d }", rssi);
+    request->send(200, MIMETYPE_JSON, _rssiBuffer);
 }

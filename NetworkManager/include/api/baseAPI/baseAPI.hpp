@@ -40,6 +40,8 @@ class BaseAPI : public API_Utilities {
     void getJsonConfig(AsyncWebServerRequest* request);
     void ping(AsyncWebServerRequest* request);
     void save(AsyncWebServerRequest* request);
+    void rssi(AsyncWebServerRequest* request);
+
     /* Helpers */
     void notFound(AsyncWebServerRequest* request) const;
 
@@ -70,7 +72,7 @@ class BaseAPI : public API_Utilities {
             {"PUT", HTTP_PUT},     {"DELETE", HTTP_DELETE},
             {"PATCH", HTTP_PATCH}, {"OPTIONS", HTTP_OPTIONS},
         };
-        
+
     std::unordered_map<WebRequestMethodComposite, std::string>
         _networkMethodsMap = {
             {HTTP_GET, "GET"},     {HTTP_POST, "POST"},

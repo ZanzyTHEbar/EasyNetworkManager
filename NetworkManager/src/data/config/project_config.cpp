@@ -239,8 +239,7 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
 
     int networkToUpdate = -1;
     for (int i = 0; i < size; i++) {
-        if (strcmp(this->config.networks[i].name.c_str(),
-                   networkName.c_str()) == 0) {
+        if (this->config.networks[i].name == networkName) {
             // we've found a preexisting network, let's upate it
             networkToUpdate = i;
             break;
@@ -260,6 +259,31 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
         // we want to avoid that
         this->config.networks.emplace_back(networkName, ssid, password, channel,
                                            power, false);
+    }
+
+    if (shouldNotify)
+        this->notify(ObserverEvent::networksConfigUpdated);
+}
+
+void ProjectConfig::deleteWifiConfig(const std::string& networkName,
+                                     bool shouldNotify) {
+    size_t size = this->config.networks.size();
+    if (size == 0) {
+        Serial.println("No networks, nothing to delete");
+    }
+
+    int networkToDelete = -1;
+    for (int i = 0; i < size; i++) {
+        if (networkName == this->config.networks[i].name) {
+            // we've found a preexisting network, let's upate it
+            networkToDelete = i;
+            break;  // we can break here as we're not allowing duplicate names
+        }
+    }
+
+    if (networkToDelete >= 0) {
+        this->config.networks.erase(this->config.networks.begin() +
+                                    networkToDelete);
     }
 
     if (shouldNotify)
