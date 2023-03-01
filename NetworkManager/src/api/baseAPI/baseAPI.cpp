@@ -134,15 +134,10 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
                                     "valid alpha numeric string.\"}");
             }
 
-            if (reboot) {
-                request->send(
-                    200, MIMETYPE_JSON,
-                    "{\"msg\":\"Done. Wifi Creds have been set. Rebooting\"}");
-                this->save(request);
-            } else {
-                request->send(200, MIMETYPE_JSON,
-                              "{\"msg\":\"Done. Wifi Creds have been set.\"}");
-            }
+            request->send(
+                200, MIMETYPE_JSON,
+                "{\"msg\":\"Done. Wifi Creds have been set. Rebooting\"}");
+            this->save(request);
             break;
         }
         case DELETE: {

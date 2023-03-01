@@ -105,7 +105,7 @@ void ProjectConfig::save() {
     mdnsConfigSave();
     end();
     log_i("Project config saved and system is rebooting");
-    Network_Utilities::my_delay(5L);
+    Network_Utilities::my_delay(5);
     ESP.restart();
 }
 
