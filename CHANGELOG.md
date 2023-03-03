@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.9.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.9.1...v1.9.2) (2023-03-03)
+
+
+### 🐛 Bug Fixes
+
+* esp restar time on save ([c5c04f2](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/c5c04f2f047097d164d5082e56937777542761bf))
+
 ## [1.9.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.9.0...v1.9.1) (2023-03-01)
 
 
