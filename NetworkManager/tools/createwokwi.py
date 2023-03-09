@@ -26,7 +26,7 @@ to = "target:80"
 """
             toml_string = wokwi_string.format(name=firmware_name)
             print(toml_string)
-            with open("wokwi.toml", "w") as f:
+            with open("wokwi.toml", "w+") as f:
                 f.write(toml_string)
                 f.close()
 
