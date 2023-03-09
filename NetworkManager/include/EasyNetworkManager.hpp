@@ -3,7 +3,7 @@
 
 //! Required header files
 #include <api/webserverHandler.hpp>             //! (*)
-#include <data/StateManager/StateManager.hpp>   //! (*)
+#include <data/statemanager/StateManager.hpp>   //! (*)
 #include <data/config/project_config.hpp>       //! (*)
 
 #if ENABLE_ETHERNET
