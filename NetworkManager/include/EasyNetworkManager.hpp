@@ -7,7 +7,7 @@
 #include <data/config/project_config.hpp>       //! (*)
 
 #if ENABLE_ETHERNET
-#include <network/wifihandler/ethernet/ethernetHandler.hpp>  //! (*)
+#include <network/wifihandler/ethernet/ethernethandler.hpp>  //! (*)
 #else
 #include <network/wifihandler/wifihandler.hpp>  //! (*)
 #endif

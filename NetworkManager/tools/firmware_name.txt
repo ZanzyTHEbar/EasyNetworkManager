@@ -1,1 +1,0 @@
-EasyNetworkManager-v1.11.0-esp32dev_debug-73fdd34-main 
