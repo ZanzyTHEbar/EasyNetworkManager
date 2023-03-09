@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.10.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.9.2...v1.10.0) (2023-03-09)
+
+
+### 🍕 Features
+
+* remove the need for spiffs for wifimanager ([7c02ba3](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/7c02ba31e0010ed0f15b79d0fec506710723a973))
+
 ## [1.9.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.9.1...v1.9.2) (2023-03-03)
 
 
