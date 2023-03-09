@@ -21,7 +21,7 @@ class MDNSHandler : public IObserver<ObserverEvent::Event> {
                 ProjectConfig* configManager, const std::string& service_name,
                 const std::string& service_text, const std::string& proto,
                 const std::string& key, const std::string& value);
-    bool startMDNS();
+    bool begin();
     void update(ObserverEvent::Event event);
 };
 

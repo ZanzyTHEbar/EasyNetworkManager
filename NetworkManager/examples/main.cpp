@@ -18,13 +18,14 @@
 //! Required header files
 //! Required Defines - these nust come before the EasyNetworkManager header
 //* If you use platformio, you can add these defines to the platformio.ini file
-//under the `build_flags` section
+// under the `build_flags` section
 
 // #define USE_WEBMANAGER  // enable the web manager
 // #define ASYNCWEBSERVER_REGEX // enable the use of regex - this is required
 // for the library to work
-// #define CORE_DEBUG_LEVEL 5 // set the debug level for the core library - levels 1-5 this is set to level 1 by default
-// I recommend level 4 for debugging - level 5 is for verbose debugging, level one is errors only.
+// #define CORE_DEBUG_LEVEL 5 // set the debug level for the core library -
+// levels 1-5 this is set to level 1 by default I recommend level 4 for
+// debugging - level 5 is for verbose debugging, level one is errors only.
 #include <EasyNetworkManager.h>  // (*)
 
 //? The Project Config Manager is used to store and retrieve the configuration
@@ -147,14 +148,13 @@ void setup() {
     Serial.begin(115200);
     Serial.println("\nHello, EasyNetworkManager!");
 
-    configManager.initConfig();  // call before load to initialise the structs
     configManager.attach(
         &mDNS);  // attach the config manager to the mdns object - this will
                  // update the config when mdns hostname changes
     configManager.load();  // load the config from flash
 
-    network.begin();   // setup wifi connection
-    mDNS.startMDNS();  // start mDNS service (optional)
+    network.begin();  // setup wifi connection
+    mDNS.begin();     // start mDNS service (optional)
 
     // handle the WiFi connection state changes
     switch (wifiStateManager.getCurrentState()) {

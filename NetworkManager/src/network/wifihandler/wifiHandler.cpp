@@ -25,21 +25,21 @@ void WiFiHandler::begin() {
     WiFi.mode(WIFI_STA);
     WiFi.setSleep(WIFI_PS_NONE);
 
-    log_i("Initializing connection to wifi \n\r");
+    Serial.print("Initializing connection to wifi \n\r");
     stateManager->setState(WiFiState_e::WiFiState_Connecting);
 
     std::vector<Project_Config::WiFiConfig_t>* networks =
         configManager->getWifiConfigs();
 
     if (networks->empty()) {
-        log_i(
+        Serial.print(
             "No networks found in config, trying the "
             "default one \n\r");
         if (this->iniSTA(this->ssid, this->password, this->channel,
                          (wifi_power_t)txpower->power)) {
             return;
         } else {
-            log_i(
+            Serial.print(
                 "Could not connect to the hardcoded "
                 "network, setting up ADHOC network \n\r");
             this->setUpADHOC();
@@ -58,21 +58,21 @@ void WiFiHandler::begin() {
 
     // at this point, we've tried every network, let's just
     // setup adhoc
-    log_i(
+    Serial.printf(
         "We've gone through every network, each timed out. "
-        "Trying to connect to hardcoded network: %s \n\r",
+        "Trying to connect to the hardcoded network one last time: %s \n\r",
         this->ssid.c_str());
     if (this->iniSTA(this->ssid, this->password, this->channel,
                      (wifi_power_t)txpower->power)) {
-        log_i(
+        Serial.print(
             "Successfully connected to the hardcoded "
             "network. \n\r");
-    } else {
-        log_i(
-            "Could not connect to the hardcoded network, "
-            "setting up adhoc. \n\r");
-        this->setUpADHOC();
+        return;
     }
+    log_e(
+        "Could not connect to the hardcoded network, "
+        "setting up adhoc. \n\r");
+    this->setUpADHOC();
 }
 
 void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
@@ -130,7 +130,7 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
     int progress = 0;
 
     stateManager->setState(WiFiState_e::WiFiState_Connecting);
-    log_i("Trying to connect to: %s \n\r", ssid.c_str());
+    Serial.printf("Trying to connect to: %s \n\r", ssid.c_str());
     auto mdnsConfig = configManager->getMDNSConfig();
     WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE,
                 INADDR_NONE);  // need to call before
@@ -150,8 +150,8 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
     }
 
     stateManager->setState(WiFiState_e::WiFiState_Connected);
-    log_i("Successfully connected to %s \n\r", ssid.c_str());
-    log_i("Setting TX power to: %d \n\r", (uint8_t)power);
+    Serial.printf("Successfully connected to %s \n\r", ssid.c_str());
+    Serial.printf("Setting TX power to: %d \n\r", (uint8_t)power);
     WiFi.setTxPower(power);
 
     return true;

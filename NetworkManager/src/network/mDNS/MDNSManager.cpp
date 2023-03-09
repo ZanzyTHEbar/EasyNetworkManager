@@ -4,8 +4,7 @@ MDNSHandler::MDNSHandler(StateManager<MDNSState_e>* stateManager,
                          ProjectConfig* configManager,
                          const std::string& service_name,
                          const std::string& service_text,
-                         const std::string& proto, 
-                         const std::string& key,
+                         const std::string& proto, const std::string& key,
                          const std::string& value)
     : stateManager(stateManager),
       configManager(configManager),
@@ -15,7 +14,7 @@ MDNSHandler::MDNSHandler(StateManager<MDNSState_e>* stateManager,
       key(key),
       value(value) {}
 
-bool MDNSHandler::startMDNS() {
+bool MDNSHandler::begin() {
     auto mdnsConfig = configManager->getMDNSConfig();
     log_d("%s", mdnsConfig->hostname.c_str());
     if (!MDNS.begin(mdnsConfig->hostname.c_str())) {
@@ -40,7 +39,7 @@ void MDNSHandler::update(ObserverEvent::Event event) {
     switch (event) {
         case ObserverEvent::Event::mdnsConfigUpdated:
             MDNS.end();
-            startMDNS();
+            begin();
             break;
         default:
             break;

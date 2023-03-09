@@ -54,15 +54,13 @@ void blink(AsyncWebServerRequest* request) {
 void setup() {
     Serial.begin(115200);
     Serial.println("\nHello, EasyNetworkManager!");
-    configManager.initConfig();   // call before load to
-                                  // initialise the structs
     configManager.attach(&mDNS);  // attach the config manager to the mdns
                                   // object - this will update the config
                                   // when mdns hostname changes
     configManager.load();         // load the config from flash
 
-    network.begin();   // setup wifi or ethernet connection
-    mDNS.startMDNS();  // start mDNS service (optional)
+    network.begin();  // setup wifi or ethernet connection
+    mDNS.begin();     // start mDNS service (optional)
 
     // handle the WiFi connection state changes
     switch (wifiStateManager.getCurrentState()) {

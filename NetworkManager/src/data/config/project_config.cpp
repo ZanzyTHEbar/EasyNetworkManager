@@ -119,6 +119,8 @@ bool ProjectConfig::reset() {
 
 void ProjectConfig::load() {
     log_d("Loading project config");
+    // call before load to initialise the structs
+    initConfig();
     if (this->_already_loaded) {
         log_w("Project config already loaded");
         return;
