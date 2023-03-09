@@ -8,7 +8,7 @@ This project supports the following boards:
 - ESP32
   
 > **Note**: Full ESP32C3 support is still in development, please report any bugs in the issues section.
-> Of note, this has been successfully tested onall boards except for the ESP32C3.
+> Of note, this has been successfully tested on all boards except for the ESP32C3.
 > This library fully supports M5Stack devices.
 
 This library provides a WiFi Manager front-end on a customisable URL endpoint using a provided HTML file.
@@ -23,6 +23,7 @@ It also provides numerous key features such as:
 - mDNS
 - OTA
 - customisable REST API
+- WebSockets
 
 And much more :smile: See the classes below.
 
@@ -47,7 +48,7 @@ This library implements the following classes:
 You can install via the `Platformio Registry` by navigating to the `Libraries` section of `Platformio`.
 The library is called `EasyNetworkManager` by `ZanzyTHEbar`.
 
-In your `platformio.ini` file add the following:
+if you like to install the bleading edge, in your `platformio.ini` file add the following:
 
 ```ini
 lib_deps = 
@@ -82,7 +83,7 @@ All dependencies _should_ be installed automatically. If not, please make a new 
 
 For basic usage please see the [examples](/NetworkManager/examples) folder.
 
-To use the provided [wifi manager html](/NetworkManager/data/wifimanager.html) page you need to move the `wifimanager.html` file into a `data` folder in the root of your `pio` project.
+To use the provided [wifi manager html](/NetworkManager/ui/wifimanager.html) page you don't needto do anything except for set a `define` before you include the library header (for `pio` users see the [Extras](#extras) section)
 
 Then, build and flash the SPIFFS image as normal.
 
@@ -99,6 +100,14 @@ For `platformio`
 ```ini
 build_flags = 
   -DASYNCWEBSERVER_REGEX ; add regex support to AsyncWebServer
+```
+
+Optionally you can enable the wifi maneger here as well:
+
+```ini
+build_flags = 
+  -DASYNCWEBSERVER_REGEX ; add regex support to AsyncWebServer
+  -DUSE_WEBMANAGER ; enable wifimanager
 ```
 
 For `ArduinoIDE`:
@@ -125,7 +134,13 @@ The text to add is:
 compiler.cpp.extra_flags=-DASYNCWEBSERVER_REGEX=1
 ```
 
-> **Note**: This library is still in development and is not yet complete, if there are any bugs please report them in the issues section.
+Optionally you can enable the wifi manager here as well:
+
+```txt
+compiler.cpp.extra_flags=-DASYNCWEBSERVER_REGEX=1 -DUSE_WEBMANAGER=1
+```
+
+> **Note**: This library is still in development, if there are any bugs please report them in the issues section.
 
 ## Modification
 
@@ -135,13 +150,12 @@ If you have any questions, please ask in the [discussions](https://github.com/Za
 
 To extend any of the enums please use the `data/utilities/enuminheritance.hpp` file.
 
-To extend any of the config sections, simply create a namespace with the same name as the config struct is in and add your own `struct` to it. For example, to extend the `DeviceConfig_t` `struct`, you would do the following:
+To extend any of the config sections, simply create a namespace with the same name as the config struct is in and add your own `struct` to it.
 
 ```cpp
 namespace Project_Config {
-
-    struct NewConfig_t : DeviceConfig_t {
-        String newConfig;
+    struct NewConfig_t {
+        std::string newConfig;
         int newint;
         bool newbool;
     };
@@ -156,15 +170,15 @@ To see any of the `log` statements - you need to add this to your `platformio.in
 
 ```ini
 build_flags = 
-  -DASYNCWEBSERVER_REGEX ; add regex support to AsyncWebServer
-  -DCORE_DEBUG_LEVEL=4 ; add verbose debug logging in serial monitor
+  -DASYNCWEBSERVER_REGEX # add regex support to AsyncWebServer
+  -DUSE_WEBMANAGER # enable wifimanager
+  -DCORE_DEBUG_LEVEL=4 # add debug logging in serial monitor
 
 ; other build parameters
 monitor_filters = 
  esp32_exception_decoder
 build_type = debug
 lib_ldf_mode = deep+
-board_build.partitions = min_spiffs.csv ; use min_spiffs partition table for a large WebServer App - or huge_app.csv for a large Code-based App
 ```
 
 If you want to build in debug mode add this (it's not a build flag):
