@@ -19,22 +19,48 @@ void BaseAPI::begin() {
     server.on("/", HTTP_GET,
               [&](AsyncWebServerRequest* request) { request->send(200); });
 
+#ifdef USE_WEBMANAGER
+    server.on(
+        wifimanager_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest* request) {
+            // TODO: add authentication support
+            /* if (_authRequired) {
+                if (!request->authenticate(_username.c_str(),
+                                           _password.c_str())) {
+                    return request->requestAuthentication();
+                }
+            } */
+            AsyncWebServerResponse* response = request->beginResponse_P(
+                200, "text/html", WEB_MANAGER_HTML, WEB_MANAGER_HTML_SIZE);
+            response->addHeader("Content-Encoding", "gzip");
+            request->send(response);
+        });
+#endif  // USE_WEBManager
+
     if (initSPIFFS()) {
         if (userEndpointsVector.size() > 0) {
             for (auto& route : userEndpointsVector) {
                 server.on(route.endpoint.c_str(),
                           _networkMethodsMap_inv[route.method],
                           [&](AsyncWebServerRequest* request) {
+                              // TODO: add authentication support
+                              /* if (_authRequired) {
+                                  if (!request->authenticate(_username.c_str(),
+                                                             _password.c_str()))
+                              { return request->requestAuthentication();
+                                  }
+                              } */
                               request->send(SPIFFS, route.file.c_str(),
                                             MIMETYPE_HTML);
                           });
             }
         }
-        server.serveStatic(wifimanager_url.c_str(), SPIFFS, "/wifimanager.html")
-            .setCacheControl("max-age=600");
+        /* server.serveStatic(wifimanager_url.c_str(), SPIFFS,
+           "/wifimanager.html") .setCacheControl("max-age=600"); */
     } else {
         log_e(
-            "SPIFFS not initialized - no user defined html files available \n");
+            "SPIFFS not initialized - no user defined html files available. "
+            "API will still function, no custom html files have been loaded. "
+            "\n");
     }
 
     // preflight cors check

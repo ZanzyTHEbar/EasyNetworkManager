@@ -1,9 +1,13 @@
 #ifndef BASEAPI_HPP
 #define BASEAPI_HPP
 
-#include <sstream>
+
 #include <string>
 #include <unordered_map>
+
+#ifdef USE_WEBMANAGER
+#include <data/webpage.h>
+#endif
 
 #define WEBSERVER_H
 

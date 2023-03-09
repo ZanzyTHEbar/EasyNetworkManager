@@ -5,12 +5,12 @@ OTA::OTA(ProjectConfig* deviceConfig)
 
 OTA::~OTA() {}
 
-void OTA::SetupOTA() {
-    log_e("Setting up OTA updates");
+void OTA::begin() {
+    log_i("Setting up OTA updates");
     auto localConfig = _deviceConfig->getDeviceConfig();
     auto mdnsConfig = _deviceConfig->getMDNSConfig();
-    if (strcmp(localConfig->OTAPassword.c_str(), "") == 0) {
-        log_e("THE PASSWORD IS REQUIRED, [[ABORTING]]");
+    if (localConfig->OTAPassword.empty()) {
+        log_e("THE OTA PASSWORD IS REQUIRED, [[ABORTING]]");
         return;
     }
 
@@ -49,8 +49,8 @@ void OTA::SetupOTA() {
             }
         });
 
-    log_i("Starting up basic OTA server");
-    log_i(
+    Serial.println("Starting up basic OTA server");
+    Serial.println(
         "OTA will be live for 5mins, after which it will be disabled until "
         "restart");
     ArduinoOTA.setHostname(mdnsConfig->hostname.c_str());
@@ -58,13 +58,13 @@ void OTA::SetupOTA() {
     _bootTimestamp = millis();
 }
 
-void OTA::HandleOTAUpdate() {
+void OTA::handleOTAUpdate() {
     if (_isOtaEnabled) {
         if (_bootTimestamp + (60000 * 5) < millis()) {
             // we're disabling ota after first 5 minutes so that nothing bad
             // happens during runtime
             _isOtaEnabled = false;
-            log_i("From now on, OTA is disabled");
+            Serial.println("From now on, OTA is disabled");
             return;
         }
         ArduinoOTA.handle();

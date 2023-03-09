@@ -40,11 +40,11 @@ MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test",
                  "80");  //! service name and service protocol have to be
                          //! lowercase and begin with an underscore
 
-void printHelloWorld() {
+void printHelloWorld(AsyncWebServerRequest* request) {
     Serial.println("Hello World!");
 }
 
-void blink() {
+void blink(AsyncWebServerRequest* request) {
     digitalWrite(27, HIGH);
     Network_Utilities::my_delay(0.5);  // delay for 500ms
     digitalWrite(27, LOW);
@@ -54,8 +54,6 @@ void blink() {
 void setup() {
     Serial.begin(115200);
     Serial.println("\nHello, EasyNetworkManager!");
-
-    Serial.setDebugOutput(true);
     configManager.initConfig();   // call before load to
                                   // initialise the structs
     configManager.attach(&mDNS);  // attach the config manager to the mdns
@@ -119,9 +117,9 @@ void setup() {
             break;
         }
     }
-    ota.SetupOTA();
+    ota.begin();
 }
 
 void loop() {
-    ota.HandleOTAUpdate();
+    ota.handleOTAUpdate();
 }

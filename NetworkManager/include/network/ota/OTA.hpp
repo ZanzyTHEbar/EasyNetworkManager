@@ -10,8 +10,8 @@ class OTA {
     OTA(ProjectConfig* deviceConfig);
     virtual ~OTA();
 
-    void SetupOTA();
-    void HandleOTAUpdate();
+    void begin();
+    void handleOTAUpdate();
 
    private:
     unsigned long _bootTimestamp;
