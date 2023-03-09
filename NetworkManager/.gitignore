@@ -6,3 +6,4 @@
 src/main.cpp
 node_modules
 /include/secrets.h
+/tools/__pycache__
