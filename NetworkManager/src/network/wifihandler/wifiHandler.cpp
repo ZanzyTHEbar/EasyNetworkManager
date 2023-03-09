@@ -1,4 +1,4 @@
-#include <network/wifihandler/wifiHandler.hpp>
+#include <network/wifihandler/wifihandler.hpp>
 
 WiFiHandler::WiFiHandler(ProjectConfig* configManager,
                          StateManager<WiFiState_e>* stateManager,

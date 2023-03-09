@@ -7,8 +7,8 @@
 #include <data/config/project_config.hpp>       //! (*)
 
 #if ENABLE_ETHERNET
-#include <network/wifiHandler/ethernet/ethernetHandler.hpp>  //! (*)
+#include <network/wifihandler/ethernet/ethernetHandler.hpp>  //! (*)
 #else
-#include <network/wifihandler/wifiHandler.hpp>  //! (*)
+#include <network/wifihandler/wifihandler.hpp>  //! (*)
 #endif
 #endif // EASY_NETWORK_MANAGER_HPP

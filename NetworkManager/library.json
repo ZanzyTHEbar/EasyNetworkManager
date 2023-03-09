@@ -20,12 +20,16 @@
     {
       "name": "AsyncTCP",
       "version": "https://github.com/me-no-dev/AsyncTCP.git",
-      "platforms": ["espressif32"]
+      "platforms": [
+        "espressif32"
+      ]
     },
     {
       "name": "ESPAsyncTCP",
       "version": "https://github.com/me-no-dev/ESPAsyncTCP.git",
-      "platforms": ["espressif8266"]
+      "platforms": [
+        "espressif8266"
+      ]
     },
     {
       "owner": "leftcoast",
@@ -48,12 +52,20 @@
     "utilities/Observer.hpp",
     "network/mDNS/MDNSManager.hpp",
     "network/ota/OTA.hpp",
-    "network/wifihandler/wifiHandler.hpp"
+    "network/wifihandler/wifihandler.hpp"
   ],
   "export": {
-    "include": ["data/*", "src/*", "examples/*", "include/*"]
+    "include": [
+      "data/*",
+      "src/*",
+      "examples/*",
+      "include/*"
+    ]
   },
   "version": "1.11.0",
   "frameworks": "arduino",
-  "platforms": ["espressif32", "espressif8266"]
+  "platforms": [
+    "espressif32",
+    "espressif8266"
+  ]
 }
