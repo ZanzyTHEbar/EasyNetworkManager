@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.11.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.11.1...v1.11.2) (2023-03-09)
+
+
+### 🐛 Bug Fixes
+
+* python script not working on linux ([54a9433](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/54a94332c4448404157c47d4c1d682216803b0aa))
+
 ## [1.11.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.11.0...v1.11.1) (2023-03-09)
 
 
