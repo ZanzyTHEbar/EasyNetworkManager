@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [1.11.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.11.0...v1.11.1) (2023-03-09)
+
+
+### 🐛 Bug Fixes
+
+* pathing error on linux ([d2695d2](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/d2695d2dab2b23de74a1d1c9061c52c4e1e5e5b9))
+
 ## [1.11.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.10.1...v1.11.0) (2023-03-09)
 
 
