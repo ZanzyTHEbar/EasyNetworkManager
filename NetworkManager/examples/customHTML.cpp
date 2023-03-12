@@ -1,7 +1,8 @@
 #include <Arduino.h>
 
-//? Here is a list of all the library header files - required ones are marked
-// with an asterisk (*)
+// Note: Here is a list of all the library header files - required ones are
+// marked
+//  with an asterisk (*)
 
 //! Optional header files
 #include <network/mDNS/MDNSManager.hpp>

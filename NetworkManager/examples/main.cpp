@@ -1,12 +1,14 @@
 #include <Arduino.h>
 
-//? Here is a list of all the library header files - required ones are marked
-// with an asterisk (*)
+// Note: Here is a list of all the library header files - required ones are
+// marked
+//  with an asterisk (*)
 
 //! Optional header files
 #include <network/mDNS/MDNSManager.hpp>
 #include <network/ota/OTA.hpp>
 #include <utilities/network_utilities.hpp>  // various network utilities
+// (unique_ptr) to create unique objects
 // #include <utilities/Observer.hpp>
 // #include <utilities/api_utilities.hpp>
 // #include <utilities/enuminheritance.hpp> // used for extending enums with new
@@ -18,48 +20,50 @@
 //! Required header files
 #include <EasyNetworkManager.h>  // (*)
 
-//? The Project Config Manager is used to store and retrieve the configuration
-// data ? The config manager constructor takes two (optional) parameters: ? 1.
-// The name of the project (used to create the config file name) ? 2. The
-// hostname for your device on the network(used for mDNS, OTA, etc.)
+// Note: The Project Config Manager is used to store and retrieve the
+// configuration
+//  data ? The config manager constructor takes two (optional) parameters: ? 1.
+//  The name of the project (used to create the config file name) ? 2. The
+//  hostname for your device on the network(used for mDNS, OTA, etc.)
 ProjectConfig configManager("easynetwork", MDNS_HOSTNAME);
-//? The WiFi Handler is used to manage the WiFi connection
-//? The WiFi Handler constructor takes four parameters:
-//? 1. A pointer to the config manager
-//? 2. A pointer to the WiFi State Manager
-//? 3. The SSID of the WiFi network to connect to
-//? 4. The password of the WiFi network to connect to
+// Note: The WiFi Handler is used to manage the WiFi connection
+// Note: The WiFi Handler constructor takes four parameters:
+// Note: 1. A pointer to the config manager
+// Note: 2. A pointer to the WiFi State Manager
+// Note: 3. The SSID of the WiFi network to connect to
+// Note: 4. The password of the WiFi network to connect to
 WiFiHandler network(&configManager, &wifiStateManager, WIFI_SSID, WIFI_PASSWORD,
                     1);
 
-//? The API Server is used to create a web server that can be used to send
-// commands to the device ? The API Server constructor takes five parameters:
-//? 1. The port number to use for the web server
-//? 2. A pointer to the config manager
-//? 3. The root path for the API
-//? 4. The path for the WiFi Manager html page
-//? 5. The root path for the user commands for the API
-//? This file example will create a web server on port 80, with the root path:
-// http://easynetwork.local/api/mycommands/command/helloWorld
-// http://easynetwork.local/api/mycommands/command/blink
-// http://easynetwork.local/api/mycommands/command/params?Axes1=1&Axes2=2
+// Note: The API Server is used to create a web server that can be used to send
+//  commands to the device ? The API Server constructor takes five parameters:
+// Note: 1. The port number to use for the web server
+// Note: 2. A pointer to the config manager
+// Note: 3. The root path for the API
+// Note: 4. The path for the WiFi Manager html page
+// Note: 5. The root path for the user commands for the API
+// Note: This file example will create a web server on port 80, with the root
+// path:
+//  http://easynetwork.local/api/mycommands/command/helloWorld
+//  http://easynetwork.local/api/mycommands/command/blink
+//  http://easynetwork.local/api/mycommands/command/params?Axes1=1&Axes2=2
 APIServer server(80, &configManager, "/api", "/wifimanager", "/mycommands");
 OTA ota(&configManager);
 
-//? The mDNS Manager is used to create a mDNS service for the device
-//? The mDNS Manager constructor takes seven parameters:
-//? 1. A pointer to the mDNS State Manager
-//? 2. A pointer to the config manager
-//? 3. The service name
-//? 4. The service instance name
-//? 5. The service protocol
-//? 6. The service description
-//? 7. The service port
+// Note: The mDNS Manager is used to create a mDNS service for the device
+// Note: The mDNS Manager constructor takes seven parameters:
+// Note: 1. A pointer to the mDNS State Manager
+// Note: 2. A pointer to the config manager
+// Note: 3. The service name
+// Note: 4. The service instance name
+// Note: 5. The service protocol
+// Note: 6. The service description
+// Note: 7. The service port
 
-std::shared_ptr<MDNSHandler> mDNS = std::make_shared<MDNSHandler>(
-    &mdnsStateManager, &configManager, "_easynetwork", "test", "_tcp",
-    "_api_port", "80");  //! service name and service protocol have to be
-                         //! lowercase and begin with an underscore
+//! service name and service protocol have to be
+//! lowercase and begin with an underscore
+MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test",
+                 "_tcp", "_api_port", "80");
 
 class Temp {
    public:
@@ -69,8 +73,8 @@ class Temp {
     ~Temp() {
         Serial.println("Temp destroyed");
     }
-    //? Here is a function that can be used to handle custom API requests inside
-    //? of a class
+    // Note: Here is a function that can be used to handle custom API requests
+    // inside Note: of a class
     void grabParams(AsyncWebServerRequest* request) {
         int params = request->params();
         log_d("Number of Params: %d", params);
@@ -89,7 +93,7 @@ class Temp {
     }
 };
 
-//? Here is a function that can be used to handle custom API requests
+// Note: Here is a function that can be used to handle custom API requests
 void grabParams(AsyncWebServerRequest* request) {
     int params = request->params();
     log_d("Number of Params: %d", params);
@@ -107,7 +111,7 @@ void grabParams(AsyncWebServerRequest* request) {
     request->send(200, "text/plain", "OK");
 }
 
-//? Here are two functions that can be used to handle custom API requests
+// Note: Here are two functions that can be used to handle custom API requests
 void printHelloWorld(AsyncWebServerRequest* request) {
     Serial.println("Hello World!");
     request->send(200, "text/plain", "Hello World!");
@@ -141,14 +145,14 @@ void setup() {
     Serial.begin(115200);
     pinMode(4, OUTPUT);
     Serial.println("\nHello, EasyNetworkManager!");
-    mDNS->setName("mdns");  // set the mDNS name for the Observer
+    mDNS.setName("mdns");  // set the mDNS name for the Observer
     configManager.attach(
-        mDNS);  // attach the config manager to the mdns object - this will
-                // update the config when mdns hostname changes
+        &mDNS);  // attach the config manager to the mdns object - this will
+                 // update the config when mdns hostname changes
     configManager.load();  // load the config from flash
 
     network.begin();  // setup wifi connection
-    mDNS->begin();    // start mDNS service (optional)
+    mDNS.begin();     // start mDNS service (optional)
 
     // handle the WiFi connection state changes
     switch (wifiStateManager.getCurrentState()) {
