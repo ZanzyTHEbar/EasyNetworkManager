@@ -103,16 +103,14 @@ void APIServer::handleRequest(AsyncWebServerRequest* request) {
         if (it_method != it_map->second.end()) {
             log_d("We are trying to execute the function");
             (*this.*(it_method->second))(request);
-        } else {
-            log_e("Invalid Command");
-            request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Command\"}");
             return;
         }
-    } else {
-        log_e("Invalid Map Index");
-        request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Map Index\"}");
+        log_e("Invalid Command");
+        request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Command\"}");
         return;
     }
+    log_e("Invalid Map Index");
+    request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Map Index\"}");
 }
 
 void APIServer::updateCommandHandlers(const std::string& url,
@@ -136,10 +134,8 @@ void APIServer::handleUserCommands(AsyncWebServerRequest* request) {
     if (it != stateFunctionMap.end()) {
         log_d("We are trying to execute the function");
         it->second(request);
-    } else {
-        log_e("Invalid Command");
-        request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Command\"}");
         return;
     }
-    return;
+    log_e("Invalid Command");
+    request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Command\"}");
 }

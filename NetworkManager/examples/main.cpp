@@ -16,31 +16,21 @@
 // #include <utilities/helpers.hpp> // various helper functions
 
 //! Required header files
-//! Required Defines - these nust come before the EasyNetworkManager header
-//* If you use platformio, you can add these defines to the platformio.ini file
-// under the `build_flags` section
-
-// #define USE_WEBMANAGER  // enable the web manager
-// #define ASYNCWEBSERVER_REGEX // enable the use of regex - this is required
-// for the library to work
-// #define CORE_DEBUG_LEVEL 5 // set the debug level for the core library -
-// levels 1-5 this is set to level 1 by default I recommend level 4 for
-// debugging - level 5 is for verbose debugging, level one is errors only.
 #include <EasyNetworkManager.h>  // (*)
 
 //? The Project Config Manager is used to store and retrieve the configuration
 // data ? The config manager constructor takes two (optional) parameters: ? 1.
 // The name of the project (used to create the config file name) ? 2. The
 // hostname for your device on the network(used for mDNS, OTA, etc.)
-ProjectConfig configManager("easynetwork", "esp32custom");
+ProjectConfig configManager("easynetwork", MDNS_HOSTNAME);
 //? The WiFi Handler is used to manage the WiFi connection
 //? The WiFi Handler constructor takes four parameters:
 //? 1. A pointer to the config manager
 //? 2. A pointer to the WiFi State Manager
 //? 3. The SSID of the WiFi network to connect to
 //? 4. The password of the WiFi network to connect to
-WiFiHandler network(&configManager, &wifiStateManager, "YOUR_SSID",
-                    "YOUR_PASWORD", 1);
+WiFiHandler network(&configManager, &wifiStateManager, WIFI_SSID, WIFI_PASSWORD,
+                    1);
 
 //? The API Server is used to create a web server that can be used to send
 // commands to the device ? The API Server constructor takes five parameters:
@@ -65,9 +55,10 @@ OTA ota(&configManager);
 //? 5. The service protocol
 //? 6. The service description
 //? 7. The service port
-MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test",
-                 "_tcp", "_api_port",
-                 "80");  //! service name and service protocol have to be
+
+std::shared_ptr<MDNSHandler> mDNS = std::make_shared<MDNSHandler>(
+    &mdnsStateManager, &configManager, "_easynetwork", "test", "_tcp",
+    "_api_port", "80");  //! service name and service protocol have to be
                          //! lowercase and begin with an underscore
 
 class Temp {
@@ -115,17 +106,19 @@ void grabParams(AsyncWebServerRequest* request) {
     Serial.printf("Axes1: %s, Axes2: %s\n", x.c_str(), y.c_str());
     request->send(200, "text/plain", "OK");
 }
-//? Here are two functions that can be used to handle custom API requests,
-// without access to the request object
+
+//? Here are two functions that can be used to handle custom API requests
 void printHelloWorld(AsyncWebServerRequest* request) {
     Serial.println("Hello World!");
+    request->send(200, "text/plain", "Hello World!");
 }
 
 void blink(AsyncWebServerRequest* request) {
-    digitalWrite(27, HIGH);
-    Network_Utilities::my_delay(0.5);  // delay for 500ms
-    digitalWrite(27, LOW);
-    Network_Utilities::my_delay(0.5);  // delay for 500ms
+    digitalWrite(4, HIGH);
+    Network_Utilities::my_delay(1);  // delay for 1sec
+    digitalWrite(4, LOW);
+    Network_Utilities::my_delay(1);  // delay for 1sec
+    request->send(200, "text/plain", "Blink!");
 }
 
 void setupServer() {
@@ -146,15 +139,16 @@ void setupServer() {
 
 void setup() {
     Serial.begin(115200);
+    pinMode(4, OUTPUT);
     Serial.println("\nHello, EasyNetworkManager!");
-
+    mDNS->setName("mdns");  // set the mDNS name for the Observer
     configManager.attach(
-        &mDNS);  // attach the config manager to the mdns object - this will
-                 // update the config when mdns hostname changes
+        mDNS);  // attach the config manager to the mdns object - this will
+                // update the config when mdns hostname changes
     configManager.load();  // load the config from flash
 
     network.begin();  // setup wifi connection
-    mDNS.begin();     // start mDNS service (optional)
+    mDNS->begin();    // start mDNS service (optional)
 
     // handle the WiFi connection state changes
     switch (wifiStateManager.getCurrentState()) {

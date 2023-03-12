@@ -6,7 +6,7 @@
 #include "data/statemanager/StateManager.hpp"
 #include "utilities/Observer.hpp"
 
-class MDNSHandler : public IObserver<ObserverEvent::Event> {
+class MDNSHandler : public IObserver<Event_e> {
    private:
     StateManager<MDNSState_e>* stateManager;
     ProjectConfig* configManager;
@@ -16,13 +16,17 @@ class MDNSHandler : public IObserver<ObserverEvent::Event> {
     std::string key;
     std::string value;
 
+    std::string name;
+
    public:
     MDNSHandler(StateManager<MDNSState_e>* stateManager,
                 ProjectConfig* configManager, const std::string& service_name,
                 const std::string& service_text, const std::string& proto,
                 const std::string& key, const std::string& value);
     bool begin();
-    void update(ObserverEvent::Event event);
+    void setName(const std::string& name);
+    void update(Event_e event) override;
+    std::string getName() override;
 };
 
 #endif  // MDNS_HANDLER_HPP

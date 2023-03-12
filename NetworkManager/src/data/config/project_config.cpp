@@ -178,7 +178,7 @@ void ProjectConfig::load() {
     this->config.ap_network.channel = getUInt("apChannel", 1);
 
     this->_already_loaded = true;
-    this->notify(ObserverEvent::configLoaded);
+    this->notifyAll(Event_e::configLoaded);
 }
 
 //**********************************************************************************************************************
@@ -193,7 +193,7 @@ void ProjectConfig::setDeviceConfig(const std::string& OTAPassword, int OTAPort,
     this->config.device.OTAPort = OTAPort;
 
     if (shouldNotify) {
-        this->notify(ObserverEvent::deviceConfigUpdated);
+        this->notifyAll(Event_e::deviceConfigUpdated);
     }
 }
 
@@ -221,7 +221,7 @@ bool ProjectConfig::setMDNSConfig(const std::string& hostname,
     this->config.mdns.hostname.assign(hostname);
 
     if (shouldNotify)
-        this->notify(ObserverEvent::mdnsConfigUpdated);
+        this->notifyAll(Event_e::mdnsConfigUpdated);
     return true;
 }
 
@@ -241,7 +241,7 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
                                            power, false);
 
         if (shouldNotify)
-            this->notify(ObserverEvent::networksConfigUpdated);
+            this->notifyAll(Event_e::networksConfigUpdated);
 
         return;
     }
@@ -259,7 +259,7 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
             it->adhoc = false;
 
             if (shouldNotify)
-                this->notify(ObserverEvent::networksConfigUpdated);
+                this->notifyAll(Event_e::networksConfigUpdated);
 
             return;
         } else {
@@ -277,7 +277,7 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
     }
 
     if (shouldNotify)
-        this->notify(ObserverEvent::networksConfigUpdated);
+        this->notifyAll(Event_e::networksConfigUpdated);
 }
 
 void ProjectConfig::deleteWifiConfig(const std::string& networkName,
@@ -300,7 +300,7 @@ void ProjectConfig::deleteWifiConfig(const std::string& networkName,
     }
 
     if (shouldNotify)
-        this->notify(ObserverEvent::networksConfigUpdated);
+        this->notifyAll(Event_e::networksConfigUpdated);
 }
 
 void ProjectConfig::setAPWifiConfig(const std::string& ssid,
@@ -314,7 +314,7 @@ void ProjectConfig::setAPWifiConfig(const std::string& ssid,
 
     log_d("Updating access point config");
     if (shouldNotify) {
-        this->notify(ObserverEvent::apConfigUpdated);
+        this->notifyAll(Event_e::apConfigUpdated);
     }
 }
 
@@ -323,7 +323,7 @@ void ProjectConfig::setWiFiTxPower(uint8_t power, bool shouldNotify) {
 
     log_d("Updating wifi tx power");
     if (shouldNotify)
-        this->notify(ObserverEvent::wifiTxPowerUpdated);
+        this->notifyAll(Event_e::wifiTxPowerUpdated);
 }
 
 void ProjectConfig::setDeviceDataJson(const std::string& data,
@@ -332,7 +332,7 @@ void ProjectConfig::setDeviceDataJson(const std::string& data,
 
     log_d("Updating device data json");
     if (shouldNotify)
-        this->notify(ObserverEvent::deviceDataJsonUpdated);
+        this->notifyAll(Event_e::deviceDataJsonUpdated);
 }
 
 std::string Project_Config::DeviceConfig_t::toRepresentation() {

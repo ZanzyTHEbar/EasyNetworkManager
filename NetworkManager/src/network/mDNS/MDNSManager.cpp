@@ -35,13 +35,21 @@ bool MDNSHandler::begin() {
     return true;
 }
 
-void MDNSHandler::update(ObserverEvent::Event event) {
+void MDNSHandler::update(Event_e event) {
     switch (event) {
-        case ObserverEvent::Event::mdnsConfigUpdated:
+        case Event_e::mdnsConfigUpdated:
             MDNS.end();
             begin();
             break;
         default:
             break;
     }
+}
+
+std::string MDNSHandler::getName() {
+    return std::string();
+}
+
+void MDNSHandler::setName(const std::string& name) {
+    this->name.assign(name);
 }

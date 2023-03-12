@@ -71,8 +71,7 @@ struct ProjectConfig_t {
 };
 }  // namespace Project_Config
 
-class ProjectConfig : public Preferences,
-                      public ISubject<ObserverEvent::Event> {
+class ProjectConfig : public Preferences, public ISubject<Event_e> {
    public:
     ProjectConfig(const std::string& configName = std::string(),
                   const std::string& mdnsName = std::string());

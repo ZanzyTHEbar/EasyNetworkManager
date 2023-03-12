@@ -109,7 +109,6 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
             std::string ota_password;
             std::string mdns;
             int ota_port = 0;
-            bool reboot = false;
             uint8_t channel = 0;
             uint8_t power = 0;
             uint8_t adhoc = 0;
@@ -136,10 +135,6 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
                     mdns.assign(param->value().c_str());
                 } else if (param->name() == "adhoc") {
                     adhoc = (uint8_t)atoi(param->value().c_str());
-                } else if (param->name() == "reboot") {
-                    if (param->value() == "true") {
-                        reboot = true;
-                    }
                 }
                 log_i("%s[%s]: %s\n",
                       _networkMethodsMap[request->method()].c_str(),
@@ -151,18 +146,22 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
                                          power, adhoc, true);
 
             if (!mdns.empty()) {
-                configManager->setMDNSConfig(mdns, true)
-                    ? request->send(
-                          200, MIMETYPE_JSON,
-                          "{\"msg\":\"Done. MDNS Creds have been set.\"}")
-                    : request->send(400, MIMETYPE_JSON,
-                                    "{\"msg\":\"Error. MDNS Name is not a "
-                                    "valid alpha numeric string.\"}");
+                if (!configManager->setMDNSConfig(mdns, true)) {
+                    request->send(400, MIMETYPE_JSON,
+                                  "{\"msg\":\"Error. MDNS Name is not a "
+                                  "valid alpha numeric string.\"}");
+                }
+                log_i("MDNS Name set to: %s", mdns.c_str());
+            }
+
+            if (!ota_password.empty()) {
+                configManager->setDeviceConfig(ota_password, ota_port, true);
+                log_i("OTA Password set to: %s", ota_password.c_str());
             }
 
             request->send(
                 200, MIMETYPE_JSON,
-                "{\"msg\":\"Done. Wifi Creds have been set. Rebooting\"}");
+                "{\"msg\":\"Done. Network Credentials have been set. Rebooting\"}");
             this->save(request);
             break;
         }

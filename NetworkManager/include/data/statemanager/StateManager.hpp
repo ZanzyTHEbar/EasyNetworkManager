@@ -10,6 +10,16 @@ namespace ProgramStates {
 struct DeviceStates {
     enum State_e { Starting, Started, Stopping, Stopped, Error };
 
+    enum Event_e {
+        configLoaded,
+        deviceConfigUpdated,
+        mdnsConfigUpdated,
+        networksConfigUpdated,
+        apConfigUpdated,
+        wifiTxPowerUpdated,
+        deviceDataJsonUpdated,
+    };
+
     enum WiFiState_e {
         WiFiState_None,
         WiFiState_Idle,
@@ -75,10 +85,12 @@ class StateManager {
 };
 
 typedef ProgramStates::DeviceStates::State_e State_e;
+typedef ProgramStates::DeviceStates::Event_e Event_e;
 typedef ProgramStates::DeviceStates::WiFiState_e WiFiState_e;
 typedef ProgramStates::DeviceStates::WebServerState_e WebServerState_e;
 typedef ProgramStates::DeviceStates::MDNSState_e MDNSState_e;
 
+extern StateManager<Event_e> eventManager;
 extern StateManager<State_e> stateManager;
 extern StateManager<WiFiState_e> wifiStateManager;
 extern StateManager<WebServerState_e> webServerStateManager;
