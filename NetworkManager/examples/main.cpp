@@ -32,8 +32,7 @@ ProjectConfig configManager("easynetwork", MDNS_HOSTNAME);
 // Note: 2. A pointer to the WiFi State Manager
 // Note: 3. The SSID of the WiFi network to connect to
 // Note: 4. The password of the WiFi network to connect to
-WiFiHandler network(&configManager, &wifiStateManager, WIFI_SSID, WIFI_PASSWORD,
-                    1);
+WiFiHandler network(configManager, WIFI_SSID, WIFI_PASSWORD, 1);
 
 // Note: The API Server is used to create a web server that can be used to send
 //  commands to the device ? The API Server constructor takes five parameters:
@@ -47,8 +46,8 @@ WiFiHandler network(&configManager, &wifiStateManager, WIFI_SSID, WIFI_PASSWORD,
 //  http://easynetwork.local/api/mycommands/command/helloWorld
 //  http://easynetwork.local/api/mycommands/command/blink
 //  http://easynetwork.local/api/mycommands/command/params?Axes1=1&Axes2=2
-APIServer server(80, &configManager, "/api", "/wifimanager", "/mycommands");
-OTA ota(&configManager);
+APIServer server(80, configManager, "/api", "/wifimanager", "/mycommands");
+OTA ota(configManager);
 
 // Note: The mDNS Manager is used to create a mDNS service for the device
 // Note: The mDNS Manager constructor takes seven parameters:
@@ -62,8 +61,8 @@ OTA ota(&configManager);
 
 //! service name and service protocol have to be
 //! lowercase and begin with an underscore
-MDNSHandler mDNS(&mdnsStateManager, &configManager, "_easynetwork", "test",
-                 "_tcp", "_api_port", "80");
+MDNSHandler mDNS(configManager, "_easynetwork", "test", "_tcp", "_api_port",
+                 "80");
 
 class Temp {
    public:

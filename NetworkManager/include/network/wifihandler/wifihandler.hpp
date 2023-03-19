@@ -22,8 +22,7 @@
 
 class WiFiHandler {
    public:
-    WiFiHandler(ProjectConfig* configManager,
-                StateManager<WiFiState_e>* stateManager,
+    WiFiHandler(ProjectConfig& configManager,
                 const std::string& ssid, const std::string& password,
                 uint8_t channel);
 
@@ -31,9 +30,8 @@ class WiFiHandler {
     void begin();
     void toggleAdhoc(bool* enable);
 
-    ProjectConfig* configManager;
-    StateManager<WiFiState_e>* stateManager;
-    Project_Config::WiFiTxPower_t* txpower;
+    ProjectConfig& configManager;
+    Project_Config::WiFiTxPower_t& txpower;
 
    private:
     void setUpADHOC();

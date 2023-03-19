@@ -1,21 +1,20 @@
 #ifndef OTA_HPP
 #define OTA_HPP
 #include <ArduinoOTA.h>
-#include <HTTPClient.h>
 
 #include "data/config/project_config.hpp"
 
 class OTA {
+   private:
+    unsigned long _bootTimestamp;
+    bool _isOtaEnabled;
+    ProjectConfig& _deviceConfig;
+
    public:
-    OTA(ProjectConfig* deviceConfig);
+    OTA(ProjectConfig& deviceConfig);
     virtual ~OTA();
 
     void begin();
     void handleOTAUpdate();
-
-   private:
-    unsigned long _bootTimestamp;
-    bool _isOtaEnabled;
-    ProjectConfig* _deviceConfig;
 };
 #endif  // OTA_HPP

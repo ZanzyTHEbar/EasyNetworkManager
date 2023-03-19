@@ -1,6 +1,6 @@
 #include <api/baseAPI/baseAPI.hpp>
 
-BaseAPI::BaseAPI(int CONTROL_PORT, ProjectConfig* configManager,
+BaseAPI::BaseAPI(const int CONTROL_PORT, ProjectConfig& configManager,
                  const std::string& api_url, const std::string& wifimanager_url,
                  const std::string& userCommands)
     : server(CONTROL_PORT),
@@ -142,11 +142,11 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
             }
             // note: We're passing empty params by design, this is done to reset
             // specific fields
-            configManager->setWifiConfig(networkName, ssid, password, channel,
-                                         power, adhoc, true);
+            configManager.setWifiConfig(networkName, ssid, password, channel,
+                                        power, adhoc, true);
 
             if (!mdns.empty()) {
-                if (!configManager->setMDNSConfig(mdns, true)) {
+                if (!configManager.setMDNSConfig(mdns, true)) {
                     request->send(400, MIMETYPE_JSON,
                                   "{\"msg\":\"Error. MDNS Name is not a "
                                   "valid alpha numeric string.\"}");
@@ -155,19 +155,19 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
             }
 
             if (!ota_password.empty()) {
-                configManager->setDeviceConfig(ota_password, ota_port, true);
+                configManager.setDeviceConfig(ota_password, ota_port, true);
                 log_i("OTA Password set to: %s", ota_password.c_str());
             }
 
-            request->send(
-                200, MIMETYPE_JSON,
-                "{\"msg\":\"Done. Network Credentials have been set. Rebooting\"}");
+            request->send(200, MIMETYPE_JSON,
+                          "{\"msg\":\"Done. Network Credentials have been set. "
+                          "Rebooting\"}");
             this->save(request);
             break;
         }
         case DELETE: {
-            configManager->deleteWifiConfig(request->arg("networkName").c_str(),
-                                            true);
+            configManager.deleteWifiConfig(request->arg("networkName").c_str(),
+                                           true);
             request->send(200, MIMETYPE_JSON,
                           "{\"msg\":\"Done. Wifi Creds have been deleted.\"}");
             break;
@@ -197,8 +197,8 @@ void BaseAPI::setWiFiTXPower(AsyncWebServerRequest* request) {
                     txPower = atoi(param->value().c_str());
                 }
             }
-            configManager->setWiFiTxPower(txPower, true);
-            configManager->wifiTxPowerConfigSave();
+            configManager.setWiFiTxPower(txPower, true);
+            configManager.wifiTxPowerConfigSave();
             request->send(200, MIMETYPE_JSON,
                           "{\"msg\":\"Done. TX Power has been set.\"}");
         }
@@ -208,9 +208,8 @@ void BaseAPI::setWiFiTXPower(AsyncWebServerRequest* request) {
 void BaseAPI::handleJson(AsyncWebServerRequest* request) {
     switch (_networkMethodsMap_enum[request->method()]) {
         case GET: {
-            request->send(
-                200, MIMETYPE_JSON,
-                configManager->getDeviceDataJson()->deviceJson.c_str());
+            request->send(200, MIMETYPE_JSON,
+                          configManager.getDeviceDataJson().deviceJson.c_str());
             break;
         }
         case POST: {
@@ -219,7 +218,7 @@ void BaseAPI::handleJson(AsyncWebServerRequest* request) {
                 log_i("%s[%s]: %s\n",
                       _networkMethodsMap[request->method()].c_str(),
                       param->name().c_str(), param->value().c_str());
-                // configManager->setJsonConfig(param->value().c_str());
+                // configManager.setJsonConfig(param->value().c_str());
                 request->send(200, MIMETYPE_JSON,
                               "{\"msg\":\"Done. Config has been set.\"}");
             } else {
@@ -241,25 +240,22 @@ void BaseAPI::getJsonConfig(AsyncWebServerRequest* request) {
     switch (_networkMethodsMap_enum[request->method()]) {
         case GET: {
             std::string wifiConfigSerialized = "\"wifi_config\": [";
-            auto networksConfigs = configManager->getWifiConfigs();
-            for (auto networkIterator = networksConfigs->begin();
-                 networkIterator != networksConfigs->end(); networkIterator++) {
-                wifiConfigSerialized +=
-                    networkIterator->toRepresentation() +
-                    (std::next(networkIterator) != networksConfigs->end() ? ","
-                                                                          : "");
+            auto networksConfigs = configManager.getWifiConfigs();
+            for (auto& networkConfig : networksConfigs) {
+                wifiConfigSerialized += networkConfig.toRepresentation();
+
+                if (&networkConfig != &networksConfigs.back())
+                    wifiConfigSerialized += ",";
             }
             wifiConfigSerialized += "]";
 
             std::string json = Helpers::format_string(
                 "{%s, %s, %s, %s, %s}",
-                configManager->getDeviceConfig()->toRepresentation().c_str(),
-                configManager->getWifiTxPowerConfig()
-                    ->toRepresentation()
-                    .c_str(),
+                configManager.getDeviceConfig().toRepresentation().c_str(),
+                configManager.getWifiTxPowerConfig().toRepresentation().c_str(),
                 wifiConfigSerialized.c_str(),
-                configManager->getMDNSConfig()->toRepresentation().c_str(),
-                configManager->getAPWifiConfig()->toRepresentation().c_str());
+                configManager.getMDNSConfig().toRepresentation().c_str(),
+                configManager.getAPWifiConfig().toRepresentation().c_str());
             request->send(200, MIMETYPE_JSON, json.c_str());
             break;
         }
@@ -287,7 +283,7 @@ void BaseAPI::factoryReset(AsyncWebServerRequest* request) {
     switch (_networkMethodsMap_enum[request->method()]) {
         case GET: {
             log_d("Factory Reset");
-            bool success = configManager->reset();
+            bool success = configManager.reset();
             char buf[100];
             snprintf(buf, sizeof(buf), "{\"msg\":\"Factory Reset - %s\"}",
                      success ? "Done" : "Failed");
@@ -337,7 +333,7 @@ void BaseAPI::ping(AsyncWebServerRequest* request) {
 }
 
 void BaseAPI::save(AsyncWebServerRequest* request) {
-    configManager->save();
+    configManager.save();
     request->send(200, MIMETYPE_JSON, "{\"msg\": \"ok\" }");
 }
 

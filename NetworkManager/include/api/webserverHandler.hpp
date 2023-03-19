@@ -10,7 +10,7 @@ class APIServer : public BaseAPI {
     void handleUserCommands(AsyncWebServerRequest* request);
 
    public:
-    APIServer(int CONTROL_PORT, ProjectConfig* configManager,
+    APIServer(const int CONTROL_PORT, ProjectConfig& configManager,
               const std::string& api_url, const std::string& wifimanager_url,
               const std::string& userCommands);
 

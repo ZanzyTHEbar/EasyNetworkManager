@@ -4,7 +4,7 @@
 //!                                     API Server
 //*********************************************************************************************
 
-APIServer::APIServer(int CONTROL_PORT, ProjectConfig* configManager,
+APIServer::APIServer(const int CONTROL_PORT, ProjectConfig& configManager,
                      const std::string& api_url,
                      const std::string& wifimanager_url,
                      const std::string& userCommands)

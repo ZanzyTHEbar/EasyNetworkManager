@@ -8,8 +8,7 @@
 
 class MDNSHandler : public IObserver<Event_e> {
    private:
-    StateManager<MDNSState_e>* stateManager;
-    ProjectConfig* configManager;
+    ProjectConfig& configManager;
     std::string service_name;
     std::string service_text;
     std::string proto;
@@ -19,8 +18,7 @@ class MDNSHandler : public IObserver<Event_e> {
     std::string name;
 
    public:
-    MDNSHandler(StateManager<MDNSState_e>* stateManager,
-                ProjectConfig* configManager, const std::string& service_name,
+    MDNSHandler(ProjectConfig& configManager, const std::string& service_name,
                 const std::string& service_text, const std::string& proto,
                 const std::string& key, const std::string& value);
     bool begin();

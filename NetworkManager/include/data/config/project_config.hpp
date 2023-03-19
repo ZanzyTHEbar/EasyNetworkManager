@@ -85,12 +85,12 @@ class ProjectConfig : public Preferences, public ISubject<Event_e> {
     void wifiTxPowerConfigSave();
     bool reset();
 
-    Project_Config::DeviceConfig_t* getDeviceConfig();
-    Project_Config::MDNSConfig_t* getMDNSConfig();
-    std::vector<Project_Config::WiFiConfig_t>* getWifiConfigs();
-    Project_Config::AP_WiFiConfig_t* getAPWifiConfig();
-    Project_Config::WiFiTxPower_t* getWifiTxPowerConfig();
-    Project_Config::DeviceDataJson_t* getDeviceDataJson();
+    Project_Config::DeviceConfig_t& getDeviceConfig();
+    Project_Config::MDNSConfig_t& getMDNSConfig();
+    std::vector<Project_Config::WiFiConfig_t>& getWifiConfigs();
+    Project_Config::AP_WiFiConfig_t& getAPWifiConfig();
+    Project_Config::WiFiTxPower_t& getWifiTxPowerConfig();
+    Project_Config::DeviceDataJson_t& getDeviceDataJson();
 
     void setDeviceConfig(const std::string& OTAPassword, int OTAPort,
                          bool shouldNotify);

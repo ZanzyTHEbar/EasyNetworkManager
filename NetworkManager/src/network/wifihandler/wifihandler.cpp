@@ -1,12 +1,9 @@
 #include <network/wifihandler/wifihandler.hpp>
 
-WiFiHandler::WiFiHandler(ProjectConfig* configManager,
-                         StateManager<WiFiState_e>* stateManager,
-                         const std::string& ssid, const std::string& password,
-                         uint8_t channel)
+WiFiHandler::WiFiHandler(ProjectConfig& configManager, const std::string& ssid,
+                         const std::string& password, uint8_t channel)
     : configManager(configManager),
-      stateManager(stateManager),
-      txpower(NULL),
+      txpower(configManager.getWifiTxPowerConfig()),
       ssid(ssid),
       password(password),
       channel(channel),
@@ -17,38 +14,35 @@ WiFiHandler::~WiFiHandler() {}
 
 void WiFiHandler::begin() {
     if (this->_enable_adhoc ||
-        stateManager->getCurrentState() == WiFiState_e::WiFiState_ADHOC) {
+        wifiStateManager.getCurrentState() == WiFiState_e::WiFiState_ADHOC) {
         this->setUpADHOC();
         return;
     }
-    txpower = configManager->getWifiTxPowerConfig();
     WiFi.mode(WIFI_STA);
     WiFi.setSleep(WIFI_PS_NONE);
 
     Serial.print("Initializing connection to wifi \n\r");
-    stateManager->setState(WiFiState_e::WiFiState_Connecting);
+    wifiStateManager.setState(WiFiState_e::WiFiState_Connecting);
 
-    std::vector<Project_Config::WiFiConfig_t>* networks =
-        configManager->getWifiConfigs();
+    auto networks = configManager.getWifiConfigs();
 
-    if (networks->empty()) {
+    if (networks.empty()) {
         Serial.print(
             "No networks found in config, trying the "
             "default one \n\r");
         if (this->iniSTA(this->ssid, this->password, this->channel,
-                         (wifi_power_t)txpower->power)) {
-            return;
-        } else {
-            Serial.print(
-                "Could not connect to the hardcoded "
-                "network, setting up ADHOC network \n\r");
-            this->setUpADHOC();
+                         (wifi_power_t)txpower.power)) {
             return;
         }
+        Serial.print(
+            "Could not connect to the hardcoded "
+            "network, setting up ADHOC network \n\r");
+        this->setUpADHOC();
+        return;
     }
 
-    for (auto networkIterator = networks->begin();
-         networkIterator != networks->end(); ++networkIterator) {
+    for (auto networkIterator = networks.begin();
+         networkIterator != networks.end(); ++networkIterator) {
         if (this->iniSTA(networkIterator->ssid, networkIterator->password,
                          networkIterator->channel,
                          (wifi_power_t)networkIterator->power)) {
@@ -63,7 +57,7 @@ void WiFiHandler::begin() {
         "Trying to connect to the hardcoded network one last time: %s \n\r",
         this->ssid.c_str());
     if (this->iniSTA(this->ssid, this->password, this->channel,
-                     (wifi_power_t)txpower->power)) {
+                     (wifi_power_t)txpower.power)) {
         Serial.print(
             "Successfully connected to the hardcoded "
             "network. \n\r");
@@ -77,7 +71,7 @@ void WiFiHandler::begin() {
 
 void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
                         const std::string& password) {
-    stateManager->setState(WiFiState_e::WiFiState_ADHOC);
+    wifiStateManager.setState(WiFiState_e::WiFiState_ADHOC);
     log_i("\n[INFO]: Setting Access Point...\n");
     log_i("\n[INFO]: Configuring access point...\n");
     WiFi.mode(WIFI_AP);
@@ -89,13 +83,13 @@ void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
     // AP to be open.
     WiFi.softAP(ssid.c_str(), password.c_str(),
                 channel);  // AP mode with password
-    WiFi.setTxPower((wifi_power_t)txpower->power);
+    WiFi.setTxPower((wifi_power_t)txpower.power);
 }
 
 void WiFiHandler::setUpADHOC() {
     log_i("\n[INFO]: Setting Access Point...\n");
-    size_t ssidLen = configManager->getAPWifiConfig()->ssid.length();
-    size_t passwordLen = configManager->getAPWifiConfig()->password.length();
+    size_t ssidLen = configManager.getAPWifiConfig().ssid.length();
+    size_t passwordLen = configManager.getAPWifiConfig().password.length();
     if (ssidLen <= 0) {
         this->adhoc("EasyNetworkManager", 1, "12345678");
         return;
@@ -105,21 +99,20 @@ void WiFiHandler::setUpADHOC() {
         log_i(
             "\n[INFO]: Configuring access point without a "
             "password\n");
-        this->adhoc(configManager->getAPWifiConfig()->ssid,
-                    configManager->getAPWifiConfig()->channel);
+        this->adhoc(configManager.getAPWifiConfig().ssid,
+                    configManager.getAPWifiConfig().channel);
         return;
     }
 
-    this->adhoc(configManager->getAPWifiConfig()->ssid,
-                configManager->getAPWifiConfig()->channel,
-                configManager->getAPWifiConfig()->password);
+    this->adhoc(configManager.getAPWifiConfig().ssid,
+                configManager.getAPWifiConfig().channel,
+                configManager.getAPWifiConfig().password);
     log_i("\n[INFO]: Configuring access point...\n");
     log_d("\n[DEBUG]: ssid: %s\n",
-          configManager->getAPWifiConfig()->ssid.c_str());
+          configManager.getAPWifiConfig().ssid.c_str());
     log_d("\n[DEBUG]: password: %s\n",
-          configManager->getAPWifiConfig()->password.c_str());
-    log_d("\n[DEBUG]: channel: %d\n",
-          configManager->getAPWifiConfig()->channel);
+          configManager.getAPWifiConfig().password.c_str());
+    log_d("\n[DEBUG]: channel: %d\n", configManager.getAPWifiConfig().channel);
 }
 
 bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
@@ -129,13 +122,13 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
     int connectionTimeout = 30000;  // 30 seconds
     int progress = 0;
 
-    stateManager->setState(WiFiState_e::WiFiState_Connecting);
+    wifiStateManager.setState(WiFiState_e::WiFiState_Connecting);
     Serial.printf("Trying to connect to: %s \n\r", ssid.c_str());
-    auto mdnsConfig = configManager->getMDNSConfig();
+    auto mdnsConfig = configManager.getMDNSConfig();
     WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE,
                 INADDR_NONE);  // need to call before
                                // setting hostname
-    WiFi.setHostname(mdnsConfig->hostname.c_str());
+    WiFi.setHostname(mdnsConfig.hostname.c_str());
     WiFi.begin(ssid.c_str(), password.c_str(), channel);
     while (WiFi.status() != WL_CONNECTED) {
         progress++;
@@ -143,13 +136,13 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
         Helpers::update_progress_bar(progress, 100);
         delay(301);
         if ((currentMillis - startingMillis) >= connectionTimeout) {
-            stateManager->setState(WiFiState_e::WiFiState_Error);
+            wifiStateManager.setState(WiFiState_e::WiFiState_Error);
             log_e("Connection to: %s TIMEOUT \n\r", ssid.c_str());
             return false;
         }
     }
 
-    stateManager->setState(WiFiState_e::WiFiState_Connected);
+    wifiStateManager.setState(WiFiState_e::WiFiState_Connected);
     Serial.printf("Successfully connected to %s \n\r", ssid.c_str());
     Serial.printf("Setting TX power to: %d \n\r", (uint8_t)power);
     WiFi.setTxPower(power);

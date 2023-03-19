@@ -61,7 +61,7 @@ class BaseAPI : public API_Utilities {
     /// @brief Local instance of the AsyncWebServer - so that we dont need to
     /// use new and delete
     AsyncWebServer server;
-    ProjectConfig* configManager;
+    ProjectConfig& configManager;
 
     std::string api_url;
     std::string wifimanager_url;
@@ -93,7 +93,7 @@ class BaseAPI : public API_Utilities {
         };
 
    public:
-    BaseAPI(int CONTROL_PORT, ProjectConfig* configManager,
+    BaseAPI(const int CONTROL_PORT, ProjectConfig& configManager,
             const std::string& api_url, const std::string& wifimanager_url,
             const std::string& userCommands);
     virtual ~BaseAPI();

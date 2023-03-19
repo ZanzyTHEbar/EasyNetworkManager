@@ -351,7 +351,7 @@ std::string Project_Config::MDNSConfig_t::toRepresentation() {
 std::string Project_Config::WiFiConfig_t::toRepresentation() {
     std::string json = Helpers::format_string(
         "{\"name\": \"%s\", \"ssid\": \"%s\", \"password\": \"%s\", "
-        "\"channel\": %u, \"adhoc\": %s}",
+        "\"channel\": %u, \"power\": %u, \"adhoc\": %s}",
         this->name.c_str(), this->ssid.c_str(), this->password.c_str(),
         this->channel, this->power, this->adhoc ? "true" : "false");
     return json;
@@ -384,21 +384,21 @@ std::string Project_Config::DeviceDataJson_t::toRepresentation() {
 //*
 //**********************************************************************************************************************
 
-Project_Config::DeviceConfig_t* ProjectConfig::getDeviceConfig() {
-    return &this->config.device;
+Project_Config::DeviceConfig_t& ProjectConfig::getDeviceConfig() {
+    return this->config.device;
 }
-Project_Config::MDNSConfig_t* ProjectConfig::getMDNSConfig() {
-    return &this->config.mdns;
+Project_Config::MDNSConfig_t& ProjectConfig::getMDNSConfig() {
+    return this->config.mdns;
 }
-std::vector<Project_Config::WiFiConfig_t>* ProjectConfig::getWifiConfigs() {
-    return &this->config.networks;
+std::vector<Project_Config::WiFiConfig_t>& ProjectConfig::getWifiConfigs() {
+    return this->config.networks;
 }
-Project_Config::AP_WiFiConfig_t* ProjectConfig::getAPWifiConfig() {
-    return &this->config.ap_network;
+Project_Config::AP_WiFiConfig_t& ProjectConfig::getAPWifiConfig() {
+    return this->config.ap_network;
 }
-Project_Config::WiFiTxPower_t* ProjectConfig::getWifiTxPowerConfig() {
-    return &this->config.wifi_tx_power;
+Project_Config::WiFiTxPower_t& ProjectConfig::getWifiTxPowerConfig() {
+    return this->config.wifi_tx_power;
 }
-Project_Config::DeviceDataJson_t* ProjectConfig::getDeviceDataJson() {
-    return &this->config.device_data;
+Project_Config::DeviceDataJson_t& ProjectConfig::getDeviceDataJson() {
+    return this->config.device_data;
 }
