@@ -124,7 +124,7 @@ void APIServer::updateCommandHandlers(const std::string& url,
  * @param request
  * @return \c void
  * @note This function is called by the API server when a command is received
- * @warning  \c This function requries the user to access the index using a url
+ * @warning  \c This function requires the user to access the index using a url
  * parameter \c we need to fix this!! I need a better implemenation
  *
  */
