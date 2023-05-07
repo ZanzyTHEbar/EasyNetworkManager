@@ -4,27 +4,30 @@
 #    include <memory>
 #    include <string>
 #    include <vector>
-
-#    ifdef ESP32
+#    if defined(ARDUINO_SAMD_MKRWIFI1010) || \
+        defined(ARDUINO_SAMD_NANO_33_IOT) || \
+        defined(ARDUINO_AVR_UNO_WIFI_REV2)
+#        include <WiFiNINA.h>
+#    elif defined(ARDUINO_SAMD_MKR1000)
+#        include <WiFi101.h>
+#    elif defined(ARDUINO_ARCH_ESP8266)
+#        include <ESP8266WiFi.h>
+#    elif defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_NICLA_VISION) || \
+        defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_GIGA)
 #        ifdef USE_ETHERNET
 #            include "ethernet/ethernetHandler.hpp"
 #        else
 #            include <WiFi.h>
 #        endif
-
-#    elif defined(ESP8266)
-#        include <ESP8266WiFi.h>
 #    endif
-
-#    include "data/statemanager/StateManager.hpp"
 #    include "data/config/project_config.hpp"
+#    include "data/statemanager/StateManager.hpp"
 #    include "utilities/helpers.hpp"
 
 class WiFiHandler {
    public:
-    WiFiHandler(ProjectConfig& configManager,
-                const std::string& ssid, const std::string& password,
-                uint8_t channel);
+    WiFiHandler(ProjectConfig& configManager, const std::string& ssid,
+                const std::string& password, uint8_t channel);
 
     virtual ~WiFiHandler();
     void begin();
