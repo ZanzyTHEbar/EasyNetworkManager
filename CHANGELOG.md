@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [2.1.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v2.0.0...v2.1.0) (2023-05-07)
+
+
+### 🍕 Features
+
+* add wifi support for other boards ([9b1c5b5](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/9b1c5b518b4c99ebc72b6d386235b145cecd10fb))
+
 ## [2.0.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v1.12.0...v2.0.0) (2023-03-19)
 
 
