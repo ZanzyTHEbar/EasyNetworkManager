@@ -1,8 +1,10 @@
 {
-	"folders": [
-		{
-			"path": "./NetworkManager"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "./NetworkManager"
+    }
+  ],
+  "settings": {
+    "cSpell.words": ["successs"]
+  }
 }

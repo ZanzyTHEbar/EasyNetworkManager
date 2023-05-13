@@ -78,7 +78,6 @@ class ProjectConfig : public Preferences, public ISubject<Event_e> {
     virtual ~ProjectConfig();
     virtual void load();
     virtual void save();
-    virtual void initConfig();
     void wifiConfigSave();
     void deviceConfigSave();
     void mdnsConfigSave();
@@ -105,6 +104,7 @@ class ProjectConfig : public Preferences, public ISubject<Event_e> {
     void deleteWifiConfig(const std::string& networkName, bool shouldNotify);
 
    private:
+    virtual void initConfig();
     Project_Config::ProjectConfig_t config;
     std::string _configName;
     std::string _mdnsName;
