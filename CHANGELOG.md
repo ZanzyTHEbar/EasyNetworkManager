@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [2.1.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v2.1.0...v2.1.1) (2023-05-13)
+
+
+### 🧑‍💻 Code Refactoring
+
+* simplify api ([15ca82b](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/15ca82b2cd108ae66e4b8a4aa5241ae5c0f51a64))
+
 ## [2.1.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v2.0.0...v2.1.0) (2023-05-07)
 
 
