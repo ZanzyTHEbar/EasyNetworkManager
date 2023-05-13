@@ -62,7 +62,7 @@
       "include/*"
     ]
   },
-  "version": "2.1.1",
+  "version": "2.1.2",
   "frameworks": "arduino",
   "platforms": [
     "espressif32",
