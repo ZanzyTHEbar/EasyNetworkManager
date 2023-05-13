@@ -1,6 +1,5 @@
 #ifndef STATEMANAGER_HPP
 #define STATEMANAGER_HPP
-#include <Arduino.h>
 
 /*
  * StateManager
@@ -80,7 +79,7 @@ class StateManager {
         return _current_state;
     }
 
-   private:
+   protected:
     T _current_state;
 };
 
