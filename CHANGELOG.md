@@ -3,6 +3,19 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [3.0.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v2.1.2...v3.0.0) (2023-05-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* CHANGES
+
+- implement hot-reload handler for config
+
+### 🐛 Bug Fixes
+
+* duplicate config glitch ([16a20ca](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/16a20ca9ef021139b3a679307f7fdb3ccbd8e599))
+
 ## [2.1.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v2.1.1...v2.1.2) (2023-05-13)
 
 
