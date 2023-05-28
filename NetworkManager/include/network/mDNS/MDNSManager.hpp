@@ -15,8 +15,6 @@ class MDNSHandler : public IObserver<Event_e> {
     std::string key;
     std::string value;
 
-    std::string name;
-
    public:
     MDNSHandler(ProjectConfig& configManager, const std::string& service_name,
                 const std::string& service_text, const std::string& proto,

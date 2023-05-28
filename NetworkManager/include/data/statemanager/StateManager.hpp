@@ -11,6 +11,7 @@ struct DeviceStates {
 
     enum Event_e {
         configLoaded,
+        configSaved,
         deviceConfigUpdated,
         mdnsConfigUpdated,
         networksConfigUpdated,

@@ -24,7 +24,7 @@
 #    include "data/statemanager/StateManager.hpp"
 #    include "utilities/helpers.hpp"
 
-class WiFiHandler {
+class WiFiHandler : public IObserver<Event_e> {
    public:
     WiFiHandler(ProjectConfig& configManager, const std::string& ssid,
                 const std::string& password, uint8_t channel);
@@ -42,6 +42,9 @@ class WiFiHandler {
                const std::string& password = std::string());
     bool iniSTA(const std::string& ssid, const std::string& password,
                 uint8_t channel, wifi_power_t power);
+
+    void update(Event_e event) override;
+    std::string getName() override;
 
     std::string ssid;
     std::string password;

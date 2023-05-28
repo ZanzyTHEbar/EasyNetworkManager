@@ -4,6 +4,7 @@
 #    include <Arduino.h>
 #    include <Preferences.h>
 
+#    include <functional>
 #    include <string>
 #    include <vector>
 
@@ -103,12 +104,19 @@ class ProjectConfig : public Preferences, public ISubject<Event_e> {
     void setWiFiTxPower(uint8_t power, bool shouldNotify);
     void deleteWifiConfig(const std::string& networkName, bool shouldNotify);
 
+    void registerCallbacks(std::function<void(void)> load_callback,
+                           std::function<void(void)> save_callback);
+
+    bool reboot;
+
    private:
     virtual void initConfig();
     Project_Config::ProjectConfig_t config;
     std::string _configName;
     std::string _mdnsName;
     bool _already_loaded;
+    std::function<void(void)> load_callback;
+    std::function<void(void)> save_callback;
 };
 
 #endif  // PROJECT_CONFIG_HPP

@@ -158,10 +158,6 @@ void BaseAPI::setWiFi(AsyncWebServerRequest* request) {
                 configManager.setDeviceConfig(ota_password, ota_port, true);
                 log_i("OTA Password set to: %s", ota_password.c_str());
             }
-
-            request->send(200, MIMETYPE_JSON,
-                          "{\"msg\":\"Done. Network Credentials have been set. "
-                          "Rebooting\"}");
             this->save(request);
             break;
         }

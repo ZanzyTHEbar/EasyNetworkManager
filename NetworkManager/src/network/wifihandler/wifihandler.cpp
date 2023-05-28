@@ -153,3 +153,17 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
 void WiFiHandler::toggleAdhoc(bool* enable) {
     _enable_adhoc = enable;
 }
+
+void WiFiHandler::update(Event_e event) {
+    switch (event) {
+        case Event_e::networksConfigUpdated:
+            this->begin();
+            break;
+        default:
+            break;
+    }
+}
+
+std::string WiFiHandler::getName() {
+    return "WiFiHandler";
+}

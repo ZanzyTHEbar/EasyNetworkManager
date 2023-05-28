@@ -10,9 +10,7 @@ MDNSHandler::MDNSHandler(ProjectConfig& configManager,
       service_text(std::move(service_text)),
       proto(std::move(proto)),
       key(std::move(key)),
-      value(std::move(value)) {
-    this->name.assign(this->service_name);
-}
+      value(std::move(value)) {}
 
 bool MDNSHandler::begin() {
     auto mdnsConfig = configManager.getMDNSConfig();
@@ -47,5 +45,5 @@ void MDNSHandler::update(Event_e event) {
 }
 
 std::string MDNSHandler::getName() {
-    return this->name;
+    return this->service_name;
 }

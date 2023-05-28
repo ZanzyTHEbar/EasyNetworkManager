@@ -6,7 +6,31 @@ ProjectConfig::ProjectConfig(const std::string& configName,
       _mdnsName(std::move(mdnsName)),
       _already_loaded(false) {}
 
-ProjectConfig::~ProjectConfig() {}
+ProjectConfig::~ProjectConfig() {
+    this->config.device = {
+        "12345678",
+        3232,
+    };
+
+    if (_mdnsName.empty()) {
+        log_e(
+            "[Project Config]: MDNS name is null\n Auto-assigning name to "
+            "'easynetwork'");
+        _mdnsName = "easynetwork";
+    }
+    this->config.mdns = {
+        _mdnsName,
+    };
+
+    log_i("[Project Config]: MDNS name: %s", _mdnsName.c_str());
+
+    this->config.ap_network = {
+        "",
+        "",
+        1,
+        false,
+    };
+}
 
 /**
  *@brief Initializes the structures with blank data to prevent empty memory
@@ -15,36 +39,14 @@ ProjectConfig::~ProjectConfig() {}
  */
 void ProjectConfig::initConfig() {
     if (_configName.empty()) {
-        log_e("Config name is null\n");
+        log_e("[Project Config]: Config name is null\n");
         _configName = "easynetwork";
     }
 
-    bool successs = begin(_configName.c_str());
+    bool success = begin(_configName.c_str());
 
-    log_i("Config name: %s", _configName.c_str());
-    log_i("Config loaded: %s", successs ? "true" : "false");
-
-    this->config.device = {
-        "12345678",
-        3232,
-    };
-
-    if (_mdnsName.empty()) {
-        log_e("MDNS name is null\n Auto-assigning name to 'easynetwork'");
-        _mdnsName = "easynetwork";
-    }
-    this->config.mdns = {
-        _mdnsName,
-    };
-
-    log_i("MDNS name: %s", _mdnsName.c_str());
-
-    this->config.ap_network = {
-        "",
-        "",
-        1,
-        false,
-    };
+    log_i("[Project Config]: Config name: %s", _configName.c_str());
+    log_i("[Project Config]: Config loaded: %s", success ? "true" : "false");
 }
 
 void ProjectConfig::deviceConfigSave() {
@@ -98,33 +100,75 @@ void ProjectConfig::wifiTxPowerConfigSave() {
 }
 
 void ProjectConfig::save() {
-    log_d("Saving project config");
+    log_d("[Project Config]: Saving project config");
+
     deviceConfigSave();
     wifiConfigSave();
     wifiTxPowerConfigSave();
     mdnsConfigSave();
-    end();
-    log_i("Project config saved and system is rebooting");
+
+    /* Custom save */
+    if (save_callback != nullptr)
+        save_callback();
+
     int initialTime = millis();
     while (millis() - initialTime <= 2000) {
         continue;
     }
-    ESP.restart();
+
+    // Close NVS
+    end();
+
+    if (this->reboot) {
+        log_i("[Project Config]: Project config saved and system is rebooting");
+        ESP.restart();
+        return;
+    }
+
+    log_w("[Project Config]: Reboot is disabled, triggering observer");
+    this->_already_loaded = false;
+
+    //* clear struct data
+    this->config.device = {
+        "",
+        0,
+    };
+
+    this->config.mdns = {
+        "",
+    };
+
+    this->config.ap_network = {
+        "",
+        "",
+        1,
+        false,
+    };
+
+    this->config.networks.clear();
+
+    this->notifyAll(Event_e::configSaved);
 }
 
 bool ProjectConfig::reset() {
-    log_w("Resetting project config");
+    log_w("[Project Config]: Resetting project config");
     return clear();
 }
 
 void ProjectConfig::load() {
-    log_d("Loading project config");
-    // call before load to initialise the structs
-    initConfig();
+    log_d("[Project Config]: Loading project config");
+
     if (this->_already_loaded) {
-        log_w("Project config already loaded");
+        log_w("[Project Config]: Project config already loaded");
         return;
     }
+
+    // call before load to initialise the structs
+    initConfig();
+
+    /* Custom Load */
+    if (load_callback != nullptr)
+        load_callback();
 
     /* MDNS Config */
     this->config.mdns.hostname.assign(
@@ -188,7 +232,7 @@ void ProjectConfig::load() {
 //**********************************************************************************************************************
 void ProjectConfig::setDeviceConfig(const std::string& OTAPassword, int OTAPort,
                                     bool shouldNotify) {
-    log_d("Updating device config");
+    log_d("[Project Config]: Updating device config");
     this->config.device.OTAPassword.assign(OTAPassword);
     this->config.device.OTAPort = OTAPort;
 
@@ -199,7 +243,7 @@ void ProjectConfig::setDeviceConfig(const std::string& OTAPassword, int OTAPort,
 
 bool ProjectConfig::setMDNSConfig(const std::string& hostname,
                                   bool shouldNotify) {
-    log_d("Updating MDNS config");
+    log_d("[Project Config]: Updating MDNS config");
     for (int i = 0; i < this->config.mdns.hostname.size(); i++) {
         if (this->config.mdns.hostname[i] == '-' ||
             this->config.mdns.hostname[i] == '.')
@@ -215,7 +259,9 @@ bool ProjectConfig::setMDNSConfig(const std::string& hostname,
             continue;
         else if (this->config.mdns.hostname[i] == 0 && i > 0)
             break;
-        log_i("Invalid hostname, please use only alphanumeric characters");
+        log_i(
+            "[Project Config]: Invalid hostname, please use only alphanumeric "
+            "characters");
         return false;
     }
     this->config.mdns.hostname.assign(hostname);
@@ -234,22 +280,12 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
     // config are the ones we want the esp to connect to, rather than host as
     // AP, and here we're just updating them
     size_t size = this->config.networks.size();
-    // we're allowing to store up to three additional networks
-    if (size == 0) {
-        Serial.println("No networks, We're adding a new network");
-        this->config.networks.emplace_back(networkName, ssid, password, channel,
-                                           power, false);
-
-        if (shouldNotify)
-            this->notifyAll(Event_e::networksConfigUpdated);
-
-        return;
-    }
 
     for (auto it = this->config.networks.begin();
          it != this->config.networks.end();) {
-        if (it->name == networkName) {
-            log_i("Found network %s, updating it ...", it->name.c_str());
+        if (it->ssid == ssid) {
+            log_i("[Project Config]: Found network %s, updating it ...",
+                  it->name.c_str());
 
             it->name = networkName;
             it->ssid = ssid;
@@ -258,8 +294,12 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
             it->power = power;
             it->adhoc = false;
 
-            if (shouldNotify)
+            if (shouldNotify) {
+                wifiStateManager.setState(WiFiState_e::WiFiState_Disconnected);
+                WiFi.disconnect();
+                this->wifiConfigSave();
                 this->notifyAll(Event_e::networksConfigUpdated);
+            }
 
             return;
         } else {
@@ -267,8 +307,8 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
         }
     }
 
-    if (size < 3) {
-        Serial.println("We're adding a new network");
+    if (size < 3 && size > 0) {
+        Serial.println("[Project Config]: We're adding a new network");
         // we don't have that network yet, we can add it as we still have some
         // space we're using emplace_back as push_back will create a copy of it,
         // we want to avoid that
@@ -276,23 +316,35 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
                                            power, false);
     }
 
-    if (shouldNotify)
+    // we're allowing to store up to three additional networks
+    if (size == 0) {
+        Serial.println(
+            "[Project Config]: No networks, We're adding a new network");
+        this->config.networks.emplace_back(networkName, ssid, password, channel,
+                                           power, false);
+    }
+
+    if (shouldNotify) {
+        wifiStateManager.setState(WiFiState_e::WiFiState_None);
+        WiFi.disconnect();
+        this->wifiConfigSave();
         this->notifyAll(Event_e::networksConfigUpdated);
+    }
 }
 
 void ProjectConfig::deleteWifiConfig(const std::string& networkName,
                                      bool shouldNotify) {
     size_t size = this->config.networks.size();
     if (size == 0) {
-        Serial.println("No networks, nothing to delete");
+        Serial.println("[Project Config]: No networks, nothing to delete");
     }
 
     for (auto it = this->config.networks.begin();
          it != this->config.networks.end();) {
         if (it->name == networkName) {
-            log_i("Found network %s", it->name.c_str());
+            log_i("[Project Config]: Found network %s", it->name.c_str());
             it = this->config.networks.erase(it);
-            log_i("Deleted network %s", networkName.c_str());
+            log_i("[Project Config]: Deleted network %s", networkName.c_str());
 
         } else {
             ++it;
@@ -312,7 +364,7 @@ void ProjectConfig::setAPWifiConfig(const std::string& ssid,
     this->config.ap_network.channel = channel;
     this->config.ap_network.adhoc = adhoc;
 
-    log_d("Updating access point config");
+    log_d("[Project Config]: Updating access point config");
     if (shouldNotify) {
         this->notifyAll(Event_e::apConfigUpdated);
     }
@@ -321,7 +373,7 @@ void ProjectConfig::setAPWifiConfig(const std::string& ssid,
 void ProjectConfig::setWiFiTxPower(uint8_t power, bool shouldNotify) {
     this->config.wifi_tx_power.power = power;
 
-    log_d("Updating wifi tx power");
+    log_d("[Project Config]: Updating wifi tx power");
     if (shouldNotify)
         this->notifyAll(Event_e::wifiTxPowerUpdated);
 }
@@ -330,7 +382,7 @@ void ProjectConfig::setDeviceDataJson(const std::string& data,
                                       bool shouldNotify) {
     this->config.device_data.deviceJson.assign(data);
 
-    log_d("Updating device data json");
+    log_d("[Project Config]: Updating device data json");
     if (shouldNotify)
         this->notifyAll(Event_e::deviceDataJsonUpdated);
 }
@@ -401,4 +453,16 @@ Project_Config::WiFiTxPower_t& ProjectConfig::getWifiTxPowerConfig() {
 }
 Project_Config::DeviceDataJson_t& ProjectConfig::getDeviceDataJson() {
     return this->config.device_data;
+}
+
+//**********************************************************************************************************************
+//*
+//!                                                callbacks
+//*
+//**********************************************************************************************************************
+
+void ProjectConfig::registerCallbacks(std::function<void(void)> load_callback,
+                                      std::function<void(void)> save_callback) {
+    this->load_callback = load_callback;
+    this->save_callback = save_callback;
 }

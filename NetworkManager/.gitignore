@@ -8,3 +8,4 @@ node_modules
 /include/secrets.h
 /tools/__pycache__
 /tools/firmware_name.txt
+/logs
