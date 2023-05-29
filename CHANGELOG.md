@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [3.0.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v3.0.1...v3.0.2) (2023-05-29)
+
+
+### 🐛 Bug Fixes
+
+* improve custom config handler  API ([04452b5](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/04452b55bba0db8fa13302fd90bef16ef253fcba))
+
 ## [3.0.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v3.0.0...v3.0.1) (2023-05-29)
 
 
