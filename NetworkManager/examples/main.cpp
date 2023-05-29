@@ -25,8 +25,8 @@
 //  data ? The config manager constructor takes two (optional) parameters: ? 1.
 //  The name of the project (used to create the config file name) ? 2. The
 //  hostname for your device on the network(used for mDNS, OTA, etc.)
-ProjectConfig config("easynetwork", MDNS_HOSTNAME);
-ConfigHandler configHandler(config);
+ProjectConfig configManager("easynetwork", MDNS_HOSTNAME);
+ConfigHandler configHandler(configManager);
 
 // Note: The WiFi Handler is used to manage the WiFi connection
 // Note: The WiFi Handler constructor takes four parameters:
@@ -34,7 +34,7 @@ ConfigHandler configHandler(config);
 // Note: 2. A pointer to the WiFi State Manager
 // Note: 3. The SSID of the WiFi network to connect to
 // Note: 4. The password of the WiFi network to connect to
-WiFiHandler network(config, WIFI_SSID, WIFI_PASSWORD, 1);
+WiFiHandler network(configManager, WIFI_SSID, WIFI_PASSWORD, 1);
 
 // Note: The API Server is used to create a web server that can be used to send
 //  commands to the device ? The API Server constructor takes five parameters:
@@ -48,8 +48,8 @@ WiFiHandler network(config, WIFI_SSID, WIFI_PASSWORD, 1);
 //  http://easynetwork.local/api/mycommands/command/helloWorld
 //  http://easynetwork.local/api/mycommands/command/blink
 //  http://easynetwork.local/api/mycommands/command/params?Axes1=1&Axes2=2
-APIServer server(80, config, "/api", "/wifimanager", "/mycommands");
-OTA ota(config);
+APIServer server(80, configManager, "/api", "/wifimanager", "/mycommands");
+OTA ota(configManager);
 
 // Note: The mDNS Manager is used to create a mDNS service for the device
 // Note: The mDNS Manager constructor takes seven parameters:
@@ -63,8 +63,20 @@ OTA ota(config);
 
 //! service name and service protocol have to be
 //! lowercase and begin with an underscore
-MDNSHandler mDNS(config, "_easynetwork", "test", "_tcp", "_api_port",
+MDNSHandler mDNS(configManager, "_easynetwork", "test", "_tcp", "_api_port",
                  "80");
+
+class CustomConfig : public CustomConfigInterface {
+    void save() override {
+        Serial.println("Saving custom config");
+    }
+
+    void load() override {
+        Serial.println("Loading custom config");
+    }
+};
+
+CustomConfig customConfig;
 
 class Temp {
    public:
@@ -151,16 +163,14 @@ void setup() {
     pinMode(4, OUTPUT);
     Serial.println("\nHello, EasyNetworkManager!");
 
-    //* Attach the config to the config handler to hot-reload the config on save
-    config.attach(configHandler);
-    //* Attach the config to the network handler to hot-reload the config on save
-    config.attach(network);
-    //* Attach the config to the mDNS handler to hot-reload the config on save
-    config.attach(
+    configManager.attach(configHandler);
+    //* Optionally register a custom config  - this will be saved and loaded
+    configManager.registerUserConfig(&customConfig);
+    configManager.attach(network);
+    configManager.attach(
         mDNS);  // attach the config manager to the mdns object - this will
                 // update the config when mdns hostname changes
 
-    //* Load the config from flash
     configHandler.begin();  // load the config from flash
     network.begin();        // setup wifi connection
     mDNS.begin();           // start mDNS service (optional)
