@@ -463,6 +463,6 @@ Project_Config::DeviceDataJson_t& ProjectConfig::getDeviceDataJson() {
 //**********************************************************************************************************************
 
 void ProjectConfig::registerUserConfig(
-    CustomConfigInterface* custom_config_interface) {
+    _custom_config_interface_t custom_config_interface) {
     this->_custom_config_interface = custom_config_interface;
 }

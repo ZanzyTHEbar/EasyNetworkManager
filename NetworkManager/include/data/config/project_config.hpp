@@ -79,6 +79,15 @@ class CustomConfigInterface {
 };
 
 class ProjectConfig : public Preferences, public ISubject<Event_e> {
+   private:
+    virtual void initConfig();
+    Project_Config::ProjectConfig_t config;
+    std::string _configName;
+    std::string _mdnsName;
+    bool _already_loaded;
+    typedef CustomConfigInterface* _custom_config_interface_t;
+    _custom_config_interface_t _custom_config_interface;
+
    public:
     ProjectConfig(const std::string& configName = std::string(),
                   const std::string& mdnsName = std::string());
@@ -110,18 +119,9 @@ class ProjectConfig : public Preferences, public ISubject<Event_e> {
     void setWiFiTxPower(uint8_t power, bool shouldNotify);
     void deleteWifiConfig(const std::string& networkName, bool shouldNotify);
 
-    void registerUserConfig(CustomConfigInterface* _custom_config_interface);
+    void registerUserConfig(_custom_config_interface_t custom_config_interface);
 
     bool reboot;
-
-   private:
-    virtual void initConfig();
-    Project_Config::ProjectConfig_t config;
-    std::string _configName;
-    std::string _mdnsName;
-    bool _already_loaded;
-
-    CustomConfigInterface* _custom_config_interface;
 };
 
 #endif  // PROJECT_CONFIG_HPP
