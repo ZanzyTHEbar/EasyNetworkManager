@@ -108,8 +108,8 @@ void ProjectConfig::save() {
     mdnsConfigSave();
 
     /* Custom save */
-    if (save_callback != nullptr)
-        save_callback();
+    if (_custom_config_interface != nullptr)
+        _custom_config_interface->save();
 
     int initialTime = millis();
     while (millis() - initialTime <= 2000) {
@@ -167,8 +167,8 @@ void ProjectConfig::load() {
     initConfig();
 
     /* Custom Load */
-    if (load_callback != nullptr)
-        load_callback();
+    if (_custom_config_interface != nullptr)
+        _custom_config_interface->load();
 
     /* MDNS Config */
     this->config.mdns.hostname.assign(
@@ -182,6 +182,7 @@ void ProjectConfig::load() {
 
     /* Wifi TX Power Config */
     this->config.wifi_tx_power.power = getUInt("power", 52);
+
     /* WiFi Config */
     int networkCount = getInt("networkCount", 0);
     std::string name = "name";
@@ -461,8 +462,7 @@ Project_Config::DeviceDataJson_t& ProjectConfig::getDeviceDataJson() {
 //*
 //**********************************************************************************************************************
 
-void ProjectConfig::registerCallbacks(std::function<void(void)> load_callback,
-                                      std::function<void(void)> save_callback) {
-    this->load_callback = load_callback;
-    this->save_callback = save_callback;
+void ProjectConfig::registerUserConfig(
+    CustomConfigInterface* custom_config_interface) {
+    this->_custom_config_interface = custom_config_interface;
 }

@@ -72,6 +72,12 @@ struct ProjectConfig_t {
 };
 }  // namespace Project_Config
 
+class CustomConfigInterface {
+   public:
+    virtual void load() = 0;
+    virtual void save() = 0;
+};
+
 class ProjectConfig : public Preferences, public ISubject<Event_e> {
    public:
     ProjectConfig(const std::string& configName = std::string(),
@@ -104,8 +110,7 @@ class ProjectConfig : public Preferences, public ISubject<Event_e> {
     void setWiFiTxPower(uint8_t power, bool shouldNotify);
     void deleteWifiConfig(const std::string& networkName, bool shouldNotify);
 
-    void registerCallbacks(std::function<void(void)> load_callback,
-                           std::function<void(void)> save_callback);
+    void registerUserConfig(CustomConfigInterface* _custom_config_interface);
 
     bool reboot;
 
@@ -115,8 +120,8 @@ class ProjectConfig : public Preferences, public ISubject<Event_e> {
     std::string _configName;
     std::string _mdnsName;
     bool _already_loaded;
-    std::function<void(void)> load_callback;
-    std::function<void(void)> save_callback;
+
+    CustomConfigInterface* _custom_config_interface;
 };
 
 #endif  // PROJECT_CONFIG_HPP
