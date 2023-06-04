@@ -1,7 +1,12 @@
 {
   "folders": [
     {
+      "name": "Source",
       "path": "./NetworkManager"
+    },
+    {
+      "name": "Root",
+      "path": "."
     }
   ],
   "settings": {
