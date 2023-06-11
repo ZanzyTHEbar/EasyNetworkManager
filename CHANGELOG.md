@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [3.1.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v3.1.1...v3.1.2) (2023-06-11)
+
+
+### 🐛 Bug Fixes
+
+* bug in Observer.hpp ([f2c0d00](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/f2c0d00c2f76b5d8fdd23b337e5a512a70bee39d))
+
 ## [3.1.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v3.1.0...v3.1.1) (2023-06-04)
 
 
