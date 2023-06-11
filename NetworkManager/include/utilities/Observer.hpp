@@ -25,17 +25,10 @@ class ISubject {
     }
 
     void detach(Observer_t observer) {
-        // Note: delete pointer
-        delete (*this->observers.find(observer.getName())).second;
         this->observers.erase(observer.getName());
     }
 
     void detachAll() {
-        // Note: delete pointers
-        for (auto observer = observers.begin(); observer != observers.end();
-             ++observer) {
-            delete (*observer).second;
-        }
         // Note: clear map
         this->observers.clear();
     }

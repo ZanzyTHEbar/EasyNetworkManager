@@ -74,7 +74,7 @@ std::vector<std::string> Helpers::split(const std::string& s, char delimiter) {
     return parts;
 }
 
-char* Helpers::appendChartoChar(const char* hostname, const char* def_host) {
+/* char* Helpers::appendChartoChar(const char* hostname, const char* def_host) {
     // create hostname
     int numBytes = strlen(hostname) + strlen(def_host) +
                    1;  // +1 for the null terminator | allocate a buffer of the
@@ -92,7 +92,7 @@ char* Helpers::StringtoChar(const std::string& inputString) {
     resizeBuff(inputString.length() + 1, &outputString);
     strcpy(outputString, inputString.c_str());
     return outputString;
-}
+} */
 
 void Helpers::update_progress_bar(int progress, int total) {
     int barWidth = 70;

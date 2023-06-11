@@ -1,6 +1,6 @@
 #ifndef HELPERS_HPP
 #define HELPERS_HPP
-#include <strTools.h>
+//#include <strTools.h>
 
 #include <iostream>
 #include <memory>
@@ -35,8 +35,8 @@ char* itoa(int value, char* result, int base);
 void split(const std::string& str, const std::string& splitBy,
            std::vector<std::string>& tokens);
 std::vector<std::string> split(const std::string& s, char delimiter);
-char* appendChartoChar(const char* hostname, const char* def_host);
-char* StringtoChar(const std::string& inputString);
+// char* appendChartoChar(const char* hostname, const char* def_host);
+// char* StringtoChar(const std::string& inputString);
 void update_progress_bar(int progress, int total);
 
 /// @brief
