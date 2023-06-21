@@ -16,7 +16,14 @@ const char* API_Utilities::MIMETYPE_JSON{"application/json"};
 
 API_Utilities::API_Utilities() {}
 API_Utilities::~API_Utilities() {}
-std::string API_Utilities::shaEncoder(std::string data) {
+
+/**
+ * @brief A simple sha512 encoder for a string
+ *
+ * @param data std::string
+ * @return std::string
+ */
+std::string API_Utilities::shaEncoder(const std::string& data) {
     const char* data_c = data.c_str();
     int size = 64;
     uint8_t hash[size];
@@ -49,8 +56,14 @@ bool API_Utilities::initSPIFFS() {
     return init_spiffs;
 }
 
-// Read File from SPIFFS
-std::string API_Utilities::readFile(fs::FS& fs, std::string path) {
+/**
+ * @brief Read a file from SPIFFS
+ *
+ * @param fs fs::FS&
+ * @param path std::string
+ * @return std::string
+ */
+std::string API_Utilities::readFile(fs::FS& fs, const std::string& path) {
     log_i("Reading file: %s\r\n", path.c_str());
 
     File file = fs.open(path.c_str());
@@ -67,9 +80,15 @@ std::string API_Utilities::readFile(fs::FS& fs, std::string path) {
     return fileContent;
 }
 
-// Write file to SPIFFS
-void API_Utilities::writeFile(fs::FS& fs, std::string path,
-                              std::string message) {
+/**
+ * @brief Write a file to SPIFFS
+ *
+ * @param fs fs::FS&
+ * @param path std::string
+ * @param message std::string
+ */
+void API_Utilities::writeFile(fs::FS& fs, const std::string& path,
+                              const std::string& message) {
     log_i("[Writing File]: Writing file: %s\r\n", path);
     Network_Utilities::my_delay(0.1L);
 

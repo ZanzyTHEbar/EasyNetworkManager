@@ -1,7 +1,7 @@
 #pragma once
 #ifndef XWEBSERVERHANDLER_HPP
 #    define XWEBSERVERHANDLER_HPP
-#    include "api/baseAPI/baseAPI.hpp"
+#    include "api/base/base_api.hpp"
 
 class APIServer : public BaseAPI {
    private:
@@ -20,8 +20,7 @@ class APIServer : public BaseAPI {
 
     void findParam(AsyncWebServerRequest* request, const char* param,
                    String& value);
-    void updateCommandHandlers(const std::string& url,
-                               ArRequestHandlerFunction funct);
+    void addAPICommand(const std::string& url, ArRequestHandlerFunction funct);
     void addRouteMap(const std::string& index, route_t route,
                      std::vector<std::string>& indexes);
 

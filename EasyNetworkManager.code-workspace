@@ -10,7 +10,17 @@
     }
   ],
   "settings": {
-    "cSpell.words": ["successs", "WEBMANAGER"],
+    "cSpell.words": [
+      "GIGA",
+      "MKRWIFI",
+      "mycommands",
+      "NICLA",
+      "PORTENTA",
+      "SAMD",
+      "successs",
+      "txpower",
+      "WEBMANAGER"
+    ],
     "files.associations": {
       "*.json.liquid": "json",
       "*.yaml.liquid": "yaml",
@@ -70,7 +80,43 @@
       "stdexcept": "cpp",
       "streambuf": "cpp",
       "cinttypes": "cpp",
-      "typeinfo": "cpp"
+      "typeinfo": "cpp",
+      "bit": "cpp",
+      "charconv": "cpp",
+      "chrono": "cpp",
+      "compare": "cpp",
+      "concepts": "cpp",
+      "condition_variable": "cpp",
+      "coroutine": "cpp",
+      "format": "cpp",
+      "forward_list": "cpp",
+      "ios": "cpp",
+      "list": "cpp",
+      "locale": "cpp",
+      "mutex": "cpp",
+      "queue": "cpp",
+      "ranges": "cpp",
+      "ratio": "cpp",
+      "span": "cpp",
+      "stack": "cpp",
+      "stop_token": "cpp",
+      "thread": "cpp",
+      "xfacet": "cpp",
+      "xhash": "cpp",
+      "xiosbase": "cpp",
+      "xlocale": "cpp",
+      "xlocbuf": "cpp",
+      "xlocinfo": "cpp",
+      "xlocmes": "cpp",
+      "xlocmon": "cpp",
+      "xlocnum": "cpp",
+      "xloctime": "cpp",
+      "xmemory": "cpp",
+      "xstddef": "cpp",
+      "xstring": "cpp",
+      "xtr1common": "cpp",
+      "xtree": "cpp",
+      "xutility": "cpp"
     }
   }
 }

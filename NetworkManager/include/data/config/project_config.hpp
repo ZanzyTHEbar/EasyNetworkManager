@@ -8,7 +8,7 @@
 #    include <string>
 #    include <vector>
 
-#    include "utilities/Observer.hpp"
+#    include "utilities/observer.hpp"
 #    include "utilities/helpers.hpp"
 #    include "utilities/network_utilities.hpp"
 

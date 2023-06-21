@@ -1,4 +1,4 @@
-#include <api/baseAPI/baseAPI.hpp>
+#include <api/base/base_api.hpp>
 
 BaseAPI::BaseAPI(const int CONTROL_PORT, ProjectConfig& configManager,
                  const std::string& api_url, const std::string& wifimanager_url,
@@ -37,8 +37,8 @@ void BaseAPI::begin() {
 #endif  // USE_WEBManager
 
     if (initSPIFFS()) {
-        if (userEndpointsVector.size() > 0) {
-            for (auto& route : userEndpointsVector) {
+        if (custom_html_files.size() > 0) {
+            for (auto& route : custom_html_files) {
                 server.on(route.endpoint.c_str(),
                           _networkMethodsMap_inv[route.method],
                           [&](AsyncWebServerRequest* request) {

@@ -1,4 +1,4 @@
-#include <network/wifihandler/wifihandler.hpp>
+#include <network/wifihandler/wifi_handler.hpp>
 
 WiFiHandler::WiFiHandler(ProjectConfig& configManager, const std::string& ssid,
                          const std::string& password, uint8_t channel)

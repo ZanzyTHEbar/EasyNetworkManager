@@ -2,8 +2,7 @@
 
 /**
  * @brief Function to setup the WiFi scan and set the WiFi mode to station.
- *
- * @brief Call this function in the setup() function
+ * @note Call this function in the setup() function
  */
 void Network_Utilities::setupWifiScan() {
     // Set WiFi to station mode and disconnect from an AP if it was previously
@@ -15,6 +14,12 @@ void Network_Utilities::setupWifiScan() {
     Serial.println("Setup done");
 }
 
+/**
+ * @brief Function to scan for WiFi networks and print the results to the serial
+ * @note Call this function in the loop() function
+ * @return true
+ * @return false
+ */
 bool Network_Utilities::loopWifiScan() {
     // WiFi.scanNetworks will return the number of networks found
     log_i("[INFO]: Beginning WiFi Scanner");
@@ -36,7 +41,12 @@ bool Network_Utilities::loopWifiScan() {
     return (networks > 0);
 }
 
-// Take measurements of the Wi-Fi strength and return the average result.
+/**
+ * @brief Function to get the strength of the WiFi signal
+ *
+ * @param points int Number of points to average
+ * @return int
+ */
 int Network_Utilities::getStrength(int points)  // TODO: add to JSON doc
 {
     int32_t rssi = 0, averageRSSI = 0;
@@ -50,13 +60,22 @@ int Network_Utilities::getStrength(int points)  // TODO: add to JSON doc
     return averageRSSI;
 }
 
+/**
+ * @brief Function to delay the program execution
+ *
+ * @param delay_time volatile long
+ */
 void Network_Utilities::my_delay(volatile long delay_time) {
     delay_time = delay_time * 1e6L;
     for (volatile long count = delay_time; count > 0L; count--)
         ;
 }
 
-// a function to generate the device ID
+/**
+ * @brief Function to generate a device ID from the ESP32 chip ID
+ *
+ * @return std::string
+ */
 std::string Network_Utilities::generateDeviceID() {
     uint32_t chipId = 0;
     for (int i = 0; i < 17; i = i + 8) {
@@ -73,8 +92,7 @@ std::string Network_Utilities::generateDeviceID() {
 
 /**
  * @brief Function to map the WiFi status to the WiFiState_e enum
- *
- * @brief Call this function in the loop() function
+ * @note Call this function in the loop() function
  */
 void Network_Utilities::checkWiFiState() {
     if (wifiStateManager.getCurrentState() == WiFiState_e::WiFiState_ADHOC) {
@@ -99,30 +117,4 @@ void Network_Utilities::checkWiFiState() {
         default:
             wifiStateManager.setState(WiFiState_e::WiFiState_None);
     }
-}
-
-std::string Network_Utilities::shaEncoder(const std::string& data) {
-    const char* data_c = data.c_str();
-    int size = 64;
-    uint8_t hash[size];
-    mbedtls_md_context_t ctx;
-    mbedtls_md_type_t md_type = MBEDTLS_MD_SHA512;
-
-    const size_t len = strlen(data_c);
-    mbedtls_md_init(&ctx);
-    mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(md_type), 0);
-    mbedtls_md_starts(&ctx);
-    mbedtls_md_update(&ctx, (const unsigned char*)data_c, len);
-    mbedtls_md_finish(&ctx, hash);
-    mbedtls_md_free(&ctx);
-
-    std::string hash_string = "";
-    for (uint16_t i = 0; i < size; i++) {
-        std::string hex = String(hash[i], HEX).c_str();
-        if (hex.length() < 2) {
-            hex = "0" + hex;
-        }
-        hash_string += hex;
-    }
-    return hash_string;
 }

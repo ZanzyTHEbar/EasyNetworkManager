@@ -1,4 +1,4 @@
-#include <api/webserverHandler.hpp>
+#include <api/rest_api_handler.hpp>
 
 //*********************************************************************************************
 //!                                     API Server
@@ -113,7 +113,7 @@ void APIServer::handleRequest(AsyncWebServerRequest* request) {
     request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Map Index\"}");
 }
 
-void APIServer::updateCommandHandlers(const std::string& url,
+void APIServer::addAPICommand(const std::string& url,
                                       ArRequestHandlerFunction funct) {
     stateFunctionMap.emplace(std::move(url), funct);
 }

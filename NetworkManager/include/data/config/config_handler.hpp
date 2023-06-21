@@ -1,7 +1,7 @@
 #pragma once
 #include "data/config/project_config.hpp"
-#include "data/statemanager/StateManager.hpp"
-#include "utilities/Observer.hpp"
+#include "data/statemanager/state_manager.hpp"
+#include "utilities/observer.hpp"
 
 class ConfigHandler : public IObserver<Event_e> {
    public:

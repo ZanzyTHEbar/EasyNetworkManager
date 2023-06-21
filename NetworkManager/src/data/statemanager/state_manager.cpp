@@ -1,4 +1,4 @@
-#include <data/statemanager/StateManager.hpp>
+#include <data/statemanager/state_manager.hpp>
 
 StateManager<State_e> stateManager;
 StateManager<Event_e> eventManager;

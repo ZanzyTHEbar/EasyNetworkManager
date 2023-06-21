@@ -113,7 +113,7 @@ class BaseAPI : public API_Utilities {
         std::string file;
         std::string method;
     };
-    std::vector<userRoutes_t> userEndpointsVector;
+    std::vector<userRoutes_t> custom_html_files;
 };
 
 #endif  // BASEAPI_HPP

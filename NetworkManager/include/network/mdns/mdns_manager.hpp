@@ -3,7 +3,7 @@
 #include <ESPmDNS.h>
 
 #include "data/config/project_config.hpp"
-#include "data/statemanager/StateManager.hpp"
+#include "data/statemanager/state_manager.hpp"
 #include "utilities/Observer.hpp"
 
 class MDNSHandler : public IObserver<Event_e> {

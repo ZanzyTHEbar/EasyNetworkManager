@@ -1,4 +1,4 @@
-#include <network/mDNS/MDNSManager.hpp>
+#include <network/mdns/mdns_manager.hpp>
 
 MDNSHandler::MDNSHandler(ProjectConfig& configManager,
                          const std::string& service_name,

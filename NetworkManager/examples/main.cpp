@@ -5,8 +5,8 @@
 //  with an asterisk (*)
 
 //! Optional header files
-#include <network/mDNS/MDNSManager.hpp>
-#include <network/ota/OTA.hpp>
+#include <network/mdns/mdns_manager.hpp>
+#include <network/ota/basic_ota.hpp>
 #include <utilities/network_utilities.hpp>  // various network utilities
 // (unique_ptr) to create unique objects
 // #include <utilities/Observer.hpp>
@@ -146,14 +146,19 @@ void setupServer() {
     // add command handlers to the API server
     // you can add as many as you want - you can also add methods.
     log_d("[SETUP]: Starting API Server");
-    server.updateCommandHandlers("blink", blink);
-    server.updateCommandHandlers("helloWorld", printHelloWorld);
-    server.updateCommandHandlers("params", grabParams);
-    server.updateCommandHandlers("paramsClass",
-                                 [&](AsyncWebServerRequest* request) {
-                                     Temp t;
-                                     t.grabParams(request);
-                                 });
+
+    // Note: This is an example of how to add a custom API commands
+    // Note: The first parameter is the url endpoint
+    // Note: The second parameter is the function to call
+
+    // Note: The function can be a lambda function or a normal function
+    server.addAPICommand("blink", blink);
+    server.addAPICommand("helloWorld", printHelloWorld);
+    server.addAPICommand("params", grabParams);
+    server.addAPICommand("paramsClass", [&](AsyncWebServerRequest* request) {
+        Temp t;
+        t.grabParams(request);
+    });
     server.begin();
     log_d("[SETUP]: API Server Started");
 }

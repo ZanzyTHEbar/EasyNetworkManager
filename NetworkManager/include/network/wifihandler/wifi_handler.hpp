@@ -21,7 +21,7 @@
 #        endif
 #    endif
 #    include "data/config/project_config.hpp"
-#    include "data/statemanager/StateManager.hpp"
+#    include "data/statemanager/state_manager.hpp"
 #    include "utilities/helpers.hpp"
 
 class WiFiHandler : public IObserver<Event_e> {

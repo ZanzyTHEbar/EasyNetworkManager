@@ -1,4 +1,4 @@
-#include <network/ota/OTA.hpp>
+#include <network/ota/basic_ota.hpp>
 
 OTA::OTA(ProjectConfig& deviceConfig)
     : _deviceConfig(deviceConfig), _bootTimestamp(0), _isOtaEnabled(true) {}
