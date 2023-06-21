@@ -1,12 +1,12 @@
 #ifndef BASEAPI_HPP
 #define BASEAPI_HPP
 
-
+#include <stdlib_noniso.h>
 #include <string>
 #include <unordered_map>
 
 #ifdef USE_WEBMANAGER
-#include <data/webpage.h>
+#    include <data/webpage.h>
 #endif
 
 #define WEBSERVER_H
@@ -20,7 +20,13 @@ constexpr int HTTP_HEAD = 0b00100000;
 constexpr int HTTP_OPTIONS = 0b01000000;
 constexpr int HTTP_ANY = 0b01111111;
 
+#include <Update.h>
+#include <esp_int_wdt.h>
+#include <esp_task_wdt.h>
+
 #include <ESPAsyncWebServer.h>
+#include <FS.h>
+#include "Hash.h"
 
 #ifdef ESP32
 #    include <AsyncTCP.h>
@@ -29,6 +35,7 @@ constexpr int HTTP_ANY = 0b01111111;
 #endif
 
 #include "data/config/project_config.hpp"
+#include "elegantWebpage.h"
 #include "utilities/api_utilities.hpp"
 #include "utilities/helpers.hpp"
 
@@ -66,6 +73,8 @@ class BaseAPI : public API_Utilities {
     std::string api_url;
     std::string wifimanager_url;
     std::string userCommands;
+    bool _authRequired;
+
     typedef std::unordered_map<std::string, WebRequestMethodComposite>
         networkMethodsMap_t;
 
@@ -98,7 +107,11 @@ class BaseAPI : public API_Utilities {
             const std::string& userCommands);
     virtual ~BaseAPI();
     virtual void begin();
-
+#ifdef USE_ASYNCOTA
+    void checkAuthentication(AsyncWebServerRequest* request, const char* login,
+                             const char* password);
+    void beginOTA();
+#endif  // USE_ASYNCOTA
    public:
     std::unordered_map<std::string, ArRequestHandlerFunction> stateFunctionMap;
 

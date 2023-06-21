@@ -8,14 +8,15 @@
 #    include <string>
 #    include <vector>
 
-#    include "utilities/observer.hpp"
 #    include "utilities/helpers.hpp"
 #    include "utilities/network_utilities.hpp"
+#    include "utilities/observer.hpp"
 
 namespace Project_Config {
 struct DeviceConfig_t {
-    std::string OTAPassword;
-    int OTAPort;
+    std::string ota_login;
+    std::string ota_password;
+    int ota_port;
     std::string toRepresentation();
 };
 

@@ -8,6 +8,7 @@ ProjectConfig::ProjectConfig(const std::string& configName,
 
 ProjectConfig::~ProjectConfig() {
     this->config.device = {
+        "admin",
         "12345678",
         3232,
     };
@@ -51,8 +52,9 @@ void ProjectConfig::initConfig() {
 
 void ProjectConfig::deviceConfigSave() {
     /* Device Config */
-    putString("OTAPassword", this->config.device.OTAPassword.c_str());
-    putInt("OTAPort", this->config.device.OTAPort);
+    putString("ota_login", this->config.device.ota_login.c_str());
+    putString("ota_pass", this->config.device.ota_password.c_str());
+    putInt("ota_port", this->config.device.ota_port);
     //! No need to save the JSON strings or bools, they are generated and used
     //! on the fly
 }
@@ -174,9 +176,11 @@ void ProjectConfig::load() {
     this->config.mdns.hostname.assign(
         getString("hostname", _mdnsName.c_str()).c_str());
     /* Device Config */
-    this->config.device.OTAPassword.assign(
-        getString("OTAPassword", "12345678").c_str());
-    this->config.device.OTAPort = getInt("OTAPort", 3232);
+    this->config.device.ota_login.assign(
+        getString("ota_login", "admin").c_str());
+    this->config.device.ota_password.assign(
+        getString("ota_pass", "12345678").c_str());
+    this->config.device.ota_port = getInt("ota_port", 3232);
     //! No need to load the JSON strings or bools, they are generated and used
     //! on the fly
 
@@ -231,11 +235,11 @@ void ProjectConfig::load() {
 //!                                                DeviceConfig
 //*
 //**********************************************************************************************************************
-void ProjectConfig::setDeviceConfig(const std::string& OTAPassword, int OTAPort,
+void ProjectConfig::setDeviceConfig(const std::string& ota_pass, int ota_port,
                                     bool shouldNotify) {
     log_d("[Project Config]: Updating device config");
-    this->config.device.OTAPassword.assign(OTAPassword);
-    this->config.device.OTAPort = OTAPort;
+    this->config.device.ota_password.assign(ota_pass);
+    this->config.device.ota_port = ota_port;
 
     if (shouldNotify) {
         this->notifyAll(Event_e::deviceConfigUpdated);
@@ -390,8 +394,9 @@ void ProjectConfig::setDeviceDataJson(const std::string& data,
 
 std::string Project_Config::DeviceConfig_t::toRepresentation() {
     std::string json = Helpers::format_string(
-        "\"device_config\": {\"OTAPassword\": \"%s\", \"OTAPort\": %u}",
-        this->OTAPassword.c_str(), this->OTAPort);
+        "\"device_config\": {\"ota_login\": \"%s\",\"ota_pass\": \"%s\", "
+        "\"ota_port\": %u}",
+        this->ota_login.c_str(), this->ota_password.c_str(), this->ota_port);
     return json;
 }
 
