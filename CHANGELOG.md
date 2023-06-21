@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [4.1.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.0.0...v4.1.0) (2023-06-21)
+
+
+### 🍕 Features
+
+* add async ota ([6846fb4](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/6846fb4f771702000f8e3b11ef399d6992daeef7))
+
 ## [4.0.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v3.1.2...v4.0.0) (2023-06-21)
 
 
