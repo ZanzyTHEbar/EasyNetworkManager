@@ -32,6 +32,7 @@ void APIServer::begin() {
              this->wifimanager_url.c_str());
     server.on(buf, HTTP_ANY,
               [&](AsyncWebServerRequest* request) { handleRequest(request); });
+    beginOTA();
     server.begin();
 }
 
@@ -114,7 +115,7 @@ void APIServer::handleRequest(AsyncWebServerRequest* request) {
 }
 
 void APIServer::addAPICommand(const std::string& url,
-                                      ArRequestHandlerFunction funct) {
+                              ArRequestHandlerFunction funct) {
     stateFunctionMap.emplace(std::move(url), funct);
 }
 

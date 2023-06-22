@@ -20,7 +20,8 @@
       "SAMD",
       "successs",
       "txpower",
-      "WEBMANAGER"
+      "WEBMANAGER",
+      "zopfli"
     ],
     "files.associations": {
       "*.json.liquid": "json",

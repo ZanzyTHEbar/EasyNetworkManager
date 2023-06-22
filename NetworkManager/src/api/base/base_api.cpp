@@ -475,5 +475,9 @@ void BaseAPI::beginOTA() {
             }
         });
 }
+void BaseAPI::setOTAHandler(
+    AsyncOTACustomHandlerFunction customHandlerFunction) {
+    this->customHandlerFunction = customHandlerFunction;
+}
 
 #endif  // USE_ASYNCOTA

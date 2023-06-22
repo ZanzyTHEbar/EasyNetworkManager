@@ -112,6 +112,7 @@ class BaseAPI : public API_Utilities {
                              const char* password);
     void beginOTA();
     typedef std::function<void(void)> AsyncOTACustomHandlerFunction;
+    void setOTAHandler(AsyncOTACustomHandlerFunction customHandlerFunction);
     AsyncOTACustomHandlerFunction customHandlerFunction = NULL;
 #endif  // USE_ASYNCOTA
    public:
