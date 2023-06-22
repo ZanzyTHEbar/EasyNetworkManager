@@ -9,16 +9,16 @@
 #    include <data/webpage.h>
 #endif
 
-#define WEBSERVER_H
+//#define WEBSERVER_H
 
-constexpr int HTTP_GET = 0b00000001;
-constexpr int HTTP_POST = 0b00000010;
-constexpr int HTTP_DELETE = 0b00000100;
-constexpr int HTTP_PUT = 0b00001000;
-constexpr int HTTP_PATCH = 0b00010000;
-constexpr int HTTP_HEAD = 0b00100000;
-constexpr int HTTP_OPTIONS = 0b01000000;
-constexpr int HTTP_ANY = 0b01111111;
+constexpr int XHTTP_GET = 0b00000001;
+constexpr int XHTTP_POST = 0b00000010;
+constexpr int XHTTP_DELETE = 0b00000100;
+constexpr int XHTTP_PUT = 0b00001000;
+constexpr int XHTTP_PATCH = 0b00010000;
+constexpr int XHTTP_HEAD = 0b00100000;
+constexpr int XHTTP_OPTIONS = 0b01000000;
+constexpr int XHTTP_ANY = 0b01111111;
 
 #include <Update.h>
 #include <esp_int_wdt.h>
@@ -81,24 +81,25 @@ class BaseAPI : public API_Utilities {
    public:
     std::unordered_map<std::string, WebRequestMethodComposite>
         _networkMethodsMap_inv = {
-            {"GET", HTTP_GET},     {"POST", HTTP_POST},
-            {"PUT", HTTP_PUT},     {"DELETE", HTTP_DELETE},
-            {"PATCH", HTTP_PATCH}, {"OPTIONS", HTTP_OPTIONS},
+            {"GET", XHTTP_GET},     {"POST", XHTTP_POST},
+            {"PUT", XHTTP_PUT},     {"DELETE", XHTTP_DELETE},
+            {"PATCH", XHTTP_PATCH}, {"OPTIONS", XHTTP_OPTIONS},
         };
 
     std::unordered_map<WebRequestMethodComposite, std::string>
         _networkMethodsMap = {
-            {HTTP_GET, "GET"},     {HTTP_POST, "POST"},
-            {HTTP_PUT, "PUT"},     {HTTP_DELETE, "DELETE"},
-            {HTTP_PATCH, "PATCH"}, {HTTP_OPTIONS, "OPTIONS"},
+            {XHTTP_GET, "GET"},     {XHTTP_POST, "POST"},
+            {XHTTP_PUT, "PUT"},     {XHTTP_DELETE, "DELETE"},
+            {XHTTP_PATCH, "PATCH"}, {XHTTP_OPTIONS, "OPTIONS"},
         };
 
     enum RequestMethods { GET, POST, PUT, DELETE, PATCH, OPTIONS };
 
     std::unordered_map<WebRequestMethodComposite, RequestMethods>
         _networkMethodsMap_enum = {
-            {HTTP_GET, GET},       {HTTP_POST, POST},   {HTTP_PUT, PUT},
-            {HTTP_DELETE, DELETE}, {HTTP_PATCH, PATCH}, {HTTP_OPTIONS, OPTIONS},
+            {XHTTP_GET, GET},     {XHTTP_POST, POST},
+            {XHTTP_PUT, PUT},     {XHTTP_DELETE, DELETE},
+            {XHTTP_PATCH, PATCH}, {XHTTP_OPTIONS, OPTIONS},
         };
 
    public:

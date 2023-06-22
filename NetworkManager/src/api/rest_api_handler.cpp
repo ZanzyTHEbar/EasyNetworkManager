@@ -23,7 +23,7 @@ void APIServer::begin() {
              "^\\%s\\/([a-zA-Z0-9]+)\\/command\\/([a-zA-Z0-9]+)$",
              this->api_url.c_str());
     log_d("API URL: %s", buffer);
-    server.on(buffer, HTTP_ANY,
+    server.on(buffer, XHTTP_ANY,
               [&](AsyncWebServerRequest* request) { handleRequest(request); });
 
     char buf[1000];

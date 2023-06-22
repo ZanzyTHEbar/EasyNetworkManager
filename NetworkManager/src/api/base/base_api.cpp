@@ -17,12 +17,12 @@ BaseAPI::~BaseAPI() {}
 void BaseAPI::begin() {
     //! i have changed this to use lambdas instead of std::bind to avoid the
     //! overhead. Lambdas are always more preferable.
-    server.on("/", HTTP_GET,
+    server.on("/", XHTTP_GET,
               [&](AsyncWebServerRequest* request) { request->send(200); });
 
 #ifdef USE_WEBMANAGER
     server.on(
-        wifimanager_url.c_str(), HTTP_GET, [&](AsyncWebServerRequest* request) {
+        wifimanager_url.c_str(), XHTTP_GET, [&](AsyncWebServerRequest* request) {
             // TODO: add authentication support
             /* if (_authRequired) {
                 if (!request->authenticate(_username.c_str(),
@@ -65,7 +65,7 @@ void BaseAPI::begin() {
     }
 
     // preflight cors check
-    server.on("/", HTTP_OPTIONS, [&](AsyncWebServerRequest* request) {
+    server.on("/", XHTTP_OPTIONS, [&](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse(204);
         response->addHeader("Access-Control-Allow-Methods",
                             "PUT,POST,GET,OPTIONS");
@@ -389,7 +389,7 @@ void BaseAPI::beginOTA() {
     const char* password = device_config.ota_password.c_str();
     log_d("[DEBUG] Free Heap: %d", ESP.getFreeHeap());
 
-    // Note: HTTP_GET
+    // Note: XHTTP_GET
     server.on(
         "/update/identity", 0b00000001, [&](AsyncWebServerRequest* request) {
             checkAuthentication(request, login, password);
