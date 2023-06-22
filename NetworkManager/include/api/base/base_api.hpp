@@ -111,6 +111,8 @@ class BaseAPI : public API_Utilities {
     void checkAuthentication(AsyncWebServerRequest* request, const char* login,
                              const char* password);
     void beginOTA();
+    typedef std::function<void(void)> AsyncOTACustomHandlerFunction;
+    AsyncOTACustomHandlerFunction customHandlerFunction = NULL;
 #endif  // USE_ASYNCOTA
    public:
     std::unordered_map<std::string, ArRequestHandlerFunction> stateFunctionMap;
