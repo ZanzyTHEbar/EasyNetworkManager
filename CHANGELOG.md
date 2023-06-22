@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [4.2.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.1.2...v4.2.0) (2023-06-22)
+
+
+### 🍕 Features
+
+* add compatibility with esp_web_server.h ([ade38aa](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/ade38aa6e7c917e5749ff8e99aa675976fb0fa12))
+
 ## [4.1.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.1.1...v4.1.2) (2023-06-22)
 
 
