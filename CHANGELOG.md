@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [4.2.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.2.0...v4.2.1) (2023-06-22)
+
+
+### 🐛 Bug Fixes
+
+* issue with case on observer.cpp ([24ef808](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/24ef80821178f9bc10afe1c12cbfe8483c45e88e))
+
 ## [4.2.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.1.2...v4.2.0) (2023-06-22)
 
 
