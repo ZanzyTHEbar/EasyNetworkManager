@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [4.3.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.2.3...v4.3.0) (2023-06-24)
+
+
+### 🍕 Features
+
+* Add captive portal feature ([8534d51](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/8534d51a1338b318fc52b3a3365413c48059194c))
+
 ## [4.2.3](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.2.2...v4.2.3) (2023-06-24)
 
 
