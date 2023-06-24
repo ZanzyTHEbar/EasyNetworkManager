@@ -35,19 +35,22 @@
   "headers": [
     "EasyNetworkManager.hpp",
     "EasyNetworkManager.h",
-    "api/webserverHandler.hpp",
+    "api/rest_api_handler.hpp",
+    "api/base/base_api.hpp",
     "data/config/project_config.hpp",
+    "data/config/config_handler.hpp",
     "data/statemanager/state_manager.hpp",
-    "utilities/enuminheritance.hpp",
-    "utilities/makeunique.hpp",
+    "utilities/enum_inheritance.hpp",
+    "utilities/make_unique.hpp",
     "utilities/observer.hpp",
+    "utilities/api_utilities.hpp",
+    "utilities/network_utilities.hpp",
     "network/mdns/mdns_manager.hpp",
     "network/ota/ota.hpp",
     "network/wifihandler/wifi_handler.hpp"
   ],
   "export": {
     "include": [
-      "data/*",
       "src/*",
       "examples/*",
       "include/*"
