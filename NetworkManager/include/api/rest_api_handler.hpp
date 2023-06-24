@@ -8,6 +8,7 @@ class APIServer : public BaseAPI {
     /* Handlers */
     void handleRequest(AsyncWebServerRequest* request);
     void handleUserCommands(AsyncWebServerRequest* request);
+    void setupCaptivePortal();
 
    public:
     APIServer(const int CONTROL_PORT, ProjectConfig& configManager,
@@ -18,8 +19,8 @@ class APIServer : public BaseAPI {
     void begin();
     void setupServer();
 
-    void findParam(AsyncWebServerRequest* request, const char* param,
-                   String& value);
+    bool findParam(AsyncWebServerRequest* request, const std::string& param,
+                   std::string& value);
     void addAPICommand(const std::string& url, ArRequestHandlerFunction funct);
     void addRouteMap(const std::string& index, route_t route,
                      std::vector<std::string>& indexes);

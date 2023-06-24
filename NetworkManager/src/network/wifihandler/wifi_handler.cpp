@@ -150,7 +150,7 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
     return true;
 }
 
-void WiFiHandler::toggleAdhoc(bool* enable) {
+void WiFiHandler::toggleAdhoc(bool enable) {
     _enable_adhoc = enable;
 }
 

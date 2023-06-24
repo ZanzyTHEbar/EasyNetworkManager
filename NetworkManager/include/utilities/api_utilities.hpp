@@ -13,12 +13,13 @@ class API_Utilities {
     API_Utilities();
     virtual ~API_Utilities();
 
-   protected:
     std::string readFile(fs::FS& fs, const std::string& path);
     void writeFile(fs::FS& fs, const std::string& path,
                    const std::string& message);
-    bool initSPIFFS();
     std::string shaEncoder(const std::string& data);
+
+   protected:
+    bool initSPIFFS();
 
    public:
     static const char* MIMETYPE_HTML;

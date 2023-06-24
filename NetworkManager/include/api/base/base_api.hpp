@@ -9,7 +9,7 @@
 #    include <data/webpage.h>
 #endif
 
-//#define WEBSERVER_H
+// #define WEBSERVER_H
 
 constexpr int XHTTP_GET = 0b00000001;
 constexpr int XHTTP_POST = 0b00000010;
@@ -67,7 +67,6 @@ class BaseAPI : public API_Utilities {
    protected:
     /// @brief Local instance of the AsyncWebServer - so that we dont need to
     /// use new and delete
-    AsyncWebServer server;
     ProjectConfig& configManager;
 
     std::string api_url;
@@ -108,6 +107,7 @@ class BaseAPI : public API_Utilities {
             const std::string& userCommands);
     virtual ~BaseAPI();
     virtual void begin();
+
 #ifdef USE_ASYNCOTA
     void checkAuthentication(AsyncWebServerRequest* request, const char* login,
                              const char* password);
@@ -131,6 +131,8 @@ class BaseAPI : public API_Utilities {
         std::string method;
     };
     std::vector<userRoutes_t> custom_html_files;
+    AsyncWebServer server;
+    bool spiffsMounted;
 };
 
 #endif  // BASEAPI_HPP

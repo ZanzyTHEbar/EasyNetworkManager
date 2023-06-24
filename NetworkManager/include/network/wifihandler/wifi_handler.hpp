@@ -31,7 +31,7 @@ class WiFiHandler : public IObserver<Event_e> {
 
     virtual ~WiFiHandler();
     void begin();
-    void toggleAdhoc(bool* enable);
+    void toggleAdhoc(bool enable);
 
     ProjectConfig& configManager;
     Project_Config::WiFiTxPower_t& txpower;

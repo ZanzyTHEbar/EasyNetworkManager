@@ -14,30 +14,31 @@ APIServer::APIServer(const int CONTROL_PORT, ProjectConfig& configManager,
 APIServer::~APIServer() {}
 
 void APIServer::begin() {
-    log_d("Initializing REST API");
+    log_d("[APIServer]: Initializing REST API");
     this->setupServer();
     BaseAPI::begin();
 
     char buffer[1000];
-    snprintf(buffer, sizeof(buffer),
-             "^\\%s\\/([a-zA-Z0-9]+)\\/command\\/([a-zA-Z0-9]+)$",
+    snprintf(buffer, sizeof(buffer), "^\\%s\\/([a-zA-Z0-9]+)\\/([a-zA-Z0-9]+)$",
              this->api_url.c_str());
-    log_d("API URL: %s", buffer);
+    log_d("[APIServer]: API URL: %s", buffer);
     server.on(buffer, XHTTP_ANY,
               [&](AsyncWebServerRequest* request) { handleRequest(request); });
 
     char buf[1000];
-    snprintf(buf, sizeof(buf),
-             "^\\%s\\/([a-zA-Z0-9]+)\\/command\\/([a-zA-Z0-9]+)$",
+    snprintf(buf, sizeof(buf), "^\\%s\\/([a-zA-Z0-9]+)\\/([a-zA-Z0-9]+)$",
              this->wifimanager_url.c_str());
     server.on(buf, HTTP_ANY,
               [&](AsyncWebServerRequest* request) { handleRequest(request); });
+#ifdef USE_ASYNCOTA
     beginOTA();
+#endif  // USE_ASYNCOTA
     server.begin();
 }
 
 void APIServer::setupServer() {
     // Set default routes
+    routes.reserve(10);  // reserve enough memory for all routes
     routes.emplace("wifi", &APIServer::setWiFi);
     routes.emplace("json", &APIServer::handleJson);
     routes.emplace("resetConfig", &APIServer::factoryReset);
@@ -56,11 +57,22 @@ void APIServer::setupServer() {
                 indexes);  // add new route map to the route_map
 }
 
-void APIServer::findParam(AsyncWebServerRequest* request, const char* param,
-                          String& value) {
-    if (request->hasParam(param)) {
-        value = request->getParam(param)->value();
+/**
+ * @brief Find a parameter in the request
+ * @note This is a utility function to find a parameter in the request
+ * @note This function modifies the value parameter, returns a boolean
+ * @param request \c AsyncWebServerRequest* the request object
+ * @param param \c std::string the parameter to find
+ * @param value \c std::string& the value of the parameter
+ * @return bool \c true if the parameter is found, \c false otherwise
+ */
+bool APIServer::findParam(AsyncWebServerRequest* request,
+                          const std::string& param, std::string& value) {
+    if (request->hasParam(param.c_str())) {
+        value.assign(request->getParam(param.c_str(), true)->value().c_str());
+        return true;
     }
+    return false;
 }
 
 /**
@@ -102,15 +114,15 @@ void APIServer::handleRequest(AsyncWebServerRequest* request) {
 
     if (it_map != route_map.end()) {
         if (it_method != it_map->second.end()) {
-            log_d("We are trying to execute the function");
+            log_d("[APIServer]: We are trying to execute the function");
             (*this.*(it_method->second))(request);
             return;
         }
-        log_e("Invalid Command");
+        log_e("[APIServer]: Invalid Command");
         request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Command\"}");
         return;
     }
-    log_e("Invalid Map Index");
+    log_e("[APIServer]: Invalid Map Index");
     request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Map Index\"}");
 }
 
@@ -133,10 +145,10 @@ void APIServer::handleUserCommands(AsyncWebServerRequest* request) {
     std::string url = request->pathArg(1).c_str();
     auto it = stateFunctionMap.find(url);
     if (it != stateFunctionMap.end()) {
-        log_d("We are trying to execute the function");
+        log_d("[APIServer]: We are trying to execute the function");
         it->second(request);
         return;
     }
-    log_e("Invalid Command");
+    log_e("[APIServer]: Invalid Command");
     request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Command\"}");
 }

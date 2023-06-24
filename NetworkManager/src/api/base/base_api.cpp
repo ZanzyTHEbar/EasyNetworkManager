@@ -1,5 +1,12 @@
 #include <api/base/base_api.hpp>
 
+// TODO: Implement proper JSON post and get
+//?
+// https://github.com/me-no-dev/ESPAsyncWebServer/tree/master#arduinojson-advanced-response
+// TODO: Implement authentication
+// TODO: Implement proper visitor pattern for JSON serialization and
+// deserialization
+
 BaseAPI::BaseAPI(const int CONTROL_PORT, ProjectConfig& configManager,
                  const std::string& api_url, const std::string& wifimanager_url,
                  const std::string& userCommands)
@@ -8,9 +15,10 @@ BaseAPI::BaseAPI(const int CONTROL_PORT, ProjectConfig& configManager,
       api_url(std::move(api_url)),
       wifimanager_url(std::move(wifimanager_url)),
       userCommands(std::move(userCommands)),
-      _authRequired(false)
-
-{}
+      _authRequired(false),
+      spiffsMounted(false) {
+    spiffsMounted = initSPIFFS();
+}
 
 BaseAPI::~BaseAPI() {}
 
@@ -21,23 +29,24 @@ void BaseAPI::begin() {
               [&](AsyncWebServerRequest* request) { request->send(200); });
 
 #ifdef USE_WEBMANAGER
-    server.on(
-        wifimanager_url.c_str(), XHTTP_GET, [&](AsyncWebServerRequest* request) {
-            // TODO: add authentication support
-            /* if (_authRequired) {
-                if (!request->authenticate(_username.c_str(),
-                                           _password.c_str())) {
-                    return request->requestAuthentication();
-                }
-            } */
-            AsyncWebServerResponse* response = request->beginResponse_P(
-                200, "text/html", WEB_MANAGER_HTML, WEB_MANAGER_HTML_SIZE);
-            response->addHeader("Content-Encoding", "gzip");
-            request->send(response);
-        });
+    server.on(wifimanager_url.c_str(), XHTTP_GET,
+              [&](AsyncWebServerRequest* request) {
+                  // TODO: add authentication support
+                  /* if (_authRequired) {
+                      if (!request->authenticate(_username.c_str(),
+                                                 _password.c_str())) {
+                          return request->requestAuthentication();
+                      }
+                  } */
+                  AsyncWebServerResponse* response = request->beginResponse_P(
+                      200, "text/html", WEB_MANAGER_HTML,
+                      WEB_MANAGER_HTML_SIZE);
+                  response->addHeader("Content-Encoding", "gzip");
+                  request->send(response);
+              });
 #endif  // USE_WEBManager
 
-    if (initSPIFFS()) {
+    if (spiffsMounted) {
         if (custom_html_files.size() > 0) {
             for (auto& route : custom_html_files) {
                 server.on(route.endpoint.c_str(),
