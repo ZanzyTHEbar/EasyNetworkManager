@@ -1,6 +1,8 @@
 #include "data/config/config_handler.hpp"
 
-ConfigHandler::ConfigHandler(ProjectConfig& config) : config(config) {}
+ConfigHandler::ConfigHandler(const std::string& configName,
+                             const std::string& mdnsName)
+    : config(std::move(configName), std::move(mdnsName)) {}
 
 ConfigHandler::~ConfigHandler() {}
 

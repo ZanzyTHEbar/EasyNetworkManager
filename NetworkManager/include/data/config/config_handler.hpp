@@ -5,12 +5,11 @@
 
 class ConfigHandler : public IObserver<Event_e> {
    public:
-    ConfigHandler(ProjectConfig& config);
-    ~ConfigHandler();
-    void begin();
-    void update(Event_e event) override;
-    std::string getName() override;
-
-   private:
-    ProjectConfig& config;
+    ConfigHandler(const std::string& configName = std::string(),
+                  const std::string& mdnsName = std::string());
+    virtual ~ConfigHandler();
+    virtual void begin();
+    virtual void update(Event_e event) override;
+    virtual std::string getName() override;
+    ProjectConfig config;
 };

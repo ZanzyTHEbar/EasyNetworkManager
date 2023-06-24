@@ -25,8 +25,7 @@
 //  data ? The config manager constructor takes two (optional) parameters: ? 1.
 //  The name of the project (used to create the config file name) ? 2. The
 //  hostname for your device on the network(used for mDNS, OTA, etc.)
-ProjectConfig configManager("easynetwork", MDNS_HOSTNAME);
-ConfigHandler configHandler(configManager);
+ConfigHandler configHandler("easynetwork", MDNS_HOSTNAME);
 
 // Note: The WiFi Handler is used to manage the WiFi connection
 // Note: The WiFi Handler constructor takes four parameters:
@@ -34,7 +33,7 @@ ConfigHandler configHandler(configManager);
 // Note: 2. A pointer to the WiFi State Manager
 // Note: 3. The SSID of the WiFi network to connect to
 // Note: 4. The password of the WiFi network to connect to
-WiFiHandler network(configManager, WIFI_SSID, WIFI_PASSWORD, 1);
+WiFiHandler network(configHandler.config, WIFI_SSID, WIFI_PASSWORD, 1);
 
 // Note: The API Server is used to create a web server that can be used to send
 //  commands to the device ? The API Server constructor takes five parameters:
@@ -48,8 +47,11 @@ WiFiHandler network(configManager, WIFI_SSID, WIFI_PASSWORD, 1);
 //  http://easynetwork.local/api/mycommands/command/helloWorld
 //  http://easynetwork.local/api/mycommands/command/blink
 //  http://easynetwork.local/api/mycommands/command/params?Axes1=1&Axes2=2
-APIServer server(80, configManager, "/api", "/wifimanager", "/mycommands");
-OTA ota(configManager);
+APIServer server(80, configHandler.config, "/api", "/wifimanager",
+                 "/mycommands");
+
+// Note: Not required if you are going to use the AsyncOTA feature
+OTA ota(configHandler.config);
 
 // Note: The mDNS Manager is used to create a mDNS service for the device
 // Note: The mDNS Manager constructor takes seven parameters:
@@ -63,8 +65,8 @@ OTA ota(configManager);
 
 //! service name and service protocol have to be
 //! lowercase and begin with an underscore
-MDNSHandler mDNS(configManager, "_easynetwork", "test", "_tcp", "_api_port",
-                 "80");
+MDNSHandler mDNS(configHandler.config, "_easynetwork", "test", "_tcp",
+                 "_api_port", "80");
 
 class CustomConfig : public CustomConfigInterface {
     void save() override {
@@ -154,11 +156,6 @@ void setupServer() {
     server.custom_html_files.emplace_back("/hello", "/helloWorld.html", "GET");
     server.custom_html_files.emplace_back("/goodbye", "/goodbye.html", "POST");
 
-    // Note: This is an example of how to add a custom API commands
-    // Note: The first parameter is the url endpoint
-    // Note: The second parameter is the function to call
-
-    // Note: The function can be a lambda function or a normal function
     server.addAPICommand("blink", blink);
     server.addAPICommand("helloWorld", printHelloWorld);
     server.addAPICommand("params", grabParams);
@@ -175,11 +172,11 @@ void setup() {
     pinMode(4, OUTPUT);
     Serial.println("\nHello, EasyNetworkManager!");
 
-    configManager.attach(configHandler);
+    configHandler.config.attach(configHandler);
     //* Optionally register a custom config  - this will be saved and loaded
-    configManager.registerUserConfig(&customConfig);
-    configManager.attach(network);
-    configManager.attach(
+    configHandler.config.registerUserConfig(&customConfig);
+    configHandler.config.attach(network);
+    configHandler.config.attach(
         mDNS);  // attach the config manager to the mdns object - this will
                 // update the config when mdns hostname changes
 

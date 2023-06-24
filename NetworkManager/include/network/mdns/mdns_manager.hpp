@@ -4,7 +4,7 @@
 
 #include "data/config/project_config.hpp"
 #include "data/statemanager/state_manager.hpp"
-#include "utilities/Observer.hpp"
+#include "utilities/observer.hpp"
 
 class MDNSHandler : public IObserver<Event_e> {
    private:
