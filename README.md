@@ -1,5 +1,7 @@
 # EasyNetworkManager Library
 
+>**Note**: A documentation website is being built for this library, please stand by for the docs. Until then, please feel free to ask me any questions in the [discussion](https://github.com/ZanzyTHEbar/EasyNetworkManager/discussions).
+
 This is an in-progress library for easy network management.
 
 This project supports the following boards:
@@ -21,6 +23,7 @@ It also provides numerous key features such as:
 - saving networks to memory
 - automatically creating an Access Point if connecting to a wifi network fails
 - mDNS
+- Async OTA
 - OTA
 - customisable REST API
 - WebSockets
@@ -31,6 +34,7 @@ This library implements the following classes:
 
 - APIServer - A server that can be used to manage asynchronous REST API methods.
   - has a `handleJSON` method for handling `POST` and `GET` requests. Can send and receive JSON.
+  - has a built-in async-ota endpoint that is disabled by default
   
  > **Note**: `POST` requests for `JSON` are still in development.
 
@@ -102,12 +106,13 @@ build_flags =
   -DASYNCWEBSERVER_REGEX ; add regex support to AsyncWebServer
 ```
 
-Optionally you can enable the wifi maneger here as well:
+Optionally you can enable the wifi manager and the async ota here as well:
 
 ```ini
 build_flags = 
   -DASYNCWEBSERVER_REGEX ; add regex support to AsyncWebServer
   -DUSE_WEBMANAGER ; enable wifimanager
+  -DUSE_ASYNCOTA ; enable async ota support
 ```
 
 For `ArduinoIDE`:
@@ -150,23 +155,34 @@ If you have any questions, please ask in the [discussions](https://github.com/Za
 
 To extend any of the enums please use the `data/utilities/enuminheritance.hpp` file.
 
-To extend any of the config sections, simply create a namespace with the same name as the config struct is in and add your own `struct` to it.
+To use your own custom config, simply inherit from the `CustomConfigInterface`, override the `save` and `load` methods,and then register your config.
 
 ```cpp
-namespace Project_Config {
-    struct NewConfig_t {
-        std::string newConfig;
-        int newint;
-        bool newbool;
-    };
-}
+ConfigHandler configHandler("baseConf", MDNS_HOSTNAME);
 
-Project_Config::NewConfig_t newConfig; // this creates a new object of your config struct.
+class CustomConfig : public CustomConfigInterface {
+    void save() override {
+        Serial.println("Saving custom config");
+    }
+
+    void load() override {
+        otherStuff();
+        Serial.println("Loading custom config");
+    }
+    void otherStuff() {
+      // do stuff
+    }
+};
+
+CustomConfig customConfig;
+
+// pass our custom config to the base config so that it can use it.
+configHandler.config.registerUserConfig(&customConfig);
 ```
 
 ## Extras
 
-To see any of the `log` statements - you need to add this to your `platformio.ini`:
+To see any of the `log` statements used in this library - you need to add this to your `platformio.ini`:
 
 ```ini
 build_flags = 
