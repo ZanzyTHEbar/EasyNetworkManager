@@ -1,8 +1,8 @@
 # EasyNetworkManager Library
 
 > [!NOTE]\
-> A documentation website is being built for this library, please stand by for the docs. Until then, please feel free to ask me any questions in the [discussion](https://github.com/ZanzyTHEbar/EasyNetworkManager/discussions).
-> To see an exmaple `Platformio` project that uses this library: <https://github.com/ZanzyTHEbar/WaterChamber>
+> A documentation website is being built for this library, please stand by for the docs. Until then, please feel free to ask me any questions in the [discussion](https://github.com/ZanzyTHEbar/EasyNetworkManager/discussions).\
+> To see an example `Platformio` project that uses this library: <https://github.com/ZanzyTHEbar/WaterChamber>\
 > To see an example of a widly-used production project that uses this library: <https://github.com/EyeTrackVR/OpenIris>
 
 This is an in-progress library for easy network management.
