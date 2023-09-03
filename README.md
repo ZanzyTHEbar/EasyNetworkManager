@@ -1,6 +1,7 @@
 # EasyNetworkManager Library
 
->**Note**: A documentation website is being built for this library, please stand by for the docs. Until then, please feel free to ask me any questions in the [discussion](https://github.com/ZanzyTHEbar/EasyNetworkManager/discussions).
+> [!NOTE]\
+> A documentation website is being built for this library, please stand by for the docs. Until then, please feel free to ask me any questions in the [discussion](https://github.com/ZanzyTHEbar/EasyNetworkManager/discussions).
 
 This is an in-progress library for easy network management.
 
@@ -9,7 +10,8 @@ This project supports the following boards:
 - ESP8266
 - ESP32
   
-> **Note**: Full ESP32C3 support is still in development, please report any bugs in the issues section.
+> [!NOTE]\
+> Full ESP32C3 support is still in development, please report any bugs in the issues section.
 > Of note, this has been successfully tested on all boards except for the ESP32C3.
 > This library fully supports M5Stack devices.
 
@@ -36,7 +38,8 @@ This library implements the following classes:
   - has a `handleJSON` method for handling `POST` and `GET` requests. Can send and receive JSON.
   - has a built-in async-ota endpoint that is disabled by default
   
- > **Note**: `POST` requests for `JSON` are still in development.
+> [!NOTE]\
+> `POST` requests for `JSON` are still in development.
 
 - WiFiHandler - A class that can be used to manage WiFi connections.
 - OTA - A basic OTA handler.
@@ -67,7 +70,8 @@ To install this library in your Arduino IDE, you must add all dependencies (sorr
 
 All dependencies _should_ be installed automatically. If not, please make a new issue and I will fix it.
 
-> **Note**: `ESP8266` support is still in beta, for now you manually have to install the dependancies listed below.
+> [!NOTE]\
+> `ESP8266` support is still in beta, for now you manually have to install the dependancies listed below.
 > `ESPAsyncTCP`
 > You _may_ need to install `ESP8266WiFi` if the compiler complains about it, but you shouldn't need to.
 
@@ -87,17 +91,19 @@ All dependencies _should_ be installed automatically. If not, please make a new 
 
 For basic usage please see the [examples](/NetworkManager/examples) folder.
 
-To use the provided [wifi manager html](/NetworkManager/ui/wifimanager.html) page you don't needto do anything except for set a `define` before you include the library header (for `pio` users see the [Extras](#extras) section)
+To use the provided [wifi manager html](/NetworkManager/ui/wifimanager.html) page you don't need to do anything except for set a `define` before you include the library header (for `pio` users see the [Extras](#extras) section)
 
 Then, build and flash the SPIFFS image as normal.
 
 For the ArduinoIDE you will need to follow a tutorial on `SPIFFS` and flash the provided html file using `SPIFFS`.
 
-> **Warning**: SPIFFS tools **do not** work yet in the ArduinoIDE 2.0. Support is coming soon.
+> [!WARNING]\
+> SPIFFS tools **do not** work yet in the ArduinoIDE 2.0. Support is coming soon.
 
 ## Configuration
 
-> **Warning**: It is **required** to add a build flag to your setup for the code to function properly.
+> [!WARNING]\
+> It is **required** to add a build flag to your setup for the code to function properly.
 
 For `platformio`
 
@@ -145,7 +151,8 @@ Optionally you can enable the wifi manager here as well:
 compiler.cpp.extra_flags=-DASYNCWEBSERVER_REGEX=1 -DUSE_WEBMANAGER=1
 ```
 
-> **Note**: This library is still in development, if there are any bugs please report them in the issues section.
+> [!WARNING]\
+> This library is still in development, if there are any bugs please report them in the issues section.
 
 ## Modification
 
