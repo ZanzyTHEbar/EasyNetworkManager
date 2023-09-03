@@ -95,7 +95,7 @@ To use the provided [wifi manager html](/NetworkManager/ui/wifimanager.html) pag
 
 Then, build and flash the SPIFFS image as normal.
 
-For the ArduinoIDE you will need to follow a tutorial on `SPIFFS` and flash the provided html file using `SPIFFS`.
+For the ArduinoIDE you will need to follow a tutorial on `SPIFFS` and flash any custom html files using `SPIFFS`.
 
 > [!WARNING]\
 > SPIFFS tools **do not** work yet in the ArduinoIDE 2.0. Support is coming soon.
