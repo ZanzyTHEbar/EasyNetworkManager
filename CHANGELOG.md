@@ -3,6 +3,23 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [4.5.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.4.0...v4.5.0) (2023-09-26)
+
+
+### 📝 Documentation
+
+*  Update README.md ([4a24454](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/4a244545ccff822cf19f1147816483004b72a43c))
+* Update README.md ([c586bb3](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/c586bb34ba27547a5658210c59491ede00abbbf3))
+* Update README.md ([75617e8](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/75617e8a121bed6fe48765ca9e7ba67111274af6))
+* Update README.md ([5ef6c16](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/5ef6c168b9f1eb10eb7a78cfb24ac45fae98899e))
+* Update README.md ([e8b2aaf](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/e8b2aaf8c7679e3f0c2ff03fd631215f610f2a74))
+* Update README.md ([7eec690](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/7eec690df96dab275c43e75cb662ba8653efd66f))
+
+
+### 🔁 Continuous Integration
+
+* Update release.yml ([6f478a0](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/6f478a01bb9211a737187aa475dfc8086ec670ff))
+
 ## [4.4.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.3.0...v4.4.0) (2023-07-05)
 
 
