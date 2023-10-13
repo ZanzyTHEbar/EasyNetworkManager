@@ -1,7 +1,7 @@
 [wokwi]
 version = 1
-elf = ".pio/build/esp32dev_debug/EasyNetworkManager-v4.2.3-esp32dev_debug-46d8e0c-main.elf"
-firmware = ".pio/build/esp32dev_debug/EasyNetworkManager-v4.2.3-esp32dev_debug-46d8e0c-main.bin"
+elf = ".pio/build/esp32dev_debug/EasyNetworkManager-v4.5.0-esp32dev_debug-c829234-main.elf"
+firmware = ".pio/build/esp32dev_debug/EasyNetworkManager-v4.5.0-esp32dev_debug-c829234-main.bin"
 [[net.forward]]
 from = "localhost:8180"
 to = "target:80"

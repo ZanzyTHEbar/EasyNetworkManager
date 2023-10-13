@@ -4,7 +4,9 @@
 // marked
 //  with an asterisk (*)
 
-//! This is a Captive Portal Example. Please see the customHTML.cpp for an example of how to implement custom HTML files to use instead of the default wifimanager.
+//! This is a Captive Portal Example. Please see the customHTML.cpp for an
+//! example of how to implement custom HTML files to use instead of the default
+//! wifimanager.
 
 //! Optional header files
 #include <DNSServer.h>  // (*) used for captive portal
@@ -52,8 +54,11 @@ DNSServer dnsServer;
 //  http://easynetwork.local/api/mycommands/command/helloWorld
 //  http://easynetwork.local/api/mycommands/command/blink
 //  http://easynetwork.local/api/mycommands/command/params?Axes1=1&Axes2=2
-APIServer server(80, configHandler.config, "/api", "/wifimanager",
-                 "/mycommands");
+
+AsyncServer_t async_server(80, configHandler.config, "/api", "/wifimanager",
+                           "/mycommands");
+
+APIServer server(configHandler.config, async_server);
 
 // Note: Not required if you are going to use the AsyncOTA feature
 OTA ota(configHandler.config);
@@ -149,51 +154,15 @@ void blink(AsyncWebServerRequest* request) {
     request->send(200, "text/plain", "Blink!");
 }
 
-//* Captive Portal Handler
-class CaptiveRequestHandler : public AsyncWebHandler {
-   public:
-    CaptiveRequestHandler() {}
-    virtual ~CaptiveRequestHandler() {}
-
-    bool canHandle(AsyncWebServerRequest* request) {
-        // request->addInterestingHeader("ANY");
-        return true;
-    }
-    //* use SPIFFS or built in HTML wifimanager
-    void handleRequest(AsyncWebServerRequest* request) {
-        if (server.spiffsMounted) {
-            if (server.custom_html_files.size() > 0) {
-                AsyncResponseStream* response_stream =
-                    request->beginResponseStream("text/html");
-                for (auto& file : server.custom_html_files) {
-                    if (file.endpoint == "captive_portal" ||
-                        file.endpoint == "captive_portal.html" ||
-                        file.endpoint == "/" ||
-                        file.endpoint == "/index.html" ||
-                        file.endpoint == "/index" ||
-                        file.endpoint == "portal.html") {
-                        response_stream->print(file.file.c_str());
-                    }
-                }
-                request->send(response_stream);
-                return;
-            }
-        }
-
-        AsyncWebServerResponse* response = request->beginResponse_P(
-            200, "text/html", WEB_MANAGER_HTML, WEB_MANAGER_HTML_SIZE);
-        response->addHeader("Content-Encoding", "gzip");
-        request->send(response);
-    }
-};
-
 void setupServer() {
     // add command handlers to the API server
     // you can add as many as you want - you can also add methods.
     log_d("[SETUP]: Starting API Server");
-    server.server.addHandler(new CaptiveRequestHandler())
-        .setFilter(ON_AP_FILTER);  // only when requested from AP
 
+    // Enabled the captive portal handler
+    server.setupCaptivePortal(true);
+
+    // Create a custom REST API for our application
     server.addAPICommand("blink", blink);
     server.addAPICommand("helloWorld", printHelloWorld);
     server.addAPICommand("params", grabParams);
@@ -201,6 +170,8 @@ void setupServer() {
         Temp t;
         t.grabParams(request);
     });
+
+    // start the server
     server.begin();
     log_d("[SETUP]: API Server Started");
 }
@@ -223,14 +194,14 @@ void setup() {
     //* Begin the network manager
     network.begin();  // setup wifi connection
 
-    //* Begin the captive portal
+    //* Begin the dns server for the captive portal
     //*  Port, domain name - wildcard to capture all
     dnsServer.start(53, "*", WiFi.softAPIP());
-    
+
     mDNS.begin();  // start mDNS service (optional)
 
     setupServer();  // setup the API server
-    
+
     ota.begin();
 }
 

@@ -4,36 +4,46 @@
 //!                                     API Server
 //*********************************************************************************************
 
-APIServer::APIServer(const int CONTROL_PORT, ProjectConfig& configManager,
-                     const std::string& api_url,
-                     const std::string& wifimanager_url,
-                     const std::string& userCommands)
-    : BaseAPI(CONTROL_PORT, configManager, api_url, wifimanager_url,
-              userCommands) {}
+APIServer::APIServer(ProjectConfig& configManager, AsyncServer_t& async_server,
+                     AsyncOTA* async_ota)
+    : BaseAPI(configManager), async_ota(nullptr), async_server(async_server) {
+    if (async_ota != nullptr) {
+        this->async_ota = async_ota;
+    }
+}
 
-APIServer::~APIServer() {}
+APIServer::~APIServer() {
+    if (async_ota != nullptr) {
+        delete async_ota;
+    }
+}
 
 void APIServer::begin() {
     log_d("[APIServer]: Initializing REST API");
     this->setupServer();
-    BaseAPI::begin();
+    async_server.begin();
+    char api_url[1000];
+    char wifi_manager_url[1000];
+    snprintf(api_url, sizeof(api_url),
+             "^\\%s\\/([a-zA-Z0-9]+)\\/([a-zA-Z0-9]+)$",
+             async_server.api_url.c_str());
+    snprintf(wifi_manager_url, sizeof(wifi_manager_url),
+             "^\\%s\\/([a-zA-Z0-9]+)\\/([a-zA-Z0-9]+)$",
+             async_server.wifimanager_url.c_str());
 
-    char buffer[1000];
-    snprintf(buffer, sizeof(buffer), "^\\%s\\/([a-zA-Z0-9]+)\\/([a-zA-Z0-9]+)$",
-             this->api_url.c_str());
-    log_d("[APIServer]: API URL: %s", buffer);
-    server.on(buffer, XHTTP_ANY,
-              [&](AsyncWebServerRequest* request) { handleRequest(request); });
+    log_d("[APIServer]: API URL: %s", api_url);
 
-    char buf[1000];
-    snprintf(buf, sizeof(buf), "^\\%s\\/([a-zA-Z0-9]+)\\/([a-zA-Z0-9]+)$",
-             this->wifimanager_url.c_str());
-    server.on(buf, HTTP_ANY,
-              [&](AsyncWebServerRequest* request) { handleRequest(request); });
-#ifdef USE_ASYNCOTA
-    beginOTA();
-#endif  // USE_ASYNCOTA
-    server.begin();
+    async_server.server.on(
+        api_url, XHTTP_ANY,
+        [&](AsyncWebServerRequest* request) { handleRequest(request); });
+
+    async_server.server.on(
+        wifi_manager_url, HTTP_ANY,
+        [&](AsyncWebServerRequest* request) { handleRequest(request); });
+
+    if (async_ota != nullptr)
+        async_ota->begin();
+    async_server.server.begin();
 }
 
 void APIServer::setupServer() {
@@ -53,8 +63,7 @@ void APIServer::setupServer() {
     //! routes and before adding routes to route_map
     indexes.reserve(routes.size());  // this is done to avoid reallocation of
                                      // memory and copying of data
-    addRouteMap("builtin", routes,
-                indexes);  // add new route map to the route_map
+    addRouteMap("builtin", routes);  // add new route map to the route_map
 }
 
 /**
@@ -86,18 +95,20 @@ bool APIServer::findParam(AsyncWebServerRequest* request,
  * @return void
  *
  */
-void APIServer::addRouteMap(const std::string& index, route_t route,
-                            std::vector<std::string>& indexes) {
+void APIServer::addRouteMap(const std::string& index, route_t route) {
     route_map.emplace(std::move(index), route);
 
     for (const auto& key : route) {
-        indexes.emplace_back(key.first);  // add the route to the list of routes
-                                          // - use emplace_back to avoid copying
+        const std::string temp =
+            index + '/' + key.first;  // add the route to the index
+        indexes.emplace_back(temp);   // add the route to the list of routes
+                                      // - use emplace_back to avoid copying
     }
 }
 
 void APIServer::handleRequest(AsyncWebServerRequest* request) {
-    std::vector<std::string> temp = Helpers::split(userCommands.c_str(), '/');
+    std::vector<std::string> temp =
+        Helpers::split(async_server.userCommands.c_str(), '/');
 
     if (strcmp(request->pathArg(0).c_str(), temp[1].c_str()) == 0) {
         handleUserCommands(request);
@@ -151,4 +162,51 @@ void APIServer::handleUserCommands(AsyncWebServerRequest* request) {
     }
     log_e("[APIServer]: Invalid Command");
     request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Command\"}");
+}
+
+void APIServer::setupCaptivePortal(bool apMode) {
+    log_d("[SETUP Captive Portal]: Starting Captive Portal");
+    log_d("[SETUP Captive Portal]: AP Mode: %s",
+          apMode ? "enabled" : "disabled");
+    async_server.server.addHandler(new CaptiveRequestHandler(async_server))
+        .setFilter(apMode ? ON_AP_FILTER : ON_STA_FILTER);
+}
+
+//*********************************************************************************************
+//!                                     API Utilities
+//*********************************************************************************************
+
+CaptiveRequestHandler::CaptiveRequestHandler(AsyncServer_t& async_server)
+    : async_server(async_server) {}
+
+CaptiveRequestHandler::~CaptiveRequestHandler() {}
+
+bool CaptiveRequestHandler::canHandle(AsyncWebServerRequest* request) {
+    // request->addInterestingHeader("ANY");
+    return true;
+}
+
+void CaptiveRequestHandler::handleRequest(AsyncWebServerRequest* request) {
+    if (async_server.spiffsMounted) {
+        if (async_server.custom_html_files.size() > 0) {
+            AsyncResponseStream* response_stream =
+                request->beginResponseStream("text/html");
+            for (auto& file : async_server.custom_html_files) {
+                if (file.endpoint == "captive_portal" ||
+                    file.endpoint == "captive_portal.html" ||
+                    file.endpoint == "/" || file.endpoint == "/index.html" ||
+                    file.endpoint == "/index" ||
+                    file.endpoint == "portal.html") {
+                    response_stream->print(file.file.c_str());
+                }
+            }
+            request->send(response_stream);
+            return;
+        }
+    }
+
+    AsyncWebServerResponse* response = request->beginResponse_P(
+        200, "text/html", WEB_MANAGER_HTML, WEB_MANAGER_HTML_SIZE);
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
 }

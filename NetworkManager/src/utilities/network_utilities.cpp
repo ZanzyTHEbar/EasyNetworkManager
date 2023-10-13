@@ -118,3 +118,5 @@ void Network_Utilities::checkWiFiState() {
             wifiStateManager.setState(WiFiState_e::WiFiState_None);
     }
 }
+
+// TODO: move to using the WiFi classes event system
