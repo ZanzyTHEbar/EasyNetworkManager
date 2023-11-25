@@ -121,20 +121,24 @@ void APIServer::handleRequest(AsyncWebServerRequest* request) {
     log_i("Request: %s", request->pathArg(1).c_str());
 
     auto it_map = route_map.find(request->pathArg(0).c_str());
-    auto it_method = it_map->second.find(request->pathArg(1).c_str());
 
-    if (it_map != route_map.end()) {
-        if (it_method != it_map->second.end()) {
-            log_d("[APIServer]: We are trying to execute the function");
-            (*this.*(it_method->second))(request);
-            return;
-        }
+    if (it_map == route_map.end()) {
         log_e("[APIServer]: Invalid Command");
         request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Command\"}");
         return;
     }
-    log_e("[APIServer]: Invalid Map Index");
-    request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Map Index\"}");
+
+    auto it_method = it_map->second.find(request->pathArg(1).c_str());
+
+    if (it_method == it_map->second.end()) {
+        log_e("[APIServer]: Invalid Map Index");
+        request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Map Index\"}");
+        return;
+    }
+
+    log_d("[APIServer]: We are trying to execute the function");
+    (*this.*(it_method->second))(request);
+    request->send(200);
 }
 
 void APIServer::addAPICommand(const std::string& url,

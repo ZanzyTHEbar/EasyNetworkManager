@@ -19,6 +19,7 @@
 
 //! Required header files
 #include <EasyNetworkManager.h>  // (*)
+#include "api/server.hpp"
 
 // Note: The Project Config Manager is used to store and retrieve the
 // configuration
@@ -47,8 +48,10 @@ WiFiHandler network(configHandler.config, WIFI_SSID, WIFI_PASSWORD, 1);
 //  http://easynetwork.local/api/mycommands/command/helloWorld
 //  http://easynetwork.local/api/mycommands/command/blink
 //  http://easynetwork.local/api/mycommands/command/params?Axes1=1&Axes2=2
-APIServer server(80, configHandler.config, "/api", "/wifimanager",
-                 "/mycommands");
+AsyncServer_t async_server(80, configHandler.config, "/api", "/wifimanager",
+                           "/mycommands");
+
+APIServer server(configHandler.config, async_server);
 
 // Note: Not required if you are going to use the AsyncOTA feature
 OTA ota(configHandler.config);
@@ -145,16 +148,14 @@ void blink(AsyncWebServerRequest* request) {
 }
 
 void setupServer() {
-    // add command handlers to the API server
-    // you can add as many as you want - you can also add methods.
-    log_d("[SETUP]: Starting API Server");
-
     // This is an example of how to add a custom html file to the web server
     // Note: The first parameter is the url endpoint to access the file
     // Note: The second parameter is the path to the file on the SPIFFS
     // Note: The third parameter is the HTTP method to use to access the file
-    server.custom_html_files.emplace_back("/hello", "/helloWorld.html", "GET");
-    server.custom_html_files.emplace_back("/goodbye", "/goodbye.html", "POST");
+    async_server.custom_html_files.emplace_back("/hello", "/helloWorld.html",
+                                                "GET");
+    async_server.custom_html_files.emplace_back("/goodbye", "/goodbye.html",
+                                                "POST");
 
     server.addAPICommand("blink", blink);
     server.addAPICommand("helloWorld", printHelloWorld);

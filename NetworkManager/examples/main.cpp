@@ -47,8 +47,10 @@ WiFiHandler network(configHandler.config, WIFI_SSID, WIFI_PASSWORD, 1);
 //  http://easynetwork.local/api/mycommands/command/helloWorld
 //  http://easynetwork.local/api/mycommands/command/blink
 //  http://easynetwork.local/api/mycommands/command/params?Axes1=1&Axes2=2
-APIServer server(80, configHandler.config, "/api", "/wifimanager",
-                 "/mycommands");
+AsyncServer_t async_server(80, configHandler.config, "/api", "/wifimanager",
+                           "/mycommands");
+
+APIServer server(configHandler.config, async_server);
 
 // Note: Not required if you are going to use the AsyncOTA feature
 OTA ota(configHandler.config);

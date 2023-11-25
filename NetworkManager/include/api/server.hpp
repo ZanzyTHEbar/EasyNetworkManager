@@ -30,8 +30,8 @@ class AsyncServer_t : public API_Utilities {
     virtual ~AsyncServer_t();
     virtual void begin();
 
-    struct userRoutes_t {
-        userRoutes_t(const std::string& endpoint, const std::string& file,
+    struct UserRoutes_t {
+        UserRoutes_t(const std::string& endpoint, const std::string& file,
                      const std::string& method)
             : endpoint(std::move(endpoint)),
               file(std::move(file)),
@@ -40,7 +40,7 @@ class AsyncServer_t : public API_Utilities {
         std::string file;
         std::string method;
     };
-    std::vector<userRoutes_t> custom_html_files;
+    std::vector<UserRoutes_t> custom_html_files;
 
     AsyncWebServer server;
     bool spiffsMounted;
