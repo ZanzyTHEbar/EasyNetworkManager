@@ -20,6 +20,7 @@ class ISubject {
     Observers_t observers;
 
    public:
+    virtual ~ISubject(){};
     void attach(Observer_t observer) {
         this->observers.emplace(observer.getName(), observer);
     }
@@ -49,5 +50,6 @@ class ISubject {
         log_e("Invalid Map Index");
         return;
     }
+    int id = 0;
 };
 #endif  // OBSERVER_HPP
