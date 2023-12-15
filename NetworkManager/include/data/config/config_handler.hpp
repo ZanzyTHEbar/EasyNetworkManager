@@ -9,7 +9,7 @@ class ConfigHandler : public IObserver<Event_e> {
                   const std::string& mdnsName = std::string());
     virtual ~ConfigHandler();
     virtual void begin();
-    virtual void update(Event_e event) override;
+    virtual void update(const Event_e &event) override;
     virtual std::string getName() override;
     ProjectConfig config;
 };

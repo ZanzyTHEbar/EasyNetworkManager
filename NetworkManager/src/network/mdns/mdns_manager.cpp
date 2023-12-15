@@ -33,7 +33,7 @@ bool MDNSHandler::begin() {
     return true;
 }
 
-void MDNSHandler::update(Event_e event) {
+void MDNSHandler::update(const Event_e& event) {
     switch (event) {
         case Event_e::mdnsConfigUpdated:
             MDNS.end();

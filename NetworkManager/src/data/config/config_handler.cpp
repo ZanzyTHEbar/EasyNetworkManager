@@ -10,7 +10,7 @@ void ConfigHandler::begin() {
     config.load();
 }
 
-void ConfigHandler::update(Event_e event) {
+void ConfigHandler::update(const Event_e& event) {
     switch (event) {
         case Event_e::configSaved:
             this->begin();

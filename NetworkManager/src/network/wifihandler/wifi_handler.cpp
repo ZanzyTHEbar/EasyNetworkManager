@@ -154,7 +154,7 @@ void WiFiHandler::toggleAdhoc(bool enable) {
     _enable_adhoc = enable;
 }
 
-void WiFiHandler::update(Event_e event) {
+void WiFiHandler::update(const Event_e& event) {
     switch (event) {
         case Event_e::networksConfigUpdated:
             this->begin();

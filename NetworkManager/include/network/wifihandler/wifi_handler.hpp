@@ -43,7 +43,7 @@ class WiFiHandler : public IObserver<Event_e> {
     bool iniSTA(const std::string& ssid, const std::string& password,
                 uint8_t channel, wifi_power_t power);
 
-    void update(Event_e event) override;
+    void update(const Event_e& event) override;
     std::string getName() override;
 
     std::string ssid;

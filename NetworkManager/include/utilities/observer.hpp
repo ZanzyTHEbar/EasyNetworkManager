@@ -7,7 +7,7 @@
 template <typename EnumT>
 class IObserver {
    public:
-    virtual void update(EnumT event) = 0;
+    virtual void update(const EnumT& event) = 0;
     virtual std::string getName() = 0;
 };
 

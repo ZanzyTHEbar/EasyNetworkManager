@@ -23,6 +23,7 @@
       "successs",
       "txpower",
       "WEBMANAGER",
+      "wokwi",
       "zopfli"
     ],
     "files.associations": {

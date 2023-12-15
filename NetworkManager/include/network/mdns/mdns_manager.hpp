@@ -20,7 +20,7 @@ class MDNSHandler : public IObserver<Event_e> {
                 const std::string& service_text, const std::string& proto,
                 const std::string& key, const std::string& value);
     bool begin();
-    void update(Event_e event) override;
+    void update(const Event_e& event) override;
     std::string getName() override;
 };
 
