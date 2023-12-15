@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [4.5.3](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.5.2...v4.5.3) (2023-12-15)
+
+
+### 🐛 Bug Fixes
+
+* set to ingest observer event enum as const reference ([25e5866](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/25e586656f4048808e6c8fc2a162fb4f9b3cd04c))
+
 ## [4.5.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.5.1...v4.5.2) (2023-11-25)
 
 
