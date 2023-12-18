@@ -135,7 +135,7 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
         currentMillis = millis();
         // Helpers::update_progress_bar(progress, 100);
         // delay(301);
-        Serial.print(".");
+        log_v(".");
         if ((currentMillis - startingMillis) >= connectionTimeout) {
             wifiStateManager.setState(WiFiState_e::WiFiState_Error);
             log_e("Connection to: %s TIMEOUT \n\r", ssid.c_str());
