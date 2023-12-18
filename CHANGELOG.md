@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [4.5.6](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.5.5...v4.5.6) (2023-12-18)
+
+
+### 🧑‍💻 Code Refactoring
+
+* set wifi waiting printout to verbose log only ([ce5bfc2](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/ce5bfc261a54366def17d15f608ef8260e95fe96))
+
 ## [4.5.5](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.5.4...v4.5.5) (2023-12-18)
 
 
