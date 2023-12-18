@@ -134,11 +134,12 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
         progress++;
         currentMillis = millis();
         // Helpers::update_progress_bar(progress, 100);
-        // delay(301);
+        delay(1000);
         log_v(".");
         if ((currentMillis - startingMillis) >= connectionTimeout) {
             wifiStateManager.setState(WiFiState_e::WiFiState_Error);
             log_e("Connection to: %s TIMEOUT \n\r", ssid.c_str());
+            delay(8000);
             return false;
         }
     }
