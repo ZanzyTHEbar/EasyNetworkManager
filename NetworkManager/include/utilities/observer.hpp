@@ -1,5 +1,6 @@
 #ifndef OBSERVER_HPP
 #define OBSERVER_HPP
+#include <Arduino.h>
 #include <memory>
 #include <string>
 #include <unordered_map>
