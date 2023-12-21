@@ -141,8 +141,6 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
             this->configManager.setState(this->getName(),
                                          WiFiState_e::WiFiState_Error);
             log_e("Connection to: %s TIMEOUT \n\r", ssid.c_str());
-            this->configManager.setState(this->getName(),
-                                         WiFiState_e::WiFiState_Connecting);
             delay(8000);
             return false;
         }
@@ -198,14 +196,14 @@ void WiFiHandler::update(const StateVariant& event) {
 }
 void WiFiHandler::onWiFiEvent(WiFiEvent_t event) {
     switch (event) {
-        case SYSTEM_EVENT_WIFI_READY:
+        /* case SYSTEM_EVENT_WIFI_READY:
             this->configManager.setState(this->getName(),
                                          WiFiState_e::WiFiState_Idle);
             break;
         case SYSTEM_EVENT_SCAN_DONE:
             this->configManager.setState(this->getName(),
                                          WiFiState_e::WiFiState_Scanning_Done);
-            break;
+            break; */
         case SYSTEM_EVENT_STA_DISCONNECTED:
             this->configManager.setState(this->getName(),
                                          WiFiState_e::WiFiState_Disconnected);
