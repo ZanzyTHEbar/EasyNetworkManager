@@ -43,8 +43,14 @@ AsyncServer_t async_server(80, networkManager.configHandler->config, "/api",
  */
 APIServer api(networkManager.configHandler->config, async_server);
 
+void printHelloWorld(AsyncWebServerRequest* request) {
+    Serial.println("Hello World!");
+    request->send(200, "text/plain", "Hello World!");
+}
+
 void setupServer() {
     log_d("[SETUP]: Starting API Server");
+    api.addAPICommand("helloWorld", printHelloWorld);
     api.begin();
     log_d("[SETUP]: API Server Started");
 }

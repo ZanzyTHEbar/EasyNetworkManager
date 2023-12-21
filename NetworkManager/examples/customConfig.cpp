@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <EasyNetworkManager.h>
+//! Only needed for BLOCKING OTA. AsyncOTA is recommended and builtin
+// #include <network/ota/basic_ota.hpp>
 
 /**
  * @brief Setup the EasyNetworkManager Instance
@@ -43,8 +45,31 @@ AsyncServer_t async_server(80, networkManager.configHandler->config, "/api",
  */
 APIServer api(networkManager.configHandler->config, async_server);
 
+// Note: Not required if you are going to use the AsyncOTA feature
+// OTA ota(networkManager.configHandler->config);
+
+class CustomConfig : public CustomConfigInterface {
+    void save() override {
+        Serial.println("Saving custom config");
+    }
+
+    void load() override {
+        Serial.println("Loading custom config");
+    }
+};
+
+CustomConfig customConfig;
+
+void printHelloWorld(AsyncWebServerRequest* request) {
+    Serial.println("Hello World!");
+    request->send(200, "text/plain", "Hello World!");
+}
+
 void setupServer() {
+    // add command handlers to the API server
+    // you can add as many as you want - you can also add methods.
     log_d("[SETUP]: Starting API Server");
+    api.addAPICommand("helloWorld", printHelloWorld);
     api.begin();
     log_d("[SETUP]: API Server Started");
 }
@@ -54,6 +79,8 @@ void setup() {
     pinMode(4, OUTPUT);
     Serial.println("\nHello, EasyNetworkManager!");
 
+    //* Optionally register a custom config  - this will be saved and loaded
+    networkManager.configHandler->config.registerUserConfig(&customConfig);
     networkManager.begin();
 
     /**
@@ -84,6 +111,9 @@ void setup() {
                 }
             }
         });
+    // ota.begin();
 }
 
-void loop() {}
+void loop() {
+    // ota.handleOTAUpdate();
+}

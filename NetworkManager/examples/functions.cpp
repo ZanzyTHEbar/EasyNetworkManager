@@ -43,8 +43,52 @@ AsyncServer_t async_server(80, networkManager.configHandler->config, "/api",
  */
 APIServer api(networkManager.configHandler->config, async_server);
 
+// Note: Not required if you are going to use the AsyncOTA feature
+// OTA ota(networkManager.configHandler->config);
+
+// Note: Here is a function that can be used to handle custom API requests
+void grabParams(AsyncWebServerRequest* request) {
+    int params = request->params();
+    std::string axes1;
+    std::string axes2;
+
+    for (int i = 0; i < params; i++) {
+        AsyncWebParameter* param = request->getParam(i);
+        if (param->name() == "Axes1") {
+            axes1 = param->value().c_str();
+        } else if (param->name() == "Axes2") {
+            axes2 = param->value().c_str();
+        }
+    }
+    int ax1 = atoi(axes1.c_str());
+    int ax2 = atoi(axes2.c_str());
+    int ax5 = ax1 - ax2;
+    int ax6 = ax1 + ax2;
+    Serial.printf("Axes1: %d, Axes2: %d\n", ax1, ax2);
+    request->send(200, "text/plain", "OK");
+}
+
+// Note: Here are two functions that can be used to handle custom API requests
+void printHelloWorld(AsyncWebServerRequest* request) {
+    Serial.println("Hello World!");
+    request->send(200, "text/plain", "Hello World!");
+}
+
+void blink(AsyncWebServerRequest* request) {
+    digitalWrite(4, HIGH);
+    Network_Utilities::my_delay(1);  // delay for 1sec
+    digitalWrite(4, LOW);
+    Network_Utilities::my_delay(1);  // delay for 1sec
+    request->send(200, "text/plain", "Blink!");
+}
+
 void setupServer() {
+    // add command handlers to the API server
+    // you can add as many as you want - you can also add methods.
     log_d("[SETUP]: Starting API Server");
+    api.addAPICommand("blink", blink);
+    api.addAPICommand("helloWorld", printHelloWorld);
+    api.addAPICommand("params", grabParams);
     api.begin();
     log_d("[SETUP]: API Server Started");
 }
