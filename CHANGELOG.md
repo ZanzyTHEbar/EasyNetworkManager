@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.1.4](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.1.3...v5.1.4) (2023-12-21)
+
+
+### 🐛 Bug Fixes
+
+* wifi activating before config load ([60dc0a3](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/60dc0a3b134c07dc2bc61b0ebf3f7e3e20480daf))
+
 ## [5.1.3](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.1.2...v5.1.3) (2023-12-21)
 
 
