@@ -48,6 +48,8 @@ class WiFiHandler : public IObserver<StateVariant> {
     /* Overrides */
     void update(const StateVariant& event) override;
 
+    void onWiFiEvent(WiFiEvent_t event);
+
     std::string ssid;
     std::string password;
     uint8_t channel;

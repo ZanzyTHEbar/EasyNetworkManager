@@ -22,6 +22,8 @@ enum Event_e {
 enum WiFiState_e {
     WiFiState_None,
     WiFiState_Idle,
+    WiFiState_Scanning,
+    WiFiState_Scanning_Done,
     WiFiState_Connecting,
     WiFiState_Connected,
     WiFiState_Disconnected,

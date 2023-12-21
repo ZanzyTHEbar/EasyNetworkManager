@@ -19,7 +19,8 @@ void WiFiHandler::begin() {
         return;
     }
     WiFi.mode(WIFI_STA);
-    // WiFi.onEvent();
+    WiFi.onEvent(
+        std::bind(&WiFiHandler::onWiFiEvent, this, std::placeholders::_1));
     WiFi.setSleep(WIFI_PS_NONE);
 
     Serial.print("Initializing connection to wifi \n\r");
@@ -185,13 +186,33 @@ void WiFiHandler::update(const StateVariant& event) {
         }
     });
 
-    //updateWrapper<Event_e>(event, [this](Event_e _event) {
-    //    switch (_event) {
-    //        case Event_e::configSaved:
-    //            this->begin();
-    //            break;
-    //        default:
-    //            break;
-    //    }
-    //});
+    // updateWrapper<Event_e>(event, [this](Event_e _event) {
+    //     switch (_event) {
+    //         case Event_e::configSaved:
+    //             this->begin();
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    // });
+}
+void WiFiHandler::onWiFiEvent(WiFiEvent_t event) {
+    switch (event) {
+        case SYSTEM_EVENT_WIFI_READY:
+            this->configManager.setState(this->getName(),
+                                         WiFiState_e::WiFiState_Idle);
+            break;
+        case SYSTEM_EVENT_SCAN_DONE:
+            this->configManager.setState(this->getName(),
+                                         WiFiState_e::WiFiState_Scanning_Done);
+            break;
+        case SYSTEM_EVENT_STA_DISCONNECTED:
+            this->configManager.setState(this->getName(),
+                                         WiFiState_e::WiFiState_Disconnected);
+            break;
+        case SYSTEM_EVENT_STA_GOT_IP:
+            this->configManager.setState(this->getName(),
+                                         WiFiState_e::WiFiState_Connected);
+            break;
+    }
 }
