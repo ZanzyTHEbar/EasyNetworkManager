@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.1.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.0.0...v5.1.0) (2023-12-21)
+
+
+### 🍕 Features
+
+* add wifi event mappings to native wifi class ([2ff3a86](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/2ff3a86e1059e818df74a09d6f3179519bb16a6d))
+
 ## [5.0.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.5.8...v5.0.0) (2023-12-21)
 
 
