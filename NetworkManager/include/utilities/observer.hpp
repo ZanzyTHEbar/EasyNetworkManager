@@ -78,4 +78,7 @@ class ISubject {
         }
         return {};
     }
+
+    //* Members
+    int id = 0;
 };
