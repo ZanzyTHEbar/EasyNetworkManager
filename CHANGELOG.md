@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.1.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.1.1...v5.1.2) (2023-12-21)
+
+
+### 🐛 Bug Fixes
+
+* wifi reset issue when STA cannot be found ([a2c679e](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/a2c679e0b1795aeb88e2cb255410ef29fac8b766))
+
 ## [5.1.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.1.0...v5.1.1) (2023-12-21)
 
 
