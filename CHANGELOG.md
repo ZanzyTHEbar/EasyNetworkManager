@@ -3,6 +3,23 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.0.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.5.8...v5.0.0) (2023-12-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* CHANGES
+
+- simplify the api A LOT
+- setup the state machine to follow the observer pattern for easier use
+- create a wrapper for updating the state
+- update examples
+
+### 🍕 Features
+
+* add more fine grained examples ([2e18135](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/2e181358942ecccd7892c6a631deabad660db43e))
+* total project refactor ([0f70bec](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/0f70becd098fc582b07cd66cddd1d9c569cc6bc9))
+
 ## [4.5.8](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v4.5.7...v4.5.8) (2023-12-19)
 
 
