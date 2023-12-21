@@ -38,7 +38,8 @@ void WiFiHandler::begin() {
         Serial.print(
             "Could not connect to the hardcoded "
             "network, setting up ADHOC network \n\r");
-        this->setUpADHOC();
+        this->configManager.setState(this->getName(),
+                                     WiFiState_e::WiFiState_ADHOC);
         return;
     }
 
@@ -67,12 +68,11 @@ void WiFiHandler::begin() {
     log_e(
         "Could not connect to the hardcoded network, "
         "setting up adhoc. \n\r");
-    this->setUpADHOC();
+    this->configManager.setState(this->getName(), WiFiState_e::WiFiState_ADHOC);
 }
 
 void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
                         const std::string& password) {
-    this->configManager.setState(this->getName(), WiFiState_e::WiFiState_ADHOC);
     log_i("\n[INFO]: Setting Access Point...\n");
     log_i("\n[INFO]: Configuring access point...\n");
     WiFi.mode(WIFI_AP);
