@@ -10,16 +10,14 @@ void ConfigHandler::begin() {
     config.load();
 }
 
-void ConfigHandler::update(const Event_e& event) {
-    switch (event) {
-        case Event_e::configSaved:
-            this->begin();
-            break;
-        default:
-            break;
-    }
-}
-
-std::string ConfigHandler::getName() {
-    return "ConfigHandler";
+void ConfigHandler::update(const StateVariant& event) {
+    updateWrapper<Event_e>(event, [this](Event_e _event) {
+        switch (_event) {
+            case Event_e::configSaved:
+                this->begin();
+                break;
+            default:
+                break;
+        }
+    });
 }

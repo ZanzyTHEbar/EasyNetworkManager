@@ -1,5 +1,4 @@
-#ifndef APIUTILITIES_HPP
-#define APIUTILITIES_HPP
+#pragma once
 
 #include <SPIFFS.h>
 
@@ -68,5 +67,3 @@ class API_Utilities {
     static const char* MIMETYPE_ICO;
     static const char* MIMETYPE_JSON;
 };
-
-#endif  // APIUTILITIES_HPP

@@ -1,56 +1,81 @@
-#ifndef OBSERVER_HPP
-#define OBSERVER_HPP
-#include <Arduino.h>
+#pragma once
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 template <typename EnumT>
 class IObserver {
    public:
     virtual void update(const EnumT& event) = 0;
-    virtual std::string getName() = 0;
+    virtual std::string getName() const = 0;
 };
 
+/**
+ * @brief
+ * @note The `key` parameter is used to determine which Events to notify on.
+ * @tparam EnumT
+ */
 template <typename EnumT>
 class ISubject {
    private:
-    typedef IObserver<EnumT>& Observer_t;
-    typedef std::unordered_map<std::string, Observer_t> Observers_t;
+    typedef std::shared_ptr<IObserver<EnumT> > ObserverPtr_t;
+    typedef std::unordered_map<std::string, ObserverPtr_t> ObserversByNameMap_t;
+    typedef std::unordered_map<std::string, std::vector<std::string> >
+        ObserverKeysMap_t;
 
-    Observers_t observers;
+    ObserverKeysMap_t observerKeys;
+    ObserversByNameMap_t observers;
 
    public:
-    virtual ~ISubject(){};
-    void attach(Observer_t observer) {
-        this->observers.emplace(observer.getName(), observer);
+    virtual ~ISubject() {
+        detachAll();
     }
 
-    void detach(Observer_t observer) {
-        this->observers.erase(observer.getName());
+    void attach(const std::string& key, ObserverPtr_t observer) {
+        observers.emplace(observer->getName(), observer);
+        observerKeys[observer->getName()].push_back(key);
+    }
+
+    void detach(const ObserverPtr_t& observer) {
+        const std::string& name = observer.getName();
+        observerKeys.erase(name);
+        observers.erase(name);
+    }
+
+    void detach(const std::string& observerName) {
+        observerKeys.erase(observerName);
+        observers.erase(observerName);
     }
 
     void detachAll() {
-        // Note: clear map
-        this->observers.clear();
+        observerKeys.clear();
+        observers.clear();
+    }
+
+    void notify(const std::string& key, EnumT event) {
+        for (const auto& [observerName, keys] : observerKeys) {
+            if (std::find(keys.begin(), keys.end(), key) != keys.end()) {
+                // access the observer from the map of vectors and notify it
+                observers[observerName]->update(event);
+            }
+        }
     }
 
     void notifyAll(EnumT event) {
-        for (auto observer = observers.begin(); observer != observers.end();
-             ++observer) {
-            (*observer).second.update(event);
+        for (const auto& [observerName, keys] : observerKeys) {
+            //* Notify the observer if it's subscribed to the key
+            observers[observerName]->update(event);
         }
     }
 
-    void notify(EnumT event, const std::string& observerName) {
-        auto it_map = observers.find(observerName);
-        if (it_map != observers.end()) {
-            (*it_map).second.update(event);
-            return;
+    std::vector<std::string> getObserverKeys(
+        const std::string& observerName) const {
+        if (auto it = observerKeys.find(observerName);
+            it != observerKeys.end()) {
+            return it->second;
         }
-        log_e("Invalid Map Index");
-        return;
+        return {};
     }
-    int id = 0;
 };
-#endif  // OBSERVER_HPP

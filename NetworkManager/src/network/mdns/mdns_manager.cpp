@@ -16,12 +16,14 @@ bool MDNSHandler::begin() {
     auto mdnsConfig = configManager.getMDNSConfig();
     log_d("%s", mdnsConfig.hostname.c_str());
     if (!MDNS.begin(mdnsConfig.hostname.c_str())) {
-        mdnsStateManager.setState(MDNSState_e::MDNSState_Error);
+        this->configManager.setState(this->getName(),
+                                     MDNSState_e::MDNSState_Error);
         log_e("Error initializing MDNS");
         return false;
     }
 
-    mdnsStateManager.setState(MDNSState_e::MDNSState_Starting);
+    this->configManager.setState(this->getName(),
+                                 MDNSState_e::MDNSState_Starting);
     MDNS.addService(service_name.c_str(), proto.c_str(), atoi(value.c_str()));
     MDNS.addServiceTxt(
         service_name.c_str(), proto.c_str(), key.c_str(),
@@ -29,21 +31,20 @@ bool MDNSHandler::begin() {
     log_d("%s %s %s %s %s", service_name.c_str(), proto.c_str(),
           service_text.c_str(), key.c_str(), value.c_str());
     log_i("MDNS initialized!");
-    mdnsStateManager.setState(MDNSState_e::MDNSState_Started);
+    this->configManager.setState(this->getName(),
+                                 MDNSState_e::MDNSState_Started);
     return true;
 }
 
-void MDNSHandler::update(const Event_e& event) {
-    switch (event) {
-        case Event_e::mdnsConfigUpdated:
-            MDNS.end();
-            begin();
-            break;
-        default:
-            break;
-    }
-}
-
-std::string MDNSHandler::getName() {
-    return this->service_name;
+void MDNSHandler::update(const StateVariant& event) {
+    updateWrapper<Event_e>(event, [this](Event_e _event) {
+        switch (_event) {
+            case Event_e::mdnsConfigUpdated:
+                MDNS.end();
+                this->begin();
+                break;
+            default:
+                break;
+        }
+    });
 }

@@ -1,12 +1,9 @@
-#ifndef MDNS_HANDLER_HPP
-#define MDNS_HANDLER_HPP
+#pragma once
 #include <ESPmDNS.h>
+#include <data/config/project_config.hpp>
+#include <utilities/observer.hpp>
 
-#include "data/config/project_config.hpp"
-#include "data/statemanager/state_manager.hpp"
-#include "utilities/observer.hpp"
-
-class MDNSHandler : public IObserver<Event_e> {
+class MDNSHandler : public IObserver<StateVariant> {
    private:
     ProjectConfig& configManager;
     std::string service_name;
@@ -20,8 +17,9 @@ class MDNSHandler : public IObserver<Event_e> {
                 const std::string& service_text, const std::string& proto,
                 const std::string& key, const std::string& value);
     bool begin();
-    void update(const Event_e& event) override;
-    std::string getName() override;
+    /* Overrides */
+    void update(const StateVariant& event) override;
+    std::string getName() const override {
+        return this->service_name;
+    }
 };
-
-#endif  // MDNS_HANDLER_HPP

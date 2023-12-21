@@ -1,6 +1,4 @@
-#ifndef HELPERS_HPP
-#define HELPERS_HPP
-//#include <strTools.h>
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -59,5 +57,3 @@ std::string format_string(const std::string& format, Args... args) {
                        buf.get() + size - 1);  // We don't want the '\0' inside
 }
 }  // namespace Helpers
-
-#endif  // HELPERS_HPP

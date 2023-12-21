@@ -7,6 +7,22 @@ ProjectConfig::ProjectConfig(const std::string& configName,
       _already_loaded(false) {}
 
 ProjectConfig::~ProjectConfig() {
+    this->detachAll();
+}
+
+/**
+ *@brief Initializes the structures with blank data to prevent empty memory
+ *sectors and nullptr errors.
+ *@brief This is to be called in setup() before loading the config.
+ */
+void ProjectConfig::initConfig() {
+    if (_configName.empty()) {
+        log_e("[Project Config]: Config name is null\n");
+        _configName = "easynetwork";
+    }
+
+    bool success = begin(_configName.c_str());
+
     this->config.device = {
         "admin",
         "12345678",
@@ -31,20 +47,6 @@ ProjectConfig::~ProjectConfig() {
         1,
         false,
     };
-}
-
-/**
- *@brief Initializes the structures with blank data to prevent empty memory
- *sectors and nullptr errors.
- *@brief This is to be called in setup() before loading the config.
- */
-void ProjectConfig::initConfig() {
-    if (_configName.empty()) {
-        log_e("[Project Config]: Config name is null\n");
-        _configName = "easynetwork";
-    }
-
-    bool success = begin(_configName.c_str());
 
     log_i("[Project Config]: Config name: %s", _configName.c_str());
     log_i("[Project Config]: Config loaded: %s", success ? "true" : "false");
@@ -123,32 +125,31 @@ void ProjectConfig::save() {
 
     if (this->reboot) {
         log_i("[Project Config]: Project config saved and system is rebooting");
+        //* clear struct data
+        this->config.device = {
+            "",
+            0,
+        };
+
+        this->config.mdns = {
+            "",
+        };
+
+        this->config.ap_network = {
+            "",
+            "",
+            1,
+            false,
+        };
+
+        this->config.networks.clear();
+
         ESP.restart();
         return;
     }
 
     log_w("[Project Config]: Reboot is disabled, triggering observer");
     this->_already_loaded = false;
-
-    //* clear struct data
-    this->config.device = {
-        "",
-        0,
-    };
-
-    this->config.mdns = {
-        "",
-    };
-
-    this->config.ap_network = {
-        "",
-        "",
-        1,
-        false,
-    };
-
-    this->config.networks.clear();
-
     this->notifyAll(Event_e::configSaved);
 }
 
@@ -300,10 +301,11 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
             it->adhoc = false;
 
             if (shouldNotify) {
-                wifiStateManager.setState(WiFiState_e::WiFiState_Disconnected);
+                this->setState("WiFiHandler",
+                               WiFiState_e::WiFiState_Disconnected);
                 WiFi.disconnect();
                 this->wifiConfigSave();
-                this->notifyAll(Event_e::networksConfigUpdated);
+                this->notify("WiFiHandler", Event_e::networksConfigUpdated);
             }
 
             return;
@@ -330,10 +332,10 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
     }
 
     if (shouldNotify) {
-        wifiStateManager.setState(WiFiState_e::WiFiState_Disconnected);
+        this->setState("WiFiHandler", WiFiState_e::WiFiState_Disconnected);
         WiFi.disconnect();
         this->wifiConfigSave();
-        this->notifyAll(Event_e::networksConfigUpdated);
+        this->notify("WiFiHandler", Event_e::networksConfigUpdated);
     }
 }
 

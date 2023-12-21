@@ -1,16 +1,15 @@
 #pragma once
-#ifndef PROJECT_CONFIG_HPP
-#    define PROJECT_CONFIG_HPP
-#    include <Arduino.h>
-#    include <Preferences.h>
+#include <Arduino.h>
+#include <Preferences.h>
 
-#    include <functional>
-#    include <string>
-#    include <vector>
+#include <functional>
+#include <string>
+#include <vector>
 
-#    include "utilities/helpers.hpp"
-#    include "utilities/network_utilities.hpp"
-#    include "utilities/observer.hpp"
+#include <utilities/helpers.hpp>
+#include <utilities/network_utilities.hpp>
+#include <utilities/observer.hpp>
+#include <utilities/states.hpp>
 
 namespace Project_Config {
 struct DeviceConfig_t {
@@ -79,7 +78,7 @@ class CustomConfigInterface {
     virtual void save() = 0;
 };
 
-class ProjectConfig : public Preferences, public ISubject<Event_e> {
+class ProjectConfig : public StateManager<StateVariant>, public Preferences {
    private:
     virtual void initConfig();
     Project_Config::ProjectConfig_t config;
@@ -124,5 +123,3 @@ class ProjectConfig : public Preferences, public ISubject<Event_e> {
 
     bool reboot;
 };
-
-#endif  // PROJECT_CONFIG_HPP

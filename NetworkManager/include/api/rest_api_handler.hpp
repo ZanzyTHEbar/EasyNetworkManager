@@ -11,8 +11,9 @@ class APIServer : public BaseAPI {
     void handleUserCommands(AsyncWebServerRequest* request);
 
    public:
-    APIServer(ProjectConfig& configManager, AsyncServer_t& async_server,
-              AsyncOTA* async_ota = nullptr);
+    APIServer(ProjectConfig& configManager,
+                       AsyncServer_t& async_server,
+                       AsyncOTA* async_ota = nullptr);
     virtual ~APIServer();
     void begin();
     void setupServer();
@@ -39,7 +40,7 @@ class CaptiveRequestHandler : public AsyncWebHandler {
     virtual ~CaptiveRequestHandler();
 
     bool canHandle(AsyncWebServerRequest* request);
-    
+
     //* use SPIFFS or built in HTML wifimanager
     void handleRequest(AsyncWebServerRequest* request);
 };

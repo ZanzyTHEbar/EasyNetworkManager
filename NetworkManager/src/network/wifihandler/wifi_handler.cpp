@@ -3,7 +3,7 @@
 WiFiHandler::WiFiHandler(ProjectConfig& configManager, const std::string& ssid,
                          const std::string& password, uint8_t channel)
     : configManager(configManager),
-      txpower(configManager.getWifiTxPowerConfig()),
+      txpower(this->configManager.getWifiTxPowerConfig()),
       ssid(ssid),
       password(password),
       channel(channel),
@@ -13,18 +13,18 @@ WiFiHandler::WiFiHandler(ProjectConfig& configManager, const std::string& ssid,
 WiFiHandler::~WiFiHandler() {}
 
 void WiFiHandler::begin() {
-    if (this->_enable_adhoc ||
-        wifiStateManager.getCurrentState() == WiFiState_e::WiFiState_ADHOC) {
-        this->setUpADHOC();
+    if (this->_enable_adhoc) {
+        this->configManager.setState(this->getName(),
+                                     WiFiState_e::WiFiState_ADHOC);
         return;
     }
     WiFi.mode(WIFI_STA);
+    // WiFi.onEvent();
     WiFi.setSleep(WIFI_PS_NONE);
 
     Serial.print("Initializing connection to wifi \n\r");
-    wifiStateManager.setState(WiFiState_e::WiFiState_Connecting);
 
-    auto networks = configManager.getWifiConfigs();
+    auto networks = this->configManager.getWifiConfigs();
 
     if (networks.empty()) {
         Serial.print(
@@ -71,7 +71,7 @@ void WiFiHandler::begin() {
 
 void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
                         const std::string& password) {
-    wifiStateManager.setState(WiFiState_e::WiFiState_ADHOC);
+    this->configManager.setState(this->getName(), WiFiState_e::WiFiState_ADHOC);
     log_i("\n[INFO]: Setting Access Point...\n");
     log_i("\n[INFO]: Configuring access point...\n");
     WiFi.mode(WIFI_AP);
@@ -88,8 +88,9 @@ void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
 
 void WiFiHandler::setUpADHOC() {
     log_i("\n[INFO]: Setting Access Point...\n");
-    size_t ssidLen = configManager.getAPWifiConfig().ssid.length();
-    size_t passwordLen = configManager.getAPWifiConfig().password.length();
+    size_t ssidLen = this->configManager.getAPWifiConfig().ssid.length();
+    size_t passwordLen =
+        this->configManager.getAPWifiConfig().password.length();
     if (ssidLen <= 0) {
         this->adhoc("EasyNetworkManager", 1, "12345678");
         return;
@@ -99,20 +100,21 @@ void WiFiHandler::setUpADHOC() {
         log_i(
             "\n[INFO]: Configuring access point without a "
             "password\n");
-        this->adhoc(configManager.getAPWifiConfig().ssid,
-                    configManager.getAPWifiConfig().channel);
+        this->adhoc(this->configManager.getAPWifiConfig().ssid,
+                    this->configManager.getAPWifiConfig().channel);
         return;
     }
 
-    this->adhoc(configManager.getAPWifiConfig().ssid,
-                configManager.getAPWifiConfig().channel,
-                configManager.getAPWifiConfig().password);
+    this->adhoc(this->configManager.getAPWifiConfig().ssid,
+                this->configManager.getAPWifiConfig().channel,
+                this->configManager.getAPWifiConfig().password);
     log_i("\n[INFO]: Configuring access point...\n");
     log_d("\n[DEBUG]: ssid: %s\n",
-          configManager.getAPWifiConfig().ssid.c_str());
+          this->configManager.getAPWifiConfig().ssid.c_str());
     log_d("\n[DEBUG]: password: %s\n",
-          configManager.getAPWifiConfig().password.c_str());
-    log_d("\n[DEBUG]: channel: %d\n", configManager.getAPWifiConfig().channel);
+          this->configManager.getAPWifiConfig().password.c_str());
+    log_d("\n[DEBUG]: channel: %d\n",
+          this->configManager.getAPWifiConfig().channel);
 }
 
 bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
@@ -121,10 +123,8 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
     unsigned long startingMillis = currentMillis;
     int connectionTimeout = 45000;  // 30 seconds
     int progress = 0;
-
-    wifiStateManager.setState(WiFiState_e::WiFiState_Connecting);
     Serial.printf("Trying to connect to: %s \n\r", ssid.c_str());
-    auto mdnsConfig = configManager.getMDNSConfig();
+    auto mdnsConfig = this->configManager.getMDNSConfig();
     WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE,
                 INADDR_NONE);  // need to call before
                                // setting hostname
@@ -137,17 +137,21 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
         delay(1000);
         log_v(".");
         if ((currentMillis - startingMillis) >= connectionTimeout) {
-            wifiStateManager.setState(WiFiState_e::WiFiState_Error);
+            this->configManager.setState(this->getName(),
+                                         WiFiState_e::WiFiState_Error);
             log_e("Connection to: %s TIMEOUT \n\r", ssid.c_str());
+            this->configManager.setState(this->getName(),
+                                         WiFiState_e::WiFiState_Connecting);
             delay(8000);
             return false;
         }
     }
 
-    wifiStateManager.setState(WiFiState_e::WiFiState_Connected);
+    this->configManager.setState(this->getName(),
+                                 WiFiState_e::WiFiState_Connected);
     Serial.printf("Successfully connected to %s \n\r", ssid.c_str());
-    Serial.printf("Setting TX power to: %d \n\r", (uint8_t)power);
-    WiFi.setTxPower(power);
+    // Serial.printf("Setting TX power to: %d \n\r", (uint8_t)power);
+    // WiFi.setTxPower(power);
 
     return true;
 }
@@ -156,16 +160,38 @@ void WiFiHandler::toggleAdhoc(bool enable) {
     _enable_adhoc = enable;
 }
 
-void WiFiHandler::update(const Event_e& event) {
-    switch (event) {
-        case Event_e::networksConfigUpdated:
-            this->begin();
-            break;
-        default:
-            break;
-    }
-}
+void WiFiHandler::update(const StateVariant& event) {
+    updateWrapper<WiFiState_e>(event, [this](WiFiState_e _event) {
+        switch (_event) {
+            case WiFiState_e::WiFiState_Connecting:
+                Serial.print("WiFiState_Connecting \n\r");
+                this->begin();
+                break;
+            case WiFiState_e::WiFiState_Connected:
+                Serial.print("WiFiState_Connected \n\r");
+                break;
+            case WiFiState_e::WiFiState_Disconnected:
+                Serial.print("WiFiState_Disconnected \n\r");
+                break;
+            case WiFiState_e::WiFiState_Error:
+                Serial.print("WiFiState_Error \n\r");
+                break;
+            case WiFiState_e::WiFiState_ADHOC:
+                Serial.print("WiFiState_ADHOC \n\r");
+                this->setUpADHOC();
+                break;
+            default:
+                break;
+        }
+    });
 
-std::string WiFiHandler::getName() {
-    return "WiFiHandler";
+    //updateWrapper<Event_e>(event, [this](Event_e _event) {
+    //    switch (_event) {
+    //        case Event_e::configSaved:
+    //            this->begin();
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //});
 }
