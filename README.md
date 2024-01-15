@@ -8,6 +8,10 @@
 
 This is an in-progress library for easy network management.
 
+> [!IMPORTANT]\
+> This library requires c++17
+> see [extras](#extras)
+
 This project supports the following boards:
 
 - ESP8266
@@ -199,6 +203,8 @@ build_flags =
   -DASYNCWEBSERVER_REGEX # add regex support to AsyncWebServer
   -DUSE_WEBMANAGER # enable wifimanager
   -DCORE_DEBUG_LEVEL=4 # add debug logging in serial monitor
+  -std=gnu++17
+build_unflags = -std=gnu++11
 
 ; other build parameters
 monitor_filters = 
