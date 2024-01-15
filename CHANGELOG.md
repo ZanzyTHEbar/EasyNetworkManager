@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.2.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.1.4...v5.2.0) (2024-01-15)
+
+
+### 📝 Documentation
+
+* add blurb about c++17 ([4d5027c](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/4d5027c7ea53d824421e03c485b791a7c017174e))
+
 ## [5.1.4](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.1.3...v5.1.4) (2023-12-21)
 
 
