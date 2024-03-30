@@ -23,61 +23,51 @@ void ProjectConfig::initConfig() {
 
     bool success = begin(_configName.c_str());
 
-    this->config.device = {
-        "admin",
-        "12345678",
-        3232,
-    };
-
     if (_mdnsName.empty()) {
         log_e(
             "[Project Config]: MDNS name is null\n Auto-assigning name to "
             "'easynetwork'");
         _mdnsName = "easynetwork";
     }
-    this->config.mdns = {
-        _mdnsName,
-    };
+
+    this->config.mdns.hostname.assign(_mdnsName);
 
     log_i("[Project Config]: MDNS name: %s", _mdnsName.c_str());
-
-    this->config.ap_network = {
-        "",
-        "",
-        1,
-        false,
-    };
-
     log_i("[Project Config]: Config name: %s", _configName.c_str());
     log_i("[Project Config]: Config loaded: %s", success ? "true" : "false");
 }
 
 void ProjectConfig::deviceConfigSave() {
     /* Device Config */
-    putString("ota_login", this->config.device.ota_login.c_str());
-    putString("ota_pass", this->config.device.ota_password.c_str());
-    putInt("ota_port", this->config.device.ota_port);
+    putString(this->config.device.keys.ota_login.c_str(),
+              this->config.device.ota_login.c_str());
+    putString(this->config.device.keys.ota_password.c_str(),
+              this->config.device.ota_password.c_str());
+    putInt(this->config.device.keys.ota_port.c_str(),
+           this->config.device.ota_port);
     //! No need to save the JSON strings or bools, they are generated and used
     //! on the fly
 }
 
 void ProjectConfig::mdnsConfigSave() {
     /* MDNS Config */
-    putString("hostname", this->config.mdns.hostname.c_str());
+    putString(this->config.mdns.keys.hostname.c_str(),
+              this->config.mdns.hostname.c_str());
 }
 
 void ProjectConfig::wifiConfigSave() {
     /* WiFi Config */
-    putInt("networkCount", this->config.networks.size());
-
-    std::string name = "name";
-    std::string ssid = "ssid";
-    std::string password = "pass";
-    std::string channel = "channel";
-    std::string power = "power";
+    putInt(this->config.wifKeys.networkCount.c_str(),
+           this->config.networks.size());
     for (int i = 0; i < this->config.networks.size(); i++) {
         char buffer[2];
         std::string iter_str = Helpers::itoa(i, buffer, 10);
+
+        std::string name = this->config.wifKeys.name;
+        std::string ssid = this->config.wifKeys.ssid;
+        std::string password = this->config.wifKeys.password;
+        std::string channel = this->config.wifKeys.channel;
+        std::string power = this->config.wifKeys.power;
 
         name.append(iter_str);
         ssid.append(iter_str);
@@ -93,9 +83,12 @@ void ProjectConfig::wifiConfigSave() {
     }
 
     /* AP Config */
-    putString("apSSID", this->config.ap_network.ssid.c_str());
-    putString("apPass", this->config.ap_network.password.c_str());
-    putUInt("apChannel", this->config.ap_network.channel);
+    putString(this->config.ap_network.keys.ssid.c_str(),
+              this->config.ap_network.ssid.c_str());
+    putString(this->config.ap_network.keys.password.c_str(),
+              this->config.ap_network.password.c_str());
+    putUInt(this->config.ap_network.keys.channel.c_str(),
+            this->config.ap_network.channel);
 }
 
 void ProjectConfig::wifiTxPowerConfigSave() {
@@ -125,25 +118,6 @@ void ProjectConfig::save() {
 
     if (this->reboot) {
         log_i("[Project Config]: Project config saved and system is rebooting");
-        //* clear struct data
-        this->config.device = {
-            "",
-            0,
-        };
-
-        this->config.mdns = {
-            "",
-        };
-
-        this->config.ap_network = {
-            "",
-            "",
-            1,
-            false,
-        };
-
-        this->config.networks.clear();
-
         ESP.restart();
         return;
     }
@@ -175,26 +149,30 @@ void ProjectConfig::load() {
 
     /* MDNS Config */
     this->config.mdns.hostname.assign(
-        getString("hostname", _mdnsName.c_str()).c_str());
+        getString(this->config.mdns.keys.hostname.c_str(), _mdnsName.c_str())
+            .c_str());
+
     /* Device Config */
     this->config.device.ota_login.assign(
-        getString("ota_login", "admin").c_str());
+        getString(this->config.device.keys.ota_login.c_str(), "admin").c_str());
     this->config.device.ota_password.assign(
-        getString("ota_pass", "12345678").c_str());
-    this->config.device.ota_port = getInt("ota_port", 3232);
-    //! No need to load the JSON strings or bools, they are generated and used
-    //! on the fly
+        getString(this->config.device.keys.ota_password.c_str(), "12345678")
+            .c_str());
+    this->config.device.ota_port =
+        getInt(this->config.device.keys.ota_port.c_str(), 3232);
 
     /* Wifi TX Power Config */
-    this->config.wifi_tx_power.power = getUInt("power", 52);
+    this->config.wifi_tx_power.power =
+        getUInt(this->config.wifKeys.power.c_str(), 52);
 
     /* WiFi Config */
     int networkCount = getInt("networkCount", 0);
-    std::string name = "name";
-    std::string ssid = "ssid";
-    std::string password = "pass";
-    std::string channel = "channel";
-    std::string power = "power";
+    std::string name = this->config.wifKeys.name;
+    std::string ssid = this->config.wifKeys.ssid;
+    std::string password = this->config.wifKeys.password;
+    std::string channel = this->config.wifKeys.channel;
+    std::string power = this->config.wifKeys.power;
+
     for (int i = 0; i < networkCount; i++) {
         char buffer[2];
         std::string iter_str = Helpers::itoa(i, buffer, 10);
@@ -222,10 +200,13 @@ void ProjectConfig::load() {
 
     /* AP Config */
     this->config.ap_network.ssid.assign(
-        getString("apSSID", _mdnsName.c_str()).c_str());
+        getString(this->config.ap_network.keys.ssid.c_str(), _mdnsName.c_str())
+            .c_str());
     this->config.ap_network.password.assign(
-        getString("apPass", "12345678").c_str());
-    this->config.ap_network.channel = getUInt("apChannel", 1);
+        getString(this->config.ap_network.keys.password.c_str(), "12345678")
+            .c_str());
+    this->config.ap_network.channel =
+        getUInt(this->config.ap_network.keys.channel.c_str(), 1);
 
     this->_already_loaded = true;
     this->notifyAll(Event_e::configLoaded);

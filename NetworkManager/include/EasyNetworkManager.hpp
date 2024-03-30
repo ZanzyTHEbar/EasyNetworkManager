@@ -1,17 +1,18 @@
 #pragma once
 
 //! Required header files
-#include <api/rest_api_handler.hpp>        //! (*)
-#include <data/config/config_handler.hpp>  //! (*)
-#include <utilities/states.hpp>            //! (*)
+#include <api/rest_api_handler.hpp>
+#include <data/config/config_handler.hpp>
+#include <utilities/states.hpp>
 
 #include <network/mdns/mdns_manager.hpp>
 
-#if ENABLE_ETHERNET
-#    include <network/wifihandler/ethernet/ethernet_handler.hpp>  //! (*)
+/* #if ENABLE_ETHERNET
+#include <network/wifihandler/ethernet/ethernet_handler.hpp>
 #else
-#    include <network/wifihandler/wifi_handler.hpp>  //! (*)
-#endif
+#endif */
+
+#include <network/wifihandler/wifi_handler.hpp>
 
 class EasyNetworkManager {
    public:
