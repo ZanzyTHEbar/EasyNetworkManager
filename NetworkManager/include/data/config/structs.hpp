@@ -72,6 +72,7 @@ struct WiFiConfig_t {
           channel(channel),
           power(power),
           adhoc(adhoc) {}
+
     std::string name;
     std::string ssid;
     std::string password;
@@ -141,12 +142,12 @@ struct ProjectConfig_t {
           wifi_tx_power(wifi_tx_power) {}
 
     ProjectConfig_t()
-        : device(DeviceConfig_t()),
-          device_data(DeviceDataJson_t()),
-          mdns(MDNSConfig_t()),
-          networks(std::vector<WiFiConfig_t>()),
-          ap_network(AP_WiFiConfig_t()),
-          wifi_tx_power(WiFiTxPower_t()) {}
+        : device(),
+          device_data(),
+          mdns(),
+          networks(),
+          ap_network(),
+          wifi_tx_power() {}
 
     PreferencesWiFiConfigKeys_t wifKeys;
 };
