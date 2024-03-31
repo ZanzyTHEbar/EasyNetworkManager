@@ -44,8 +44,8 @@ void APIServer::begin() {
     //* Add default JSON handler
 
     // create JSON route
-    const std::string json_url =
-        async_server.api_url.append(async_server.json_url);
+    std::string json_url = async_server.api_url;
+    json_url.append(async_server.json_url);
 
     async_server.server.addHandler(new AsyncCallbackJsonWebHandler(
         json_url.c_str(),
@@ -118,6 +118,7 @@ void APIServer::addRouteMap(const std::string& index, route_t route) {
     }
 }
 
+// TODO: Add support for body parsing
 void APIServer::handleRequest(AsyncWebServerRequest* request) {
     std::vector<std::string> temp =
         Helpers::split(async_server.user_commands.c_str(), '/');
