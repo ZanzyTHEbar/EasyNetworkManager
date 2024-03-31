@@ -18,6 +18,10 @@
       "version": "https://github.com/me-no-dev/ESPAsyncWebServer.git"
     },
     {
+      "name": "ArduinoJson",
+      "version": "https://github.com/bblanchon/ArduinoJson.git"
+    },
+    {
       "name": "AsyncTCP",
       "version": "https://github.com/me-no-dev/AsyncTCP.git",
       "platforms": [
