@@ -1,7 +1,5 @@
 #include <Arduino.h>
 #include <EasyNetworkManager.h>
-//! Only needed for BLOCKING OTA. AsyncOTA is recommended and builtin
-// #include <network/ota/basic_ota.hpp>
 
 /**
  * @brief Setup the EasyNetworkManager Instance
@@ -35,7 +33,15 @@ EasyNetworkManager networkManager("easynetwork", MDNS_HOSTNAME, WIFI_SSID,
  * @param command_path The path to the command handler
  */
 AsyncServer_t async_server(80, networkManager.configHandler->config, "/api",
-                           "/wifimanager", "/mycommands");
+                           "/wifimanager", "/mycommands", "/json");
+
+/**
+ * @brief Setup the API Server Instance
+ * @note The API Server constructor takes 2 parameters:
+ * @param config The config manager
+ * @param server The AsyncServer instance
+ */
+APIServer api(networkManager.configHandler->config, async_server);
 
 /**
  * @brief Setup the API Server Instance
@@ -111,9 +117,6 @@ void setup() {
                 }
             }
         });
-    // ota.begin();
 }
 
-void loop() {
-    // ota.handleOTAUpdate();
-}
+void loop() {}

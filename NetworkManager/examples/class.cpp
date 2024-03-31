@@ -33,7 +33,7 @@ EasyNetworkManager networkManager("easynetwork", MDNS_HOSTNAME, WIFI_SSID,
  * @param command_path The path to the command handler
  */
 AsyncServer_t async_server(80, networkManager.configHandler->config, "/api",
-                           "/wifimanager", "/mycommands");
+                           "/wifimanager", "/mycommands", "/json");
 
 /**
  * @brief Setup the API Server Instance
@@ -43,14 +43,43 @@ AsyncServer_t async_server(80, networkManager.configHandler->config, "/api",
  */
 APIServer api(networkManager.configHandler->config, async_server);
 
-void printHelloWorld(AsyncWebServerRequest* request) {
-    Serial.println("Hello World!");
-    request->send(200, "text/plain", "Hello World!");
-}
+class Temp {
+   public:
+    Temp() {
+        Serial.println("Temp created");
+    }
+    ~Temp() {
+        Serial.println("Temp destroyed");
+    }
+    // Note: Here is a function that can be used to handle custom API requests
+    // inside Note: of a class
+    void grabParams(AsyncWebServerRequest* request) {
+        int params = request->params();
+        log_d("Number of Params: %d", params);
+        std::string y;
+        std::string x;
+        for (int i = 0; i < params; i++) {
+            AsyncWebParameter* param = request->getParam(i);
+            if (param->name() == "Axes1") {
+                x = param->value().c_str();
+            } else if (param->name() == "Axes2") {
+                y = param->value().c_str();
+            }
+        }
+        Serial.printf("Axes1: %s, Axes2: %s\n", x.c_str(), y.c_str());
+        request->send(200, "text/plain", "OK");
+    }
+};
 
 void setupServer() {
+    // add command handlers to the API server
+    // you can add as many as you want - you can also add methods.
     log_d("[SETUP]: Starting API Server");
-    api.addAPICommand("helloWorld", printHelloWorld);
+    api.addAPICommand("paramsClass", [&](AsyncWebServerRequest* request) {
+        Temp t;
+        t.grabParams(request);
+    });
+
     api.begin();
     log_d("[SETUP]: API Server Started");
 }
@@ -59,7 +88,6 @@ void setup() {
     Serial.begin(115200);
     pinMode(4, OUTPUT);
     Serial.println("\nHello, EasyNetworkManager!");
-
     networkManager.begin();
 
     /**

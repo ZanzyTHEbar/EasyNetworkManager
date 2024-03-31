@@ -43,23 +43,26 @@ AsyncServer_t async_server(80, networkManager.configHandler->config, "/api",
  */
 APIServer api(networkManager.configHandler->config, async_server);
 
-/**
- * @brief Setup the API Server Instance
- * @note The API Server constructor takes 2 parameters:
- * @param config The config manager
- * @param server The AsyncServer instance
- */
-APIServer api(networkManager.configHandler->config, async_server);
-
 void setupServer() {
-    // This is an example of how to add a custom html file to the web server
-    // Note: The first parameter is the url endpoint to access the file
-    // Note: The second parameter is the path to the file on the SPIFFS
-    // Note: The third parameter is the HTTP method to use to access the file
-    async_server.custom_html_files.emplace_back("/hello", "/helloWorld.html",
-                                                "GET");
-    async_server.custom_html_files.emplace_back("/goodbye", "/goodbye.html",
-                                                "POST");
+    log_d("[SETUP]: Starting API Server");
+
+    // Add a custom handler
+    // This handler will return a custom JSON response when a POST request is
+    // made to /api/customJson
+    async_server.server.addHandler(new AsyncCallbackJsonWebHandler(
+        "/api/customJson",
+        [&](AsyncWebServerRequest* request, JsonVariant& json) {
+            JsonDocument doc;
+            doc["hello"] = "world";
+            doc["number"] = 42;
+
+            AsyncJsonResponse* response = new AsyncJsonResponse();
+            response->addHeader("EasyNetworkManager", "1.0");
+            auto root = response->getRoot();
+            root["deviceData"].set(doc);
+            response->setLength();
+            request->send(response);
+        }));
 
     api.begin();
     log_d("[SETUP]: API Server Started");

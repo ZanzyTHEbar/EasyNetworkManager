@@ -123,7 +123,7 @@ void APIServer::handleRequest(AsyncWebServerRequest* request) {
         Helpers::split(async_server.user_commands.c_str(), '/');
 
     if (strcmp(request->pathArg(0).c_str(), temp[1].c_str()) == 0) {
-        handleuser_commands(request);
+        handle_user_commands(request);
         return;
     }
 
@@ -158,14 +158,6 @@ void APIServer::addAPICommand(const std::string& url,
     useRouteHandler.emplace(std::move(url), funct);
 }
 
-void APIServer::addJSONHandler(const std::string& endpoint,
-                               AsyncCallbackJsonWebHandler* handler) {
-    static JSONRequest_t* jsonHandler = new JSONRequest_t(endpoint, handler);
-
-    jsonRequestHandlers.emplace(endpoint, jsonHandler);
-    async_server.server.addHandler(handler);
-}
-
 /**
  * @brief Add a command handler to the API
  *
@@ -176,7 +168,7 @@ void APIServer::addJSONHandler(const std::string& endpoint,
  * parameter \c we need to fix this!! I need a better implemenation
  *
  */
-void APIServer::handleuser_commands(AsyncWebServerRequest* request) {
+void APIServer::handle_user_commands(AsyncWebServerRequest* request) {
     std::string url = request->pathArg(1).c_str();
     auto it = useRouteHandler.find(url);
     if (it != useRouteHandler.end()) {

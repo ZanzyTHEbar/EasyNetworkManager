@@ -24,8 +24,6 @@ EasyNetworkManager networkManager("easynetwork", MDNS_HOSTNAME, WIFI_SSID,
                                   WIFI_PASSWORD, 1, "_easynetwork", "test",
                                   "_tcp", "_api_port", "80", true, false);
 
-DNSServer dnsServer;
-
 /**
  * @brief Setup the AsyncServer Instance
  * @note The AsyncServer constructor takes 5 parameters:
@@ -36,7 +34,7 @@ DNSServer dnsServer;
  * @param command_path The path to the command handler
  */
 AsyncServer_t async_server(80, networkManager.configHandler->config, "/api",
-                           "/wifimanager", "/mycommands");
+                           "/wifimanager", "/mycommands", "/json");
 
 /**
  * @brief Setup the API Server Instance
@@ -45,6 +43,8 @@ AsyncServer_t async_server(80, networkManager.configHandler->config, "/api",
  * @param server The AsyncServer instance
  */
 APIServer api(networkManager.configHandler->config, async_server);
+
+DNSServer dnsServer;
 
 // Note: Here are two functions that can be used to handle custom API requests
 void printHelloWorld(AsyncWebServerRequest* request) {
