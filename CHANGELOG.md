@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.3.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.2.3...v5.3.0) (2024-03-31)
+
+
+### 🍕 Features
+
+* added ability to handle JSON data POST and GET ([53035ab](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/53035abc31fd4810fb3fd1f03cab1363525f2a69))
+
 ## [5.2.3](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.2.2...v5.2.3) (2024-03-30)
 
 
