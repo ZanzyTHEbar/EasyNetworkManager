@@ -1,10 +1,10 @@
 #pragma once
 
-#include "api/server.hpp"
-#include "data/config/project_config.hpp"
-#include "utilities/api_utilities.hpp"
+#include <data/config/project_config.hpp>
+#include <utilities/api_utilities.hpp>
+#include "server.hpp"
 
-typedef std::function<void(void)> AsyncOTACustomHandlerFunction;
+using AsyncOTACustomHandlerFunction = std::function<void(void)>;
 class AsyncOTA {
     AsyncOTACustomHandlerFunction customHandlerFunction = NULL;
     AsyncServer_t& async_server;

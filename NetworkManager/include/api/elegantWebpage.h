@@ -1,8 +1,6 @@
 #ifndef ElegantOTAWebpage_h
 #define ElegantOTAWebpage_h
 
-#include <Arduino.h>
-
 const uint32_t ELEGANT_HTML_SIZE = 53715;
 const uint8_t ELEGANT_HTML[] PROGMEM = {
 31,139,8,0,0,0,0,0,2,3,148,58,233,122,26,185,178,255,243,20,141,206,249,56,221,99,185,1,219,113,

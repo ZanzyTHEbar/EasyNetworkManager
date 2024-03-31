@@ -5,7 +5,7 @@
 #include <string>
 
 #include "mbedtls/md.h"
-#include "utilities/network_utilities.hpp"
+#include "network_utilities.hpp"
 
 constexpr int XHTTP_GET = 0b00000001;
 constexpr int XHTTP_POST = 0b00000010;

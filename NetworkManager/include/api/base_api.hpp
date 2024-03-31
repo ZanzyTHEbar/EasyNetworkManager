@@ -7,9 +7,9 @@
 #include <ArduinoJson.h>
 #include <AsyncJson.h>
 
-#include "data/config/project_config.hpp"
-#include "utilities/api_utilities.hpp"
-#include "utilities/helpers.hpp"
+#include <data/config/project_config.hpp>
+#include <helpers/helpers.hpp>
+#include <utilities/api_utilities.hpp>
 
 class BaseAPI : public API_Utilities {
    protected:

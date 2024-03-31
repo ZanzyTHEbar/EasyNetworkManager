@@ -1,4 +1,4 @@
-#include "data/config/config_handler.hpp"
+#include <data/config/config_handler.hpp>
 
 ConfigHandler::ConfigHandler(const std::string& configName,
                              const std::string& mdnsName)

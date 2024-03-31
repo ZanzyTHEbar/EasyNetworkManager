@@ -19,10 +19,10 @@
 #    endif
 #endif
 #include <data/config/project_config.hpp>
-#include <utilities/helpers.hpp>
+#include <helpers/helpers.hpp>
 #include <utilities/states.hpp>
 
-class WiFiHandler : public IObserver<StateVariant> {
+class WiFiHandler : public Helpers::IObserver<StateVariant> {
    public:
     WiFiHandler(ProjectConfig& configManager, const std::string& ssid,
                 const std::string& password, uint8_t channel);

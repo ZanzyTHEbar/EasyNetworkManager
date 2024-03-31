@@ -1,9 +1,9 @@
 #pragma once
 #include <data/config/project_config.hpp>
-#include <utilities/observer.hpp>
+#include <helpers/observer.hpp>
 #include <utilities/states.hpp>
 
-class ConfigHandler : public IObserver<StateVariant> {
+class ConfigHandler : public Helpers::IObserver<StateVariant> {
    public:
     ConfigHandler(const std::string& configName = std::string(),
                   const std::string& mdnsName = std::string());

@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <helpers/observer.hpp>
 #include <iostream>
 #include <map>
 #include <optional>
@@ -7,7 +8,6 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
-#include "observer.hpp"
 
 /**
  * @brief StateManager is a singleton class that manages all states in the
@@ -15,7 +15,7 @@
  * @note It is a singleton because it is used by many classes.
  */
 template <typename StateVariant>
-class StateManager : public ISubject<StateVariant> {
+class StateManager : public Helpers::ISubject<StateVariant> {
    public:
     StateManager() = default;
     virtual ~StateManager() override = default;

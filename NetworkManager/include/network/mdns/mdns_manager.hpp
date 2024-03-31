@@ -1,9 +1,9 @@
 #pragma once
 #include <ESPmDNS.h>
 #include <data/config/project_config.hpp>
-#include <utilities/observer.hpp>
+#include <helpers/observer.hpp>
 
-class MDNSHandler : public IObserver<StateVariant> {
+class MDNSHandler : public Helpers::IObserver<StateVariant> {
    private:
     ProjectConfig& configManager;
     std::string service_name;

@@ -1,8 +1,8 @@
 #pragma once
 #define XWEBSERVERHANDLER_HPP
-#include "api/asyncota.hpp"
-#include "api/base_api.hpp"
-#include "api/server.hpp"
+#include "asyncota.hpp"
+#include "base_api.hpp"
+#include "server.hpp"
 
 class APIServer : public BaseAPI {
    private:

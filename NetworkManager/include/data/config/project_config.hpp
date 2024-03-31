@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 
-#include <utilities/helpers.hpp>
+#include <helpers/helpers.hpp>
+#include <helpers/observer.hpp>
 #include <utilities/network_utilities.hpp>
-#include <utilities/observer.hpp>
 #include <utilities/states.hpp>
 
 class CustomConfigInterface {

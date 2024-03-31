@@ -1,6 +1,5 @@
 #ifndef EasyNetworkWebManager_h
 #define EasyNetworkWebManager_h
-#include <Arduino.h>
 const uint32_t WEB_MANAGER_HTML_SIZE = 2778;
 const uint8_t WEB_MANAGER_HTML[] PROGMEM = { 
 31,139,8,0,0,0,0,0,2,3,221,91,103,119,219,56,214,254,238,95,129,151,83,108,79,68,53,55,189,178,
