@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.3.4](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.3.3...v5.3.4) (2024-03-31)
+
+
+### 🤖 Build System
+
+* Update ArduinoJson dependency in dev_config.ini ([58cb244](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/58cb24494ac29206c24ad207c244b006da6112f5))
+
 ## [5.3.3](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.3.2...v5.3.3) (2024-03-31)
 
 
