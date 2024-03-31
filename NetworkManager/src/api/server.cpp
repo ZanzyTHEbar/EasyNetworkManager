@@ -4,12 +4,14 @@ AsyncServer_t::AsyncServer_t(const int CONTROL_PORT,
                              ProjectConfig& configManager,
                              const std::string& api_url,
                              const std::string& wifimanager_url,
-                             const std::string& userCommands)
+                             const std::string& user_commands,
+                             const std::string& json_url)
     : server(CONTROL_PORT),
       configManager(configManager),
       api_url(std::move(api_url)),
       wifimanager_url(std::move(wifimanager_url)),
-      userCommands(std::move(userCommands)),
+      user_commands(std::move(user_commands)),
+      json_url(std::move(json_url)),
       spiffsMounted(false) {
     spiffsMounted = initSPIFFS();
 }

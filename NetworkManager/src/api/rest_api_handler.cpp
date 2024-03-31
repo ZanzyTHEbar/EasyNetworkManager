@@ -41,6 +41,18 @@ void APIServer::begin() {
         wifi_manager_url, HTTP_ANY,
         [&](AsyncWebServerRequest* request) { handleRequest(request); });
 
+    //* Add default JSON handler
+
+    // create JSON route
+    const std::string json_url =
+        async_server.api_url.append(async_server.json_url);
+
+    async_server.server.addHandler(new AsyncCallbackJsonWebHandler(
+        json_url.c_str(),
+        [&](AsyncWebServerRequest* request, JsonVariant& json) {
+            handleJson(request, json);
+        }));
+
     if (async_ota != nullptr)
         async_ota->begin();
     async_server.server.begin();
@@ -50,8 +62,8 @@ void APIServer::setupServer() {
     // Set default routes
     routes.reserve(10);  // reserve enough memory for all routes
     routes.emplace("wifi", &APIServer::setWiFi);
-    routes.emplace("json", &APIServer::handleJson);
     routes.emplace("resetConfig", &APIServer::factoryReset);
+    routes.emplace("getDeviceConfigData", &APIServer::getDeviceConfigData);
     routes.emplace("getConfig", &APIServer::getJsonConfig);
     routes.emplace("deleteRoute", &APIServer::removeRoute);
     routes.emplace("rebootDevice", &APIServer::rebootDevice);
@@ -108,10 +120,10 @@ void APIServer::addRouteMap(const std::string& index, route_t route) {
 
 void APIServer::handleRequest(AsyncWebServerRequest* request) {
     std::vector<std::string> temp =
-        Helpers::split(async_server.userCommands.c_str(), '/');
+        Helpers::split(async_server.user_commands.c_str(), '/');
 
     if (strcmp(request->pathArg(0).c_str(), temp[1].c_str()) == 0) {
-        handleUserCommands(request);
+        handleuser_commands(request);
         return;
     }
 
@@ -143,7 +155,15 @@ void APIServer::handleRequest(AsyncWebServerRequest* request) {
 
 void APIServer::addAPICommand(const std::string& url,
                               ArRequestHandlerFunction funct) {
-    stateFunctionMap.emplace(std::move(url), funct);
+    useRouteHandler.emplace(std::move(url), funct);
+}
+
+void APIServer::addJSONHandler(const std::string& endpoint,
+                               AsyncCallbackJsonWebHandler* handler) {
+    static JSONRequest_t* jsonHandler = new JSONRequest_t(endpoint, handler);
+
+    jsonRequestHandlers.emplace(endpoint, jsonHandler);
+    async_server.server.addHandler(handler);
 }
 
 /**
@@ -156,10 +176,10 @@ void APIServer::addAPICommand(const std::string& url,
  * parameter \c we need to fix this!! I need a better implemenation
  *
  */
-void APIServer::handleUserCommands(AsyncWebServerRequest* request) {
+void APIServer::handleuser_commands(AsyncWebServerRequest* request) {
     std::string url = request->pathArg(1).c_str();
-    auto it = stateFunctionMap.find(url);
-    if (it != stateFunctionMap.end()) {
+    auto it = useRouteHandler.find(url);
+    if (it != useRouteHandler.end()) {
         log_d("[APIServer]: We are trying to execute the function");
         it->second(request);
         return;

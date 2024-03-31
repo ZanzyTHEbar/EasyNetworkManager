@@ -12,8 +12,7 @@
 #ifdef USE_WEBMANAGER
 #    include <data/webpage.h>
 #endif  // USE_WEBMANAGER
-
-#include "data/config/project_config.hpp"
+#include <data/config/project_config.hpp>
 
 class AsyncServer_t : public API_Utilities {
     /* Helpers */
@@ -26,7 +25,8 @@ class AsyncServer_t : public API_Utilities {
     AsyncServer_t(const int CONTROL_PORT, ProjectConfig& configManager,
                   const std::string& api_url,
                   const std::string& wifimanager_url,
-                  const std::string& userCommands);
+                  const std::string& user_commands,
+                  const std::string& json_url);
     virtual ~AsyncServer_t();
     virtual void begin();
 
@@ -40,6 +40,7 @@ class AsyncServer_t : public API_Utilities {
         std::string file;
         std::string method;
     };
+
     std::vector<UserRoutes_t> custom_html_files;
 
     AsyncWebServer server;
@@ -47,5 +48,6 @@ class AsyncServer_t : public API_Utilities {
 
     std::string api_url;
     std::string wifimanager_url;
-    std::string userCommands;
+    std::string user_commands;
+    std::string json_url;
 };

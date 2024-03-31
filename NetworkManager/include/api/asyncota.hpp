@@ -4,8 +4,9 @@
 #include "data/config/project_config.hpp"
 #include "utilities/api_utilities.hpp"
 
+typedef std::function<void(void)> AsyncOTACustomHandlerFunction;
 class AsyncOTA {
-    typedef std::function<void(void)> AsyncOTACustomHandlerFunction;
+    AsyncOTACustomHandlerFunction customHandlerFunction = NULL;
     AsyncServer_t& async_server;
 
    protected:
@@ -18,7 +19,6 @@ class AsyncOTA {
     void checkAuthentication(AsyncWebServerRequest* request, const char* login,
                              const char* password);
     void setOTAHandler(AsyncOTACustomHandlerFunction customHandlerFunction);
-    AsyncOTACustomHandlerFunction customHandlerFunction = NULL;
 
     bool _authRequired;
 };

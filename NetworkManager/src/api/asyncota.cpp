@@ -68,7 +68,7 @@ void AsyncOTA::begin() {
 
             String _id = String((uint32_t)ESP.getEfuseMac(), HEX);
             _id.toUpperCase();
-            request->send(200, "application/json",
+            request->send(200, API_Utilities::MIMETYPE_JSON,
                           "{\"id\": \"" + _id + "\", \"hardware\": \"ESP32\"}");
         });
 

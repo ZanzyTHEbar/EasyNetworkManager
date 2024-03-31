@@ -1,11 +1,7 @@
 #include <api/base_api.hpp>
 
-// TODO: Implement proper JSON post and get
-//?
 // https://github.com/me-no-dev/ESPAsyncWebServer/tree/master#arduinojson-advanced-response
 // TODO: Implement authentication
-// TODO: Implement proper visitor pattern for JSON serialization and
-// deserialization
 
 BaseAPI::BaseAPI(ProjectConfig& configManager) : configManager(configManager) {}
 
@@ -115,26 +111,37 @@ void BaseAPI::setWiFiTXPower(AsyncWebServerRequest* request) {
     }
 }
 
-void BaseAPI::handleJson(AsyncWebServerRequest* request) {
+void BaseAPI::handleJson(AsyncWebServerRequest* request,
+                         JsonVariant& jsonData) {
     switch (_networkMethodsMap_enum[request->method()]) {
-        case GET: {
+        case POST: {
+            auto jsonObj = jsonData.as<JsonObject>();
+            std::string json;
+            serializeJson(jsonObj, json);
+            configManager.setDeviceDataJson(json, true);
             request->send(200, MIMETYPE_JSON,
-                          configManager.getDeviceDataJson().deviceJson.c_str());
+                          "{\"msg\":\"Done. Device Data "
+                          "has been set.\"}");
             break;
         }
-        case POST: {
-            if (request->hasParam("json", true)) {
-                AsyncWebParameter* param = request->getParam("json", true);
-                log_i("%s[%s]: %s\n",
-                      _networkMethodsMap[request->method()].c_str(),
-                      param->name().c_str(), param->value().c_str());
-                // configManager.setJsonConfig(param->value().c_str());
-                request->send(200, MIMETYPE_JSON,
-                              "{\"msg\":\"Done. Config has been set.\"}");
-            } else {
-                request->send(400, MIMETYPE_JSON,
-                              "{\"msg\":\"Invalid Request\"}");
-            }
+        default: {
+            request->send(400, MIMETYPE_JSON, "{\"msg\":\"Invalid Request\"}");
+            request->redirect("/");
+            break;
+        }
+    }
+}
+
+void BaseAPI::getDeviceConfigData(AsyncWebServerRequest* request) {
+    switch (_networkMethodsMap_enum[request->method()]) {
+        case GET: {
+            AsyncJsonResponse* response = new AsyncJsonResponse();
+            response->addHeader("EasyNetworkManager", "1.0");
+            auto root = response->getRoot();
+            root["deviceData"] =
+                configManager.getDeviceDataJson().deviceJson.c_str();
+            response->setLength();
+            request->send(response);
             break;
         }
         default: {
