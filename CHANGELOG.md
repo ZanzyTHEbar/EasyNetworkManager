@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.3.5](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.3.4...v5.3.5) (2024-04-01)
+
+
+### 🐛 Bug Fixes
+
+* change to IId interface to replace getName() ([a7e2025](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/a7e2025162d039fccc0ac1f5b1a0e202d95b21cd))
+
 ## [5.3.4](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.3.3...v5.3.4) (2024-03-31)
 
 
