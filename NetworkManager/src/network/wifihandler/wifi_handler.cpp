@@ -14,7 +14,7 @@ WiFiHandler::~WiFiHandler() {}
 
 void WiFiHandler::begin() {
     if (this->_enable_adhoc) {
-        this->configManager.setState(this->getName(),
+        this->configManager.setState(this->getID(),
                                      WiFiState_e::WiFiState_ADHOC);
         return;
     }
@@ -38,7 +38,7 @@ void WiFiHandler::begin() {
         Serial.print(
             "Could not connect to the hardcoded "
             "network, setting up ADHOC network \n\r");
-        this->configManager.setState(this->getName(),
+        this->configManager.setState(this->getID(),
                                      WiFiState_e::WiFiState_ADHOC);
         return;
     }
@@ -68,7 +68,7 @@ void WiFiHandler::begin() {
     log_e(
         "Could not connect to the hardcoded network, "
         "setting up adhoc. \n\r");
-    this->configManager.setState(this->getName(), WiFiState_e::WiFiState_ADHOC);
+    this->configManager.setState(this->getID(), WiFiState_e::WiFiState_ADHOC);
 }
 
 void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
@@ -138,7 +138,7 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
         delay(1000);
         log_v(".");
         if ((currentMillis - startingMillis) >= connectionTimeout) {
-            this->configManager.setState(this->getName(),
+            this->configManager.setState(this->getID(),
                                          WiFiState_e::WiFiState_Error);
             log_e("Connection to: %s TIMEOUT \n\r", ssid.c_str());
             delay(8000);
@@ -146,7 +146,7 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
         }
     }
 
-    this->configManager.setState(this->getName(),
+    this->configManager.setState(this->getID(),
                                  WiFiState_e::WiFiState_Connected);
     Serial.printf("Successfully connected to %s \n\r", ssid.c_str());
     // Serial.printf("Setting TX power to: %d \n\r", (uint8_t)power);
@@ -197,19 +197,19 @@ void WiFiHandler::update(const StateVariant& event) {
 void WiFiHandler::onWiFiEvent(WiFiEvent_t event) {
     switch (event) {
         /* case SYSTEM_EVENT_WIFI_READY:
-            this->configManager.setState(this->getName(),
+            this->configManager.setState(this->getID(),
                                          WiFiState_e::WiFiState_Idle);
             break;
         case SYSTEM_EVENT_SCAN_DONE:
-            this->configManager.setState(this->getName(),
+            this->configManager.setState(this->getID(),
                                          WiFiState_e::WiFiState_Scanning_Done);
             break; */
         case SYSTEM_EVENT_STA_DISCONNECTED:
-            this->configManager.setState(this->getName(),
+            this->configManager.setState(this->getID(),
                                          WiFiState_e::WiFiState_Disconnected);
             break;
         case SYSTEM_EVENT_STA_GOT_IP:
-            this->configManager.setState(this->getName(),
+            this->configManager.setState(this->getID(),
                                          WiFiState_e::WiFiState_Connected);
             break;
     }

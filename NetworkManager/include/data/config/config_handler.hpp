@@ -10,7 +10,7 @@ class ConfigHandler : public Helpers::IObserver<StateVariant> {
     virtual ~ConfigHandler();
     virtual void begin();
     virtual void update(const StateVariant& event) override;
-    std::string getName() const override {
+    std::string getID() const override {
         return "ConfigHandler";
     }
     ProjectConfig config;

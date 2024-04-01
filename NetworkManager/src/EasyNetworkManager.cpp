@@ -22,10 +22,10 @@ EasyNetworkManager::EasyNetworkManager(
 EasyNetworkManager::~EasyNetworkManager() {}
 
 void EasyNetworkManager::begin() {
-    configHandler->config.attach(configHandler->getName(), configHandler);
-    configHandler->config.attach(wifiHandler->getName(), wifiHandler);
+    configHandler->config.attach(configHandler->getID(), configHandler);
+    configHandler->config.attach(wifiHandler->getID(), wifiHandler);
     if (mdnsHandler != nullptr)
-        configHandler->config.attach(mdnsHandler->getName(), mdnsHandler);
+        configHandler->config.attach(mdnsHandler->getID(), mdnsHandler);
 
     configHandler->begin();
     wifiHandler->begin();

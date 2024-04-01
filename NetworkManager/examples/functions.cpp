@@ -102,7 +102,7 @@ void setup() {
      */
     updateWrapper<WiFiState_e>(
         networkManager.configHandler->config.getState(
-            networkManager.wifiHandler->getName()),
+            networkManager.wifiHandler->getID()),
         [](WiFiState_e state) {
             switch (state) {
                 //! intentional fallthrough case

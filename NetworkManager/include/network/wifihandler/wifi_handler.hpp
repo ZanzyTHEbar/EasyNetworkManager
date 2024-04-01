@@ -34,7 +34,7 @@ class WiFiHandler : public Helpers::IObserver<StateVariant> {
     ProjectConfig& configManager;
     Project_Config::WiFiTxPower_t& txpower;
 
-    std::string getName() const override {
+    std::string getID() const override {
         return "WiFiHandler";
     }
 

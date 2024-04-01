@@ -19,7 +19,7 @@ class MDNSHandler : public Helpers::IObserver<StateVariant> {
     bool begin();
     /* Overrides */
     void update(const StateVariant& event) override;
-    std::string getName() const override {
+    std::string getID() const override {
         return this->service_name;
     }
 };
