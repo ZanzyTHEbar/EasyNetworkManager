@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.4.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.3.5...v5.4.0) (2024-04-05)
+
+
+### 🍕 Features
+
+* update to new Helpers library ([3d10979](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/3d10979fa4c0bf6c40bf0c0e9866a3138a223817))
+
 ## [5.3.5](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.3.4...v5.3.5) (2024-04-01)
 
 
