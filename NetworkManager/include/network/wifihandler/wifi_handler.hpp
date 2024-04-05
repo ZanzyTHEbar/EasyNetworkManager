@@ -19,10 +19,16 @@
 #    endif
 #endif
 #include <data/config/project_config.hpp>
+#include <data/config/states.hpp>
 #include <helpers/helpers.hpp>
-#include <utilities/states.hpp>
+#include <helpers/logger.hpp>
 
-class WiFiHandler : public Helpers::IObserver<StateVariant> {
+using WiFiHandlerCustomHandlerFunction = std::function<void(WiFiState_e event)>;
+
+class WiFiHandler : public Helpers::Logger,
+                    public Helpers::IObserver<StateVariant> {
+    WiFiHandlerCustomHandlerFunction customHandlerFunction = NULL;
+
    public:
     WiFiHandler(ProjectConfig& configManager, const std::string& ssid,
                 const std::string& password, uint8_t channel);
@@ -30,13 +36,11 @@ class WiFiHandler : public Helpers::IObserver<StateVariant> {
     virtual ~WiFiHandler();
     void begin();
     void toggleAdhoc(bool enable);
+    void setCustomHandler(
+        WiFiHandlerCustomHandlerFunction customHandlerFunction);
 
     ProjectConfig& configManager;
     Project_Config::WiFiTxPower_t& txpower;
-
-    std::string getID() const override {
-        return "WiFiHandler";
-    }
 
    private:
     void setUpADHOC();

@@ -1,9 +1,12 @@
 #pragma once
 #include <ESPmDNS.h>
 #include <data/config/project_config.hpp>
+#include <data/config/states.hpp>
+#include <helpers/logger.hpp>
 #include <helpers/observer.hpp>
 
-class MDNSHandler : public Helpers::IObserver<StateVariant> {
+class MDNSHandler : public Helpers::Logger,
+                    public Helpers::IObserver<StateVariant> {
    private:
     ProjectConfig& configManager;
     std::string service_name;
@@ -19,7 +22,4 @@ class MDNSHandler : public Helpers::IObserver<StateVariant> {
     bool begin();
     /* Overrides */
     void update(const StateVariant& event) override;
-    std::string getID() const override {
-        return this->service_name;
-    }
 };

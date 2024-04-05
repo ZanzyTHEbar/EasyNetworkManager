@@ -267,6 +267,8 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
     // config are the ones we want the esp to connect to, rather than host as
     // AP, and here we're just updating them
     size_t size = this->config.networks.size();
+    auto wifiHandler = static_cast<uint64_t>(
+        ProjectConfigEventIDs_e::ProjectConfigEventID_WifiHandler);
 
     for (auto it = this->config.networks.begin();
          it != this->config.networks.end();) {
@@ -282,11 +284,10 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
             it->adhoc = false;
 
             if (shouldNotify) {
-                this->setState("WiFiHandler",
-                               WiFiState_e::WiFiState_Disconnected);
+                this->notify(wifiHandler, WiFiState_e::WiFiState_Disconnected);
                 WiFi.disconnect();
                 this->wifiConfigSave();
-                this->notify("WiFiHandler", Event_e::networksConfigUpdated);
+                this->notify(wifiHandler, Event_e::networksConfigUpdated);
             }
 
             return;
@@ -313,10 +314,10 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
     }
 
     if (shouldNotify) {
-        this->setState("WiFiHandler", WiFiState_e::WiFiState_Disconnected);
+        this->notify(wifiHandler, WiFiState_e::WiFiState_Disconnected);
         WiFi.disconnect();
         this->wifiConfigSave();
-        this->notify("WiFiHandler", Event_e::networksConfigUpdated);
+        this->notify(wifiHandler, Event_e::networksConfigUpdated);
     }
 }
 

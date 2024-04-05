@@ -97,34 +97,7 @@ void setup() {
 
     networkManager.begin();
 
-    /**
-     * @brief This Function is used to handle the state changes of the WiFi
-     */
-    updateWrapper<WiFiState_e>(
-        networkManager.configHandler->config.getState(
-            networkManager.wifiHandler->getID()),
-        [](WiFiState_e state) {
-            switch (state) {
-                //! intentional fallthrough case
-                case WiFiState_e::WiFiState_ADHOC:
-                case WiFiState_e::WiFiState_Connected: {
-                    setupServer();
-                    break;
-                }
-                case WiFiState_e::WiFiState_Disconnected: {
-                    break;
-                }
-                case WiFiState_e::WiFiState_Disconnecting: {
-                    break;
-                }
-                case WiFiState_e::WiFiState_Connecting: {
-                    break;
-                }
-                case WiFiState_e::WiFiState_Error: {
-                    break;
-                }
-            }
-        });
+    setupServer();
 }
 
 void loop() {}

@@ -8,10 +8,10 @@
 #include <string>
 #include <vector>
 
+#include <data/config/states.hpp>
 #include <helpers/helpers.hpp>
 #include <helpers/observer.hpp>
 #include <utilities/network_utilities.hpp>
-#include <utilities/states.hpp>
 
 class CustomConfigInterface {
    public:
@@ -19,7 +19,7 @@ class CustomConfigInterface {
     virtual void save() = 0;
 };
 
-class ProjectConfig : public StateManager<StateVariant>, public Preferences {
+class ProjectConfig : public Helpers::ISubject<StateVariant>, public Preferences {
    private:
     virtual void initConfig();
     Project_Config::ProjectConfig_t config;

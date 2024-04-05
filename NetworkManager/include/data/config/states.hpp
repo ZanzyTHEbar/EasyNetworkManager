@@ -1,13 +1,15 @@
 #pragma once
+
+#include <algorithm>
+#include <type_traits>
 #include <variant>
-#include "state_manager.hpp"
 
 /*                                     \
  * StateManager                        \
  * All Project States are managed here \
  */
 namespace ProgramStates {
-enum State_e { Starting, Started, Stopping, Stopped, Error };
+enum ProgramState_e { Starting, Started, Stopping, Stopped, Error };
 enum Event_e {
     configLoaded,
     configSaved,
@@ -49,15 +51,35 @@ enum MDNSState_e {
     MDNSState_Stopped,
     MDNSState_Error
 };
+
+enum ProjectConfigEventIDs_e {
+    ProjectConfigEventID_ConfigHandler,
+    ProjectConfigEventID_MDNSHandler,
+    ProjectConfigEventID_WifiHandler,
+};
+
 };  // namespace ProgramStates
 
-typedef ProgramStates::State_e State_e;
-typedef ProgramStates::Event_e Event_e;
-typedef ProgramStates::WiFiState_e WiFiState_e;
-typedef ProgramStates::WebServerState_e WebServerState_e;
-typedef ProgramStates::MDNSState_e MDNSState_e;
+using State_e = ProgramStates::ProgramState_e;
+using Event_e = ProgramStates::Event_e;
+using WiFiState_e = ProgramStates::WiFiState_e;
+using WebServerState_e = ProgramStates::WebServerState_e;
+using MDNSState_e = ProgramStates::MDNSState_e;
+using ProjectConfigEventIDs_e = ProgramStates::ProjectConfigEventIDs_e;
 
-//* Define a broad variant
 using StateVariant =
     std::variant<State_e, Event_e, WiFiState_e, WebServerState_e, MDNSState_e>;
-// extern StateManager<StateVariant> stateManager;
+
+// Define a generic function that applies a switch-case logic to an enum
+// variant.
+template <typename EnumType, typename VariantType, typename Func>
+void updateStateWrapper(const VariantType& _variant, Func&& _switchCaseFunc) {
+    std::visit(
+        [&](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, EnumType>) {
+                _switchCaseFunc(arg);
+            }
+        },
+        _variant);
+}

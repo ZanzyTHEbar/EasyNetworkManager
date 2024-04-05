@@ -3,7 +3,7 @@
 //! Required header files
 #include <api/rest_api_handler.hpp>
 #include <data/config/config_handler.hpp>
-#include <utilities/states.hpp>
+#include <data/config/states.hpp>
 
 #include <network/mdns/mdns_manager.hpp>
 
