@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.4.3](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.4.2...v5.4.3) (2024-04-06)
+
+
+### 🐛 Bug Fixes
+
+* Refactor handleJson function parameters to pass JsonVariant by reference ([e4c9671](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/e4c9671d313f676689e1c44268f1b805f497fbd5))
+
 ## [5.4.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.4.1...v5.4.2) (2024-04-06)
 
 
