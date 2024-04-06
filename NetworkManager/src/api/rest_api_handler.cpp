@@ -49,7 +49,7 @@ void APIServer::begin() {
 
     async_server.server.addHandler(new AsyncCallbackJsonWebHandler(
         json_url.c_str(),
-        [&](AsyncWebServerRequest* request, JsonVariant json) {
+        [&](AsyncWebServerRequest* request, JsonVariant& json) {
             handleJson(request, json);
         }));
 

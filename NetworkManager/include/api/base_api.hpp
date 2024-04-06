@@ -27,7 +27,7 @@ class BaseAPI : public API_Utilities {
     void save(AsyncWebServerRequest* request);
     void rssi(AsyncWebServerRequest* request);
 
-    void handleJson(AsyncWebServerRequest* request, JsonVariant jsonData);
+    void handleJson(AsyncWebServerRequest* request, JsonVariant& jsonData);
 
     using route_method = void (BaseAPI::*)(AsyncWebServerRequest*);
     using route_t = std::unordered_map<std::string, route_method>;

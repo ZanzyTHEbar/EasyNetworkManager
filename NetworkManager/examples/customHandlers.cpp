@@ -51,7 +51,7 @@ void setupServer() {
     // made to /api/customJson
     async_server.server.addHandler(new AsyncCallbackJsonWebHandler(
         "/api/customJson",
-        [&](AsyncWebServerRequest* request, JsonVariant json) {
+        [&](AsyncWebServerRequest* request, JsonVariant& json) {
             JsonDocument doc;
             doc["hello"] = "world";
             doc["number"] = 42;
