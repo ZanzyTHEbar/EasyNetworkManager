@@ -25,7 +25,7 @@ void OTA::begin() {
                 type = "filesystem";
         })
         .onEnd([]() {
-            Serial.println("[Basic OTA]: OTA updated finished successfully!");
+            this->log("[Basic OTA]: OTA updated finished successfully!");
         })
         .onProgress([](unsigned int progress, unsigned int total) {
             Serial.printf("[Basic OTA]: Progress: %u%%\r",
@@ -52,8 +52,8 @@ void OTA::begin() {
             }
         });
 
-    Serial.println("[Basic OTA]: Starting up basic OTA server");
-    Serial.println(
+    this->log("[Basic OTA]: Starting up basic OTA server");
+    this->log(
         "[Basic OTA]: OTA will be live for 5mins, after which it will be "
         "disabled until "
         "restart");
@@ -68,7 +68,7 @@ void OTA::handleOTAUpdate() {
             // we're disabling ota after first 5 minutes so that nothing bad
             // happens during runtime
             _isOtaEnabled = false;
-            Serial.println("[Basic OTA]: From now on, OTA is disabled");
+            this->log("[Basic OTA]: From now on, OTA is disabled");
             return;
         }
         ArduinoOTA.handle();

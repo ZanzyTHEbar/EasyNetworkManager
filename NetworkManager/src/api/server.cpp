@@ -12,12 +12,13 @@ AsyncServer_t::AsyncServer_t(const int CONTROL_PORT,
       wifimanager_url(std::move(wifimanager_url)),
       user_commands(std::move(user_commands)),
       json_url(std::move(json_url)),
-      spiffsMounted(false) {
-    spiffsMounted = initSPIFFS();
-}
+      spiffsMounted(false) {}
 AsyncServer_t::~AsyncServer_t() {}
 
 void AsyncServer_t::begin() {
+    // TODO: Migrate to LittleFS
+    spiffsMounted = initSPIFFS();
+
     server.on("/", XHTTP_GET,
               [&](AsyncWebServerRequest* request) { request->send(200); });
 

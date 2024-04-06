@@ -56,15 +56,15 @@ void WiFiHandler::begin() {
 
     // at this point, we've tried every network, let's just
     // setup adhoc
-    Serial.printf(
+    this->log(
         "We've gone through every network, each timed out. "
-        "Trying to connect to the hardcoded network one last time: %s \n\r",
-        this->ssid.c_str());
+        "Trying to connect to the hardcoded network one last time: ",
+        this->ssid);
     if (this->iniSTA(this->ssid, this->password, this->channel,
                      (wifi_power_t)txpower.power)) {
-        Serial.print(
+        this->log(
             "Successfully connected to the hardcoded "
-            "network. \n\r");
+            "network.");
         return;
     }
     log_e(
@@ -75,13 +75,13 @@ void WiFiHandler::begin() {
 
 void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
                         const std::string& password) {
-    log_i("\n[INFO]: Setting Access Point...\n");
-    log_i("\n[INFO]: Configuring access point...\n");
+    this->log("Setting Access Point...\n");
+    this->log("Configuring access point...\n");
     WiFi.mode(WIFI_AP);
     WiFi.setSleep(WIFI_PS_NONE);
-    Serial.printf("\r\nStarting AP. \r\nAP IP address: ");
+    this->log("Starting AP. \r\nAP IP address: ");
     IPAddress IP = WiFi.softAPIP();
-    Serial.printf("[INFO]: AP IP address: %s.\r\n", IP.toString().c_str());
+    this->log("AP IP address: %s.\r\n", IP.toString().c_str());
     // You can remove the password parameter if you want the
     // AP to be open.
     WiFi.softAP(ssid.c_str(), password.c_str(),
@@ -90,7 +90,7 @@ void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
 }
 
 void WiFiHandler::setUpADHOC() {
-    log_i("\n[INFO]: Setting Access Point...\n");
+    this->log("Setting Access Point... ");
     size_t ssidLen = this->configManager.getAPWifiConfig().ssid.length();
     size_t passwordLen =
         this->configManager.getAPWifiConfig().password.length();
@@ -100,9 +100,9 @@ void WiFiHandler::setUpADHOC() {
     }
 
     if (passwordLen <= 0) {
-        log_i(
-            "\n[INFO]: Configuring access point without a "
-            "password\n");
+        this->log(
+            "Configuring access point without a "
+            "password...");
         this->adhoc(this->configManager.getAPWifiConfig().ssid,
                     this->configManager.getAPWifiConfig().channel);
         return;
@@ -111,7 +111,7 @@ void WiFiHandler::setUpADHOC() {
     this->adhoc(this->configManager.getAPWifiConfig().ssid,
                 this->configManager.getAPWifiConfig().channel,
                 this->configManager.getAPWifiConfig().password);
-    log_i("\n[INFO]: Configuring access point...\n");
+    this->log("Configuring access point...");
     log_d("\n[DEBUG]: ssid: %s\n",
           this->configManager.getAPWifiConfig().ssid.c_str());
     log_d("\n[DEBUG]: password: %s\n",
@@ -126,7 +126,7 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
     unsigned long startingMillis = currentMillis;
     int connectionTimeout = 45000;  // 30 seconds
     int progress = 0;
-    Serial.printf("Trying to connect to: %s \n\r", ssid.c_str());
+    this->log("Trying to connect to: ", ssid);
     auto mdnsConfig = this->configManager.getMDNSConfig();
     WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE,
                 INADDR_NONE);  // need to call before
@@ -147,8 +147,8 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
         }
     }
 
-    this->configManager.notifyAll(WiFiState_e::WiFiState_Connected);
     this->log("Successfully connected to ", ssid);
+    this->configManager.notifyAll(WiFiState_e::WiFiState_Connected);
     // Serial.printf("Setting TX power to: %d \n\r", (uint8_t)power);
     // WiFi.setTxPower(power);
 

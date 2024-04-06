@@ -11,7 +11,7 @@ void Network_Utilities::setupWifiScan() {
     WiFi.disconnect();  // Disconnect from the access point if connected before
     delay(100);
 
-    Serial.println("Setup done");
+    log_i("[INFO]: Setup done");
 }
 
 /**
@@ -47,8 +47,7 @@ bool Network_Utilities::loopWifiScan() {
  * @param points int Number of points to average
  * @return int
  */
-int Network_Utilities::getStrength(int points)  // TODO: add to JSON doc
-{
+int Network_Utilities::getStrength(int points) {
     int32_t rssi = 0, averageRSSI = 0;
 
     for (int i = 0; i < points; i++) {

@@ -57,7 +57,7 @@ This library implements the following classes:
 
 ## Installation
 
-#### Platformio (recommended)
+### Platformio (recommended)
 
 You can install via the `Platformio Registry` by navigating to the `Libraries` section of `Platformio`.
 The library is called `EasyNetworkManager` by `ZanzyTHEbar`.
@@ -82,7 +82,7 @@ All dependencies _should_ be installed automatically. If not, please make a new 
 > `ESPAsyncTCP`
 > You _may_ need to install `ESP8266WiFi` if the compiler complains about it, but you shouldn't need to.
 
-#### Dependencies used in this project
+### Dependencies used in this project
 
 - [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer.git)
 
@@ -176,12 +176,12 @@ ConfigHandler configHandler("baseConf", MDNS_HOSTNAME);
 
 class CustomConfig : public CustomConfigInterface {
     void save() override {
-        Serial.println("Saving custom config");
+        this->log("Saving custom config");
     }
 
     void load() override {
         otherStuff();
-        Serial.println("Loading custom config");
+        this->log("Loading custom config");
     }
     void otherStuff() {
       // do stuff
@@ -210,7 +210,7 @@ build_unflags = -std=gnu++11
 monitor_filters = 
  esp32_exception_decoder
 build_type = debug
-lib_ldf_mode = deep+
+lib_ldf_mode = deep
 ```
 
 If you want to build in debug mode add this (it's not a build flag):

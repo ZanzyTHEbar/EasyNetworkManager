@@ -10,6 +10,7 @@
 
 #include <data/config/states.hpp>
 #include <helpers/helpers.hpp>
+#include <helpers/logger.hpp>
 #include <helpers/observer.hpp>
 #include <utilities/network_utilities.hpp>
 
@@ -19,7 +20,9 @@ class CustomConfigInterface {
     virtual void save() = 0;
 };
 
-class ProjectConfig : public Helpers::ISubject<StateVariant>, public Preferences {
+class ProjectConfig : public Helpers::Logger,
+                      public Helpers::ISubject<StateVariant>,
+                      public Preferences {
    private:
     virtual void initConfig();
     Project_Config::ProjectConfig_t config;
