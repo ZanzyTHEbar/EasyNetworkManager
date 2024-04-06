@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.4.4](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.4.3...v5.4.4) (2024-04-06)
+
+
+### 🐛 Bug Fixes
+
+* attach default handler to an endpoint ([c71b7d4](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/c71b7d42a0d091309c516d45e7981905265e5b41))
+
 ## [5.4.3](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.4.2...v5.4.3) (2024-04-06)
 
 
