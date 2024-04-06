@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.4.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.4.1...v5.4.2) (2024-04-06)
+
+
+### 🧑‍💻 Code Refactoring
+
+* Refactor handleJson function parameters in NetworkManager code ([46e6513](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/46e65135b12e27b9c33a9c9d9232f59d420ed336))
+
 ## [5.4.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.4.0...v5.4.1) (2024-04-06)
 
 
