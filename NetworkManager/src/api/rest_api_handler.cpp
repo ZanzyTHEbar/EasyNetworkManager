@@ -6,7 +6,7 @@
 
 APIServer::APIServer(ProjectConfig& configManager, AsyncServer_t& async_server,
                      AsyncOTA* async_ota)
-    : BaseAPI(configManager), async_ota(nullptr), async_server(async_server) {
+    : BaseAPI(configManager), async_server(async_server), async_ota(nullptr) {
     if (async_ota != nullptr) {
         this->async_ota = async_ota;
     }
@@ -49,7 +49,7 @@ void APIServer::begin() {
 
     async_server.server.addHandler(new AsyncCallbackJsonWebHandler(
         json_url.c_str(),
-        [&](AsyncWebServerRequest* request, JsonVariant& json) {
+        [&](AsyncWebServerRequest* request, JsonVariant json) {
             handleJson(request, json);
         }));
 

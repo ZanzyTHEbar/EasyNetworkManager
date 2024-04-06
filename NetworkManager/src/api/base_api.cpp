@@ -111,8 +111,7 @@ void BaseAPI::setWiFiTXPower(AsyncWebServerRequest* request) {
     }
 }
 
-void BaseAPI::handleJson(AsyncWebServerRequest* request,
-                         JsonVariant& jsonData) {
+void BaseAPI::handleJson(AsyncWebServerRequest* request, JsonVariant jsonData) {
     switch (_networkMethodsMap_enum[request->method()]) {
         case POST: {
             auto jsonObj = jsonData.as<JsonObject>();
