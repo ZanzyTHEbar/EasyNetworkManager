@@ -42,10 +42,15 @@ void APIServer::begin() {
         [&](AsyncWebServerRequest* request) { handleRequest(request); });
 
     //* Add default JSON handler
-
     // create JSON route
     std::string json_url = async_server.api_url;
     json_url.append(async_server.json_url);
+
+    async_server.server.on(
+        json_url.c_str(), XHTTP_GET, [&](AsyncWebServerRequest* request) {
+            request->send(400, MIMETYPE_JSON,
+                          "{\"msg\":\"Invalid Request Type\"}");
+        });
 
     async_server.server.addHandler(new AsyncCallbackJsonWebHandler(
         json_url.c_str(),
