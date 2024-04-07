@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.4.5](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.4.4...v5.4.5) (2024-04-07)
+
+
+### 🐛 Bug Fixes
+
+* update to new version of EasyHelpers ([4bf43a9](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/4bf43a9ea9f50bc9a91b731bff938166bce77771))
+
 ## [5.4.4](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.4.3...v5.4.4) (2024-04-06)
 
 
