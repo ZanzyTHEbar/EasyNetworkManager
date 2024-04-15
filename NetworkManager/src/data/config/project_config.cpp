@@ -257,8 +257,8 @@ bool ProjectConfig::setMDNSConfig(const std::string& hostname,
 void ProjectConfig::setWifiConfig(const std::string& networkName,
                                   const std::string& ssid,
                                   const std::string& password, uint8_t channel,
-                                  uint8_t power, bool adhoc,
-                                  bool shouldNotify) {
+                                  uint8_t power, bool adhoc, bool shouldNotify,
+                                  bool shouldReboot) {
     // we store the ADHOC flag as false because the networks we store in the
     // config are the ones we want the esp to connect to, rather than host as
     // AP, and here we're just updating them
@@ -312,6 +312,10 @@ void ProjectConfig::setWifiConfig(const std::string& networkName,
         WiFi.disconnect();
         this->wifiConfigSave();
         this->notify(wifiHandler, Event_e::networksConfigUpdated);
+    }
+
+    if (shouldReboot) {
+        this->reboot = true;
     }
 }
 

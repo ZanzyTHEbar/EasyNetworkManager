@@ -57,7 +57,8 @@ class ProjectConfig : public Helpers::Logger,
     bool setMDNSConfig(const std::string& mdns, bool shouldNotify);
     void setWifiConfig(const std::string& networkName, const std::string& ssid,
                        const std::string& password, uint8_t channel,
-                       uint8_t power, bool adhoc, bool shouldNotify);
+                       uint8_t power, bool adhoc, bool shouldNotify,
+                       bool shouldReboot = false);
     void setAPWifiConfig(const std::string& ssid, const std::string& password,
                          uint8_t channel, bool adhoc, bool shouldNotify);
     void setWiFiTxPower(uint8_t power, bool shouldNotify);
