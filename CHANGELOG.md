@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.5.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.4.5...v5.5.0) (2024-04-15)
+
+
+### 🍕 Features
+
+* Update setWifiConfig function in ProjectConfig class to toggle reboot status ([da92fd2](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/da92fd20deee4b4695885619e784245fe64dddf7))
+
 ## [5.4.5](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.4.4...v5.4.5) (2024-04-07)
 
 
