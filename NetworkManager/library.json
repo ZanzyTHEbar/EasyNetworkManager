@@ -56,7 +56,7 @@
   "export": {
     "include": ["src/*", "examples/*", "include/*"]
   },
-  "version": "5.5.0",
+  "version": "5.5.1",
   "frameworks": "arduino",
   "platforms": ["espressif32", "espressif8266"]
 }

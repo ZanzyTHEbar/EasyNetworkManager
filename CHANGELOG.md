@@ -3,6 +3,13 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.5.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.5.0...v5.5.1) (2024-04-16)
+
+
+### 🐛 Bug Fixes
+
+* Fix the issue with the wifi handler not starting the access point ([2638d40](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/2638d40c4a26534c3495db3303fc76355c2e8351))
+
 ## [5.5.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.4.5...v5.5.0) (2024-04-15)
 
 
