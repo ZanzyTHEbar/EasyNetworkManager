@@ -41,7 +41,8 @@ void WiFiHandler::begin() {
         this->log(
             "Could not connect to the hardcoded "
             "network, setting up ADHOC network ...");
-        this->configManager.notifyAll(WiFiState_e::WiFiState_ADHOC);
+        this->log("WiFiState_ADHOC");
+        this->setUpADHOC();
         return;
     }
 
@@ -67,21 +68,21 @@ void WiFiHandler::begin() {
             "network.");
         return;
     }
+    this->log("WiFiState_ADHOC");
+    this->setUpADHOC();
     log_e(
         "Could not connect to the hardcoded network, "
         "setting up adhoc. \n\r");
-    this->configManager.notifyAll(WiFiState_e::WiFiState_ADHOC);
 }
 
 void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
                         const std::string& password) {
-    this->log("Setting Access Point...\n");
     this->log("Configuring access point...\n");
     WiFi.mode(WIFI_AP);
     WiFi.setSleep(WIFI_PS_NONE);
-    this->log("Starting AP. \r\nAP IP address: ");
+    this->log("Starting AP...");
     IPAddress IP = WiFi.softAPIP();
-    this->log("AP IP address: %s.\r\n", IP.toString().c_str());
+    this->log("AP IP address: ", IP.toString().c_str());
     // You can remove the password parameter if you want the
     // AP to be open.
     WiFi.softAP(ssid.c_str(), password.c_str(),
@@ -124,25 +125,23 @@ bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
                          uint8_t channel, wifi_power_t power) {
     unsigned long currentMillis = millis();
     unsigned long startingMillis = currentMillis;
-    int connectionTimeout = 45000;  // 30 seconds
+    int connectionTimeout = 30000;  // 30 seconds
     int progress = 0;
     this->log("Trying to connect to: ", ssid);
     auto mdnsConfig = this->configManager.getMDNSConfig();
-    WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE,
-                INADDR_NONE);  // need to call before
-                               // setting hostname
+    WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
     WiFi.setHostname(mdnsConfig.hostname.c_str());
     WiFi.begin(ssid.c_str(), password.c_str(), channel);
     while (WiFi.status() != WL_CONNECTED) {
         progress++;
         currentMillis = millis();
-        // Helpers::update_progress_bar(progress, 100);
-        delay(1000);
+        Helpers::update_progress_bar(progress, 100);
+        delay(300);
         log_v(".");
         if ((currentMillis - startingMillis) >= connectionTimeout) {
             this->configManager.notifyAll(WiFiState_e::WiFiState_Error);
             log_e("Connection to: %s TIMEOUT \n\r", ssid.c_str());
-            delay(8000);
+            delay(300);
             return false;
         }
     }
