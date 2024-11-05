@@ -3,6 +3,18 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.5.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.5.1...v5.5.2) (2024-11-05)
+
+
+### 🎨 Styles
+
+* Format code and update configuration files for consistency ([922a8fd](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/922a8fd29ad587a61542e00a86797d3e42f96cc9))
+
+# 📦 Changelog 
+[![conventional commits](https://img.shields.io/badge/conventional%20commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+[![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
+> All notable changes to this project will be documented in this file
+
 ## [5.5.1](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.5.0...v5.5.1) (2024-04-16)
 
 
