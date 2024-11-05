@@ -8,7 +8,7 @@ try:
 
     def createTOML(source, target, env):
         try:
-            firmware_name = env.subst("$BUILD_DIR\${PROGNAME}")
+            firmware_name = env.subst("$BUILD_DIR/${PROGNAME}")
             firmware_name = firmware_name.split(".pio")[1]
 
             firmware_name = firmware_name.replace("\\", "/")
@@ -35,7 +35,7 @@ to = "target:80"
         except Exception as e:
             print("Error creating wokwi.toml: %s" % e)
 
-    env.AddPostAction("$BUILD_DIR\${PROGNAME}.bin", createTOML)
+    env.AddPostAction("$BUILD_DIR/${PROGNAME}.bin", createTOML)
 
 except Exception as e:
     print("Error creating wokwi.toml: %s" % e)
