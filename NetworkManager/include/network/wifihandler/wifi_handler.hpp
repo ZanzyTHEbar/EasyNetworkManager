@@ -47,16 +47,36 @@ class WiFiHandler : public Helpers::Logger,
     void adhoc(const std::string& ssid, uint8_t channel,
                const std::string& password = std::string());
     bool iniSTA(const std::string& ssid, const std::string& password,
-                uint8_t channel, wifi_power_t power);
+                uint8_t channel,
+#if defined(ARDUINO_ARCH_ESP32)
+                wifi_power_t power
+#else
+                uint8_t power
+#endif
+    );
 
     /* Overrides */
     void update(const StateVariant& event) override;
 
+#if defined(ARDUINO_ARCH_ESP32)
     void onWiFiEvent(WiFiEvent_t event);
+#elif defined(ARDUINO_ARCH_ESP8266)
+    void onStationModeGotIP(
+        const WiFiEventStationModeGotIP& event);
+    void onStationModeDisconnected(
+        const WiFiEventStationModeDisconnected& event);
+#endif
 
     std::string ssid;
     std::string password;
     uint8_t channel;
     uint8_t power;
     bool _enable_adhoc;
+#if defined(ARDUINO_ARCH_ESP32)
+    WiFiEventId_t _wifiEventId;
+#elif defined(ARDUINO_ARCH_ESP8266)
+    WiFiEventHandler _gotIpHandler;
+    WiFiEventHandler _disconnectedHandler;
+#endif
+    bool _wifiEventRegistered;
 };

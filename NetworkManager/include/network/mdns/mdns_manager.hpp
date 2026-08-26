@@ -1,5 +1,9 @@
 #pragma once
-#include <ESPmDNS.h>
+#if defined(ESP8266)
+#    include <ESP8266mDNS.h>
+#else
+#    include <ESPmDNS.h>
+#endif
 #include <data/config/project_config.hpp>
 #include <data/config/states.hpp>
 #include <helpers/logger.hpp>

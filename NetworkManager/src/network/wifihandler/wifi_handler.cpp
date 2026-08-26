@@ -8,13 +8,31 @@ WiFiHandler::WiFiHandler(ProjectConfig& configManager, const std::string& ssid,
       password(password),
       channel(channel),
       power(0),
-      _enable_adhoc(false) {
+      _enable_adhoc(false),
+#if defined(ARDUINO_ARCH_ESP32)
+      _wifiEventId(0),
+#elif defined(ARDUINO_ARCH_ESP8266)
+      _gotIpHandler(),
+      _disconnectedHandler(),
+#endif
+      _wifiEventRegistered(false) {
     this->setID(static_cast<uint64_t>(
-        ProjectConfigEventIDs_e::ProjectConfigEventID_MDNSHandler));
+        ProjectConfigEventIDs_e::ProjectConfigEventID_WifiHandler));
     this->setLabel("WiFiHandler");
 }
 
-WiFiHandler::~WiFiHandler() {}
+WiFiHandler::~WiFiHandler() {
+#if defined(ARDUINO_ARCH_ESP32)
+    if (_wifiEventRegistered) {
+        WiFi.removeEvent(_wifiEventId);
+        _wifiEventRegistered = false;
+    }
+#elif defined(ARDUINO_ARCH_ESP8266)
+    _gotIpHandler.reset();
+    _disconnectedHandler.reset();
+    _wifiEventRegistered = false;
+#endif
+}
 
 void WiFiHandler::begin() {
     if (this->_enable_adhoc) {
@@ -22,8 +40,25 @@ void WiFiHandler::begin() {
         return;
     }
     WiFi.mode(WIFI_STA);
-    WiFi.onEvent(
-        std::bind(&WiFiHandler::onWiFiEvent, this, std::placeholders::_1));
+#if defined(ARDUINO_ARCH_ESP32)
+    if (!_wifiEventRegistered) {
+        _wifiEventId = WiFi.onEvent(
+            std::bind(&WiFiHandler::onWiFiEvent, this, std::placeholders::_1));
+        _wifiEventRegistered = true;
+    }
+#elif defined(ARDUINO_ARCH_ESP8266)
+    if (!_wifiEventRegistered) {
+        _gotIpHandler = WiFi.onStationModeGotIP(
+            [this](const WiFiEventStationModeGotIP& event) {
+                this->onStationModeGotIP(event);
+            });
+        _disconnectedHandler = WiFi.onStationModeDisconnected(
+            [this](const WiFiEventStationModeDisconnected& event) {
+                this->onStationModeDisconnected(event);
+            });
+        _wifiEventRegistered = true;
+    }
+#endif
     WiFi.setSleep(WIFI_PS_NONE);
 
     this->log("Initializing connection to wifi networks...");
@@ -35,7 +70,11 @@ void WiFiHandler::begin() {
             "No networks found in config, trying the "
             "default one ...");
         if (this->iniSTA(this->ssid, this->password, this->channel,
+#if defined(ARDUINO_ARCH_ESP32)
                          (wifi_power_t)txpower.power)) {
+#else
+                         txpower.power)) {
+#endif
             return;
         }
         this->log(
@@ -49,8 +88,12 @@ void WiFiHandler::begin() {
     for (auto networkIterator = networks.begin();
          networkIterator != networks.end(); ++networkIterator) {
         if (this->iniSTA(networkIterator->ssid, networkIterator->password,
+#if defined(ARDUINO_ARCH_ESP32)
                          networkIterator->channel,
                          (wifi_power_t)networkIterator->power)) {
+#else
+                         networkIterator->channel, networkIterator->power)) {
+#endif
             return;
         }
     }
@@ -62,7 +105,11 @@ void WiFiHandler::begin() {
         "Trying to connect to the hardcoded network one last time: ",
         this->ssid);
     if (this->iniSTA(this->ssid, this->password, this->channel,
+#if defined(ARDUINO_ARCH_ESP32)
                      (wifi_power_t)txpower.power)) {
+#else
+                     txpower.power)) {
+#endif
         this->log(
             "Successfully connected to the hardcoded "
             "network.");
@@ -87,7 +134,11 @@ void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
     // AP to be open.
     WiFi.softAP(ssid.c_str(), password.c_str(),
                 channel);  // AP mode with password
+#if defined(ARDUINO_ARCH_ESP32)
     WiFi.setTxPower((wifi_power_t)txpower.power);
+#elif defined(ARDUINO_ARCH_ESP8266)
+    WiFi.setOutputPower(txpower.power / 4.0f);
+#endif
 }
 
 void WiFiHandler::setUpADHOC() {
@@ -95,17 +146,9 @@ void WiFiHandler::setUpADHOC() {
     size_t ssidLen = this->configManager.getAPWifiConfig().ssid.length();
     size_t passwordLen =
         this->configManager.getAPWifiConfig().password.length();
-    if (ssidLen <= 0) {
-        this->adhoc("EasyNetworkManager", 1, "12345678");
-        return;
-    }
-
-    if (passwordLen <= 0) {
-        this->log(
-            "Configuring access point without a "
-            "password...");
-        this->adhoc(this->configManager.getAPWifiConfig().ssid,
-                    this->configManager.getAPWifiConfig().channel);
+    if (ssidLen <= 0 || passwordLen < 8) {
+        log_e("Access point SSID and a password of at least 8 characters are "
+              "required; AP startup aborted");
         return;
     }
 
@@ -115,14 +158,18 @@ void WiFiHandler::setUpADHOC() {
     this->log("Configuring access point...");
     log_d("\n[DEBUG]: ssid: %s\n",
           this->configManager.getAPWifiConfig().ssid.c_str());
-    log_d("\n[DEBUG]: password: %s\n",
-          this->configManager.getAPWifiConfig().password.c_str());
     log_d("\n[DEBUG]: channel: %d\n",
           this->configManager.getAPWifiConfig().channel);
 }
 
 bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
-                         uint8_t channel, wifi_power_t power) {
+                         uint8_t channel,
+#if defined(ARDUINO_ARCH_ESP32)
+                         wifi_power_t power
+#else
+                         uint8_t power
+#endif
+                         ) {
     unsigned long currentMillis = millis();
     unsigned long startingMillis = currentMillis;
     int connectionTimeout = 30000;  // 30 seconds
@@ -198,6 +245,7 @@ void WiFiHandler::update(const StateVariant& event) {
     //     }
     // });
 }
+#if defined(ARDUINO_ARCH_ESP32)
 void WiFiHandler::onWiFiEvent(WiFiEvent_t event) {
     switch (event) {
         /* case SYSTEM_EVENT_WIFI_READY:
@@ -216,6 +264,19 @@ void WiFiHandler::onWiFiEvent(WiFiEvent_t event) {
             break;
     }
 }
+#elif defined(ARDUINO_ARCH_ESP8266)
+void WiFiHandler::onStationModeGotIP(
+    const WiFiEventStationModeGotIP& event) {
+    (void)event;
+    this->configManager.notifyAll(WiFiState_e::WiFiState_Connected);
+}
+
+void WiFiHandler::onStationModeDisconnected(
+    const WiFiEventStationModeDisconnected& event) {
+    (void)event;
+    this->configManager.notifyAll(WiFiState_e::WiFiState_Disconnected);
+}
+#endif
 
 void WiFiHandler::setCustomHandler(
     WiFiHandlerCustomHandlerFunction customHandlerFunction) {
