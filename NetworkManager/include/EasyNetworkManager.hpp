@@ -24,7 +24,11 @@ class EasyNetworkManager {
                        const std::string& service_protocol,
                        const std::string& service_description,
                        const std::string& service_port,
-                       bool enable_mdns = false, bool enable_adhoc = false);
+                       bool enable_mdns = false, bool enable_adhoc = false,
+                       const std::string& management_login = std::string(),
+                       const std::string& management_password = std::string(),
+                       const std::string& ap_ssid = std::string(),
+                       const std::string& ap_password = std::string());
     virtual ~EasyNetworkManager();
 
     void begin();
@@ -49,6 +53,16 @@ class EasyNetworkManager {
      * @param wifi_channel The channel of the WiFi network to connect to
      */
     std::shared_ptr<WiFiHandler> wifiHandler;
+
+    /**
+     * @brief Optional first-boot management credentials.
+     * @note Empty values intentionally leave management endpoints disabled.
+     */
+    std::string management_login;
+    std::string management_password;
+    std::string ap_ssid;
+    std::string ap_password;
+    bool enable_adhoc;
 
     /**
      * @brief The mDNS Manager is used to create a mDNS service for the device
