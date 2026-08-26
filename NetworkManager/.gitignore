@@ -3,9 +3,9 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
-src/main.cpp
 node_modules
 /include/secrets.h
 /tools/__pycache__
 /tools/firmware_name.txt
 /logs
+/.env.local

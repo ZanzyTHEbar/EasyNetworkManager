@@ -40,21 +40,19 @@
     "EasyNetworkManager.hpp",
     "EasyNetworkManager.h",
     "api/rest_api_handler.hpp",
-    "api/base/base_api.hpp",
+    "api/server.hpp",
+    "api/asyncota.hpp",
     "data/config/project_config.hpp",
     "data/config/config_handler.hpp",
-    "data/statemanager/state_manager.hpp",
-    "utilities/enum_inheritance.hpp",
-    "utilities/make_unique.hpp",
-    "utilities/observer.hpp",
-    "utilities/api_utilities.hpp",
-    "utilities/network_utilities.hpp",
+    "data/config/config_snapshot_codec.hpp",
     "network/mdns/mdns_manager.hpp",
-    "network/ota/ota.hpp",
-    "network/wifihandler/wifi_handler.hpp"
+    "network/wifihandler/wifi_handler.hpp",
+    "utilities/api_utilities.hpp",
+    "utilities/network_utilities.hpp"
   ],
   "export": {
-    "include": ["src/*", "examples/*", "include/*"]
+    "include": ["src/*", "examples/*", "extras/*", "include/*"],
+    "exclude": ["src/main.cpp", "test/*"]
   },
   "version": "5.5.2",
   "frameworks": "arduino",

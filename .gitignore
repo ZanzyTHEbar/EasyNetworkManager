@@ -34,3 +34,5 @@
 # Other files
 .DS_Store
 .vscode/
+.opencode/
+.codebase-memory/

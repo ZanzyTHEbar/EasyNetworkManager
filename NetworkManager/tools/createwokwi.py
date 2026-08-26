@@ -8,6 +8,9 @@ try:
 
     def createTOML(source, target, env):
         try:
+            if env.subst("$PIOENV") != "wokwi":
+                return
+
             firmware_name = env.subst("$BUILD_DIR/${PROGNAME}")
             firmware_name = firmware_name.split(".pio")[1]
 
