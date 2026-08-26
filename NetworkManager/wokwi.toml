@@ -1,7 +1,0 @@
-[wokwi]
-version = 1
-elf = ".pio/build/wokwi/EasyNetworkManager-v5.5.2-wokwi-12caefa-main.elf"
-firmware = ".pio/build/wokwi/EasyNetworkManager-v5.5.2-wokwi-12caefa-main.bin"
-[[net.forward]]
-from = "localhost:8180"
-to = "target:80"
