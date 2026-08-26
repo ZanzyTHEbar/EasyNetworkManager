@@ -2,12 +2,15 @@
 #define OTA_HPP
 #include <ArduinoOTA.h>
 
+#include <string>
+
 #include "data/config/project_config.hpp"
 
 class OTA {
    private:
     unsigned long _bootTimestamp;
     bool _isOtaEnabled;
+    std::string _otaPassword;
     ProjectConfig& _deviceConfig;
 
    public:

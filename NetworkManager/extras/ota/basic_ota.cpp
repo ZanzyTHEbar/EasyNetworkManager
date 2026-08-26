@@ -1,12 +1,22 @@
-#include <network/ota/basic_ota.hpp>
+#include "basic_ota.hpp"
 
 OTA::OTA(ProjectConfig& deviceConfig)
-    : _deviceConfig(deviceConfig), _bootTimestamp(0), _isOtaEnabled(true) {}
+    : _deviceConfig(deviceConfig),
+      _bootTimestamp(0),
+      _isOtaEnabled(false),
+      _otaPassword() {}
 
 OTA::~OTA() {}
 
 void OTA::begin() {
+    _isOtaEnabled = false;
     log_i("[Basic OTA]: Setting up OTA updates");
+#if !defined(EASYNETWORKMANAGER_ALLOW_INSECURE_OTA)
+    log_e(
+        "[Basic OTA]: disabled; enable EASYNETWORKMANAGER_ALLOW_INSECURE_OTA "
+        "only for trusted development networks until signed OTA is configured");
+    return;
+#endif
     auto localConfig = _deviceConfig.getDeviceConfig();
     auto mdnsConfig = _deviceConfig.getMDNSConfig();
     if (localConfig.ota_password.empty()) {
@@ -15,6 +25,8 @@ void OTA::begin() {
     }
 
     ArduinoOTA.setPort(localConfig.ota_port);
+    ArduinoOTA.setPassword(localConfig.ota_password.c_str());
+    _otaPassword = localConfig.ota_password;
 
     ArduinoOTA
         .onStart([]() {
@@ -25,7 +37,7 @@ void OTA::begin() {
                 type = "filesystem";
         })
         .onEnd([]() {
-            this->log("[Basic OTA]: OTA updated finished successfully!");
+            log_i("[Basic OTA]: OTA updated finished successfully!");
         })
         .onProgress([](unsigned int progress, unsigned int total) {
             Serial.printf("[Basic OTA]: Progress: %u%%\r",
@@ -60,10 +72,22 @@ void OTA::begin() {
     ArduinoOTA.setHostname(mdnsConfig.hostname.c_str());
     ArduinoOTA.begin();
     _bootTimestamp = millis();
+    _isOtaEnabled = true;
 }
 
 void OTA::handleOTAUpdate() {
     if (_isOtaEnabled) {
+        const auto& currentPassword = _deviceConfig.getDeviceConfig().ota_password;
+        if (currentPassword.empty()) {
+            _isOtaEnabled = false;
+            _otaPassword.clear();
+            return;
+        }
+        if (currentPassword != _otaPassword) {
+            ArduinoOTA.setPassword(currentPassword.c_str());
+            _otaPassword = currentPassword;
+        }
+
         if (_bootTimestamp + (60000 * 5) < millis()) {
             // we're disabling ota after first 5 minutes so that nothing bad
             // happens during runtime
