@@ -39,6 +39,8 @@ jobs:
           - esp32s3_release
           - wokwi
           - esp8266_debug
+          - esp8266_release
+          - esp32dev_extras_ota
     env:
       GIT_CONFIG_COUNT: 1
       GIT_CONFIG_KEY_0: safe.directory
