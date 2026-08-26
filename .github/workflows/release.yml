@@ -4,8 +4,46 @@ on:
     branches:
       - main
 jobs:
+  gate:
+    name: Release gate
+    runs-on: ubuntu-latest
+    env:
+      GIT_CONFIG_COUNT: 1
+      GIT_CONFIG_KEY_0: safe.directory
+      GIT_CONFIG_VALUE_0: ${{ github.workspace }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
+      - name: Run native Unity tests
+        run: pio test -d NetworkManager -e native
+      - name: Build representative firmware
+        run: pio run -d NetworkManager -e esp32dev_release
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install UI dependencies
+        working-directory: NetworkManager/ui
+        run: npm install --no-package-lock --ignore-scripts
+      - name: Regenerate embedded web assets
+        working-directory: NetworkManager/ui
+        run: node compress.js
+      - name: Fail if generated assets are stale
+        run: git diff --exit-code -- NetworkManager/include/data/webpage.h
+      - name: Check for whitespace errors
+        run: git diff --check
+
   release:
     name: Release
+    needs: [gate]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
