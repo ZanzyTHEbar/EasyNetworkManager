@@ -31,8 +31,16 @@ bool Network_Utilities::loopWifiScan() {
         // Print SSID and RSSI for each network found
         //! Add method here to interface with the API and forward the scanned
         //! networks to the API
-        log_i("%d: %s (%d) %s\n", i - 1, WiFi.SSID(i), WiFi.RSSI(i),
-              (WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "*");
+        log_i("%d: %s (%d) %s\n", i, WiFi.SSID(i).c_str(), WiFi.RSSI(i),
+              (WiFi.encryptionType(i) ==
+#if defined(ESP8266)
+                   ENC_TYPE_NONE
+#else
+                   WIFI_AUTH_OPEN
+#endif
+               )
+                  ? " "
+                  : "*");
         my_delay(0.02L);  // delay 20ms
     }
 
@@ -49,6 +57,11 @@ bool Network_Utilities::loopWifiScan() {
  */
 int Network_Utilities::getStrength(int points) {
     int32_t rssi = 0, averageRSSI = 0;
+
+    // Defensive guard: never divide by zero on unvalidated input.
+    if (points <= 0) {
+        return 0;
+    }
 
     for (int i = 0; i < points; i++) {
         rssi += WiFi.RSSI();
@@ -76,6 +89,13 @@ void Network_Utilities::my_delay(volatile long delay_time) {
  * @return std::string
  */
 std::string Network_Utilities::generateDeviceID() {
+#if defined(ESP8266)
+    const uint32_t chipId = ESP.getChipId();
+    log_i("Chip ID: %u", chipId);
+    char deviceId[9];
+    snprintf(deviceId, sizeof(deviceId), "%08X", chipId);
+    return std::string(deviceId);
+#else
     uint32_t chipId = 0;
     for (int i = 0; i < 17; i = i + 8) {
         chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
@@ -85,6 +105,8 @@ std::string Network_Utilities::generateDeviceID() {
           ESP.getChipRevision());
     log_i("This chip has %d cores\n", ESP.getChipCores());
     log_i("Chip ID: %d", chipId);
-    std::string deviceID = (const char*)chipId;
-    return deviceID;
+    char deviceID[11];
+    snprintf(deviceID, sizeof(deviceID), "%u", chipId);
+    return std::string(deviceID);
+#endif
 }
