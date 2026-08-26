@@ -27,6 +27,9 @@ std::string API_Utilities::shaEncoder(const std::string& data) {
     const char* data_c = data.c_str();
     int size = 64;
     uint8_t hash[size];
+#if defined(ESP8266)
+    experimental::crypto::SHA512::hash(data_c, strlen(data_c), hash);
+#else
     mbedtls_md_context_t ctx;
     mbedtls_md_type_t md_type = MBEDTLS_MD_SHA512;
 
@@ -37,6 +40,7 @@ std::string API_Utilities::shaEncoder(const std::string& data) {
     mbedtls_md_update(&ctx, (const unsigned char*)data_c, len);
     mbedtls_md_finish(&ctx, hash);
     mbedtls_md_free(&ctx);
+#endif
 
     std::string hash_string = "";
     for (uint16_t i = 0; i < size; i++) {
@@ -49,15 +53,27 @@ std::string API_Utilities::shaEncoder(const std::string& data) {
     return hash_string;
 }
 
-// Initialize SPIFFS
+// Initialize the filesystem used for web/static assets.
 bool API_Utilities::initSPIFFS() {
-    bool init_spiffs = SPIFFS.begin(false);
-    log_e("[SPIFFS]: SPIFFS Initialized: %s", init_spiffs ? "true" : "false");
-    return init_spiffs;
+#if defined(ESP8266)
+    const bool initialized = LittleFS.begin();
+#else
+    const bool initialized = SPIFFS.begin(false);
+#endif
+    log_e("[Filesystem]: Initialized: %s", initialized ? "true" : "false");
+    return initialized;
+}
+
+fs::FS& API_Utilities::webFilesystem() {
+#if defined(ESP8266)
+    return LittleFS;
+#else
+    return SPIFFS;
+#endif
 }
 
 /**
- * @brief Read a file from SPIFFS
+ * @brief Read a file from the configured web filesystem
  *
  * @param fs fs::FS&
  * @param path std::string
@@ -66,7 +82,7 @@ bool API_Utilities::initSPIFFS() {
 std::string API_Utilities::readFile(fs::FS& fs, const std::string& path) {
     log_i("Reading file: %s\r\n", path.c_str());
 
-    File file = fs.open(path.c_str());
+    File file = fs.open(path.c_str(), "r");
     if (!file || file.isDirectory()) {
         log_e("[INFO]: Failed to open file for reading");
         return std::string();
@@ -81,7 +97,7 @@ std::string API_Utilities::readFile(fs::FS& fs, const std::string& path) {
 }
 
 /**
- * @brief Write a file to SPIFFS
+ * @brief Write a file to the configured web filesystem
  *
  * @param fs fs::FS&
  * @param path std::string
@@ -89,10 +105,10 @@ std::string API_Utilities::readFile(fs::FS& fs, const std::string& path) {
  */
 void API_Utilities::writeFile(fs::FS& fs, const std::string& path,
                               const std::string& message) {
-    log_i("[Writing File]: Writing file: %s\r\n", path);
+    log_i("[Writing File]: Writing file: %s\r\n", path.c_str());
     Network_Utilities::my_delay(0.1L);
 
-    File file = fs.open(path.c_str(), FILE_WRITE);
+    File file = fs.open(path.c_str(), "w");
     if (!file) {
         log_i("[Writing File]: failed to open file for writing");
         return;

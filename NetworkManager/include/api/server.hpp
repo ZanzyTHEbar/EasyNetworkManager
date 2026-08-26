@@ -30,6 +30,29 @@ class AsyncServer_t : public API_Utilities {
     virtual ~AsyncServer_t();
     virtual void begin();
 
+    // All management endpoints use the configured OTA credentials as their
+    // single authentication boundary. Missing credentials fail closed.
+    // The current AsyncWebServer stack is plain HTTP; authenticated routes
+    // are disabled unless the application explicitly opts into that transport.
+    static constexpr bool allowsInsecureHttp() {
+#if defined(EASYNETWORKMANAGER_ALLOW_INSECURE_HTTP)
+        return true;
+#else
+        return false;
+#endif
+    }
+    bool authenticate(AsyncWebServerRequest* request) const;
+    bool authenticate(AsyncWebServerRequest* request, const char* login,
+                      const char* password) const;
+
+    AsyncWebHandler* registerHandler(AsyncWebHandler* handler);
+    AsyncWebHandler* registerHandler(
+        const char* uri, WebRequestMethodComposite method,
+        ArRequestHandlerFunction onRequest,
+        ArUploadHandlerFunction onUpload = nullptr,
+        ArBodyHandlerFunction onBody = nullptr);
+    void removeHandlers(std::vector<AsyncWebHandler*>& handlers);
+
     struct UserRoutes_t {
         UserRoutes_t(const std::string& endpoint, const std::string& file,
                      const std::string& method)
@@ -45,6 +68,7 @@ class AsyncServer_t : public API_Utilities {
 
     AsyncWebServer server;
     bool spiffsMounted;
+    bool _started;
 
     std::string api_url;
     std::string wifimanager_url;

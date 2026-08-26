@@ -1,10 +1,19 @@
 #pragma once
 
-#include <SPIFFS.h>
+#if defined(ESP32)
+#    include <SPIFFS.h>
+#elif defined(ESP8266)
+#    include <FS.h>
+#    include <Crypto.h>
+#    include <LittleFS.h>
+#endif
 
 #include <string>
+#include <utilities/platform_compat.hpp>
 
-#include "mbedtls/md.h"
+#if defined(ESP32)
+#    include "mbedtls/md.h"
+#endif
 #include "network_utilities.hpp"
 
 constexpr int XHTTP_GET = 0b00000001;
@@ -27,9 +36,8 @@ class API_Utilities {
     void writeFile(fs::FS& fs, const std::string& path,
                    const std::string& message);
     std::string shaEncoder(const std::string& data);
-
-   protected:
     bool initSPIFFS();
+    fs::FS& webFilesystem();
 
     typedef std::unordered_map<std::string, WebRequestMethodComposite>
         networkMethodsMap_t;

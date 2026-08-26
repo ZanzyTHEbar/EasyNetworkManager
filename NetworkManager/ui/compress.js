@@ -377,8 +377,10 @@ const HTML = `
                             <input type="checkbox" id="ota" name="ota" onclick="enableOTA()" unchecked><label
                                 for="ota">Use OTA</label>
                             <br>
+                            <label for="ota_login">Login</label>
+                            <input type="text" id="ota_login" name="ota_login" placeholder="choose a unique login"><br>
                             <label for="ota_password">Password</label>
-                            <input type="text" id="ota_password" name="ota_password" placeholder="12345678"><br>
+                            <input type="password" id="ota_password" name="ota_password" placeholder="choose a unique password"><br>
                             <label for="ota_port">OTA Port</label>
                             <input type="text" id="ota_port" name="ota_port" placeholder="3232"><br>
                             <script>
@@ -390,9 +392,11 @@ const HTML = `
 
                                     // If the checkbox is checked
                                     if (ota_checkBox.checked == true) {
+                                        document.getElementById("ota_login").disabled = false;
                                         document.getElementById("ota_port").disabled = false;
                                         document.getElementById("ota_password").disabled = false;
                                     } else {
+                                        document.getElementById("ota_login").disabled = true;
                                         document.getElementById("ota_port").disabled = true;
                                         document.getElementById("ota_password").disabled = true;
                                     }
@@ -463,8 +467,8 @@ gzip(HTML, { numiterations: 15 }, (err, output) => {
 #define EasyNetworkWebManager_h
 #include <Arduino.h>
 const uint32_t WEB_MANAGER_HTML_SIZE = ${output.length};
-const uint8_t WEB_MANAGER_HTML[] PROGMEM = { 
-${addLineBreaks(output)} 
+const uint8_t WEB_MANAGER_HTML[] PROGMEM = {
+${addLineBreaks(output)}
 };
 #endif
 `;
