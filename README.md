@@ -128,6 +128,74 @@ build_flags =
   -DUSE_ASYNCOTA ; enable async ota support
 ```
 
+### Management authentication
+
+The API, web manager, and Async OTA endpoints share the configured OTA login
+and password and reject requests when either credential is missing or invalid.
+The basic Arduino OTA path also requires the configured OTA password. Secrets
+are not included in configuration responses or logs. `APIServer` does not own
+an `AsyncOTA*` passed to it; the caller must keep that object alive until the
+API server is destroyed.
+
+The current AsyncWebServer stack is plain HTTP and has no TLS
+introspection/server. Authenticated management and OTA requests therefore
+fail closed unless the application explicitly defines
+`EASYNETWORKMANAGER_ALLOW_INSECURE_HTTP`. Use that flag only for a WPA2 AP
+bootstrap, trusted development/Wokwi testing, or a deployment where a trusted
+TLS boundary terminates HTTP before it reaches the device. The debug and Wokwi
+PlatformIO environments enable it; release environments intentionally do not.
+`EASYNETWORKMANAGER_ALLOW_INSECURE_OTA` is a separate development-only
+signature bypass and does not enable HTTP authentication.
+
+First boot can use the built-in `/provision` route. Leave both `ota_login` and
+`ota_password` empty, start the device in AP mode with an 8-63 character WPA2
+AP password that is not the legacy default `12345678`, and open `GET /provision`
+from that AP. Submit a form `POST /provision` containing required `ssid`,
+`password`, `ota_login`, and `ota_password` fields, plus optional `networkName`
+and `channel` (1-14; defaults to 1). STA SSIDs and names are limited to 32
+characters, STA passwords to 63 characters (empty is allowed for an open
+network), and management credentials to 64 characters; management passwords
+must be 8-64 characters. A successful request returns 202 after one atomic
+`ProjectConfig::save()` and contains no secrets. Restart the device to use the
+saved STA credentials. The route returns 404 outside this exact first-boot AP
+state and is never available in STA/online mode. This WPA2-gated bootstrap
+route is intentionally unauthenticated; subsequent plain-HTTP management and
+OTA still require `EASYNETWORKMANAGER_ALLOW_INSECURE_HTTP`.
+
+On ESP32, production Async OTA is disabled until the application configures a
+PEM public key before calling `begin()`:
+
+```cpp
+if (!asyncOta.setPublicKey(OTA_PUBLIC_KEY_PEM)) {
+    // Invalid or unsupported public key; do not start OTA.
+}
+```
+
+`setPublicKey` copies only public material. Each production `POST /update`
+must provide exactly one detached, standard-base64 `signature` before the file
+body, using either the URL-encoded query parameter
+`?signature=<base64-signature>` or the `X-OTA-Signature` header. The signature
+must not be sent as a multipart field. The MD5 value must likewise be supplied
+exactly once as the `MD5` query parameter or `X-OTA-MD5` header; neither value
+is read from multipart body fields. The signature is made over the uploaded
+image's SHA-256 digest (for example,
+`openssl dgst -sha256 -sign ota-private.pem firmware.bin > firmware.sig`, then
+base64-encode `firmware.sig`). MD5 remains an integrity check, not an
+authenticity mechanism.
+
+Async OTA and Arduino OTA can be enabled without signing only by explicitly
+defining `EASYNETWORKMANAGER_ALLOW_INSECURE_OTA`; this development-only opt-in
+skips the signature requirement/verification but still requires the
+deterministic MD5 query/header input. It still requires
+`EASYNETWORKMANAGER_ALLOW_INSECURE_HTTP` for the current plain HTTP stack and
+must not be used on untrusted networks.
+The signed implementation is unavailable on ESP8266, so production Async OTA
+fails closed there; the insecure opt-in is the only legacy development path.
+Signing authenticates the image but does not encrypt HTTP or protect
+Basic-auth credentials in transit; deploy TLS separately. No anti-rollback or
+freshness metadata is enforced, so an older validly signed image remains
+acceptable.
+
 For `ArduinoIDE`:
 
 Create, if missing, or update the `platform.local.txt` file.
