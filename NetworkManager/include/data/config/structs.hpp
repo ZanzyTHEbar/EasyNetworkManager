@@ -16,8 +16,7 @@ struct DeviceConfig_t {
           ota_password(std::move(password)),
           ota_port(port) {}
 
-    DeviceConfig_t()
-        : ota_login("admin"), ota_password("12345678"), ota_port(3232) {}
+    DeviceConfig_t() : ota_login(), ota_password(), ota_port(3232) {}
 
     std::string ota_login;
     std::string ota_password;
@@ -111,7 +110,7 @@ struct AP_WiFiConfig_t {
           adhoc(adhoc) {}
 
     AP_WiFiConfig_t()
-        : ssid("ESP32-AP"), password("12345678"), channel(1), adhoc(false) {}
+        : ssid("ESP32-AP"), password(), channel(1), adhoc(false) {}
 
     std::string ssid;
     std::string password;

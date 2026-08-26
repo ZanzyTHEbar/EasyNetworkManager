@@ -1,5 +1,41 @@
+Wokwi black-box smoke test
+==========================
+
+From the repository root, build the Wokwi fixture and run the smoke harness:
+
+    pio run --project-dir NetworkManager -e wokwi
+    bash NetworkManager/tools/wokwi_smoke.sh
+
+The CLI smoke is serial-only because Wokwi CI runs the simulation remotely.
+For HTTP/API assertions, start the project with Wokwi for VS Code and its
+Private IoT Gateway, then run:
+
+    bash NetworkManager/tools/wokwi_http_smoke.sh
+
+The `[[net.forward]]` entry in `NetworkManager/wokwi.toml` is used by the VS
+Code integration to expose `localhost:8180`; it is not a Wokwi CLI port
+forward.
+
+The smoke harness and ad hoc Wokwi commands use
+`NetworkManager/tools/wokwi_cli.sh`. It reads `NetworkManager/.env.local` when
+`WOKWI_CLI_TOKEN` is not already exported. The file must contain only a single
+`WOKWI_CLI_TOKEN=...` assignment, be a regular non-symlink file, and have
+owner-only permissions (`chmod 600`). The loader never sources shell code or
+prints the token.
+
+The fixture credentials come from `[sim] api_login` and `api_password` in
+`NetworkManager/ini/user_config.ini`. They are injected into the `wokwi` build
+only, assigned in RAM after configuration load, and are not included in
+release/OTA environments. The initial assignment is volatile; normal API/OTA
+save behavior may persist the current configuration. The harness does not
+create credential files or perform OTA uploads. Compiler errors and other
+build failures are outside the scope of this smoke harness.
 
 This directory is intended for PlatformIO Test Runner and project tests.
+
+Persistence recovery remains a hardware seam: Preferences/NVS and ESP8266
+LittleFS corruption, replacement, and power-loss behavior are not executable
+in the current hostless test directory and require board-level validation.
 
 Unit Testing is a software testing method by which individual units of
 source code, sets of one or more MCU program modules together with associated
