@@ -6,6 +6,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 jobs:
   native-tests:
     name: Native unit tests
