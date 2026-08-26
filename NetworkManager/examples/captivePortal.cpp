@@ -19,10 +19,15 @@
  * @param service_port The port of the service
  * @param enable_mdns Enable mDNS
  * @param enable_adhoc Enable Adhoc
+ * @note For first boot, leave OTA_LOGIN/OTA_PASSWORD empty and provide a
+ *       non-default 8-63 character WIFI_AP_PASSWORD. In AP mode, /provision
+ *       accepts the STA and management credentials; restart after a 202.
  */
 EasyNetworkManager networkManager("easynetwork", MDNS_HOSTNAME, WIFI_SSID,
                                   WIFI_PASSWORD, 1, "_easynetwork", "test",
-                                  "_tcp", "_api_port", "80", true, false);
+                                   "_tcp", "_api_port", "80", true, false,
+                                   OTA_LOGIN, OTA_PASSWORD, WIFI_AP_SSID,
+                                   WIFI_AP_PASSWORD);
 
 /**
  * @brief Setup the AsyncServer Instance
