@@ -3,6 +3,46 @@
 [![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
 > All notable changes to this project will be documented in this file
 
+## [5.6.0](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.5.2...v5.6.0) (2026-08-26)
+
+
+### 🍕 Features
+
+* **api:** fail-closed management authentication with transport gate ([6c80c7c](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/6c80c7c22598d179a664b7589124ecb3922bed67))
+* **config:** first-boot credential seeds with validation ([1d0bfb9](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/1d0bfb947d98d98a4580a0c58a4b1ae8a417680a))
+* **ota:** signed firmware verification and hardened upload lifecycle ([9f84a42](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/9f84a42cb46bdb14f9d29ec6dd3d2450f48ba1d2))
+
+
+### 🐛 Bug Fixes
+
+* **ci:** bump deprecated GitHub Actions in release job ([fe7947d](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/fe7947dd6a91e8e58b139d0258bed53ae68b9e89))
+* **utilities:** device ID generation, scan index, and RSSI guards ([6e943a2](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/6e943a2e522c0755d0895e6b4528380292aa19f8))
+* **wifi:** unique observer IDs, event teardown, and adhoc wiring ([42d0630](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/42d063002165eb610e951affc7f625b7986f8164))
+* **config:** versioned snapshot persistence with strict validation ([8a1b718](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/8a1b718c800a1517dce988f87cbf3a4bec87d59a))
+
+
+### 📝 Documentation
+
+* **examples:** align examples with provisioning contract ([183ece8](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/183ece848e99c59e2ed216e08b17640fc944c787))
+* document security model, provisioning, and limitations ([b3c6384](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/b3c63846b8e05c08e3a5d09d36c4c84293b06eda))
+
+
+### 🎨 Styles
+
+* **ci:** normalize release.yml to LF line endings ([0619fb5](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/0619fb58085f97119eca356d0612a0f6db57f929))
+
+
+### 🧑‍💻 Code Refactoring
+
+* **wifi:** event-driven connection state machine driven by loop() ([86555e7](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/86555e7a47c9de2ddebb3f2ab071266dfaba4c83))
+
+
+### 🔁 Continuous Integration
+
+* add workflow_dispatch so CI and Release can be retriggered ([9014b0c](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/9014b0cf463c03e01400c77f4420bebd2e7f2f93))
+* firmware matrix, native tests, UI hygiene, release gate ([6cef720](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/6cef720ffc69e6bb757a68319b1d70ccdd385895))
+* retrigger workflows after missed push event ([1e67f44](https://github.com/ZanzyTHEbar/EasyNetworkManager/commit/1e67f4490850ee70be42c3eb1ef4371f8dd14b1e))
+
 ## [5.5.2](https://github.com/ZanzyTHEbar/EasyNetworkManager/compare/v5.5.1...v5.5.2) (2024-11-05)
 
 
