@@ -73,7 +73,18 @@ void EasyNetworkManager::begin() {
 
     wifiHandler->toggleAdhoc(enable_adhoc);
     wifiHandler->begin();
+}
 
-    if (mdnsHandler != nullptr)
+void EasyNetworkManager::loop() {
+    if (wifiHandler)
+        wifiHandler->loop();
+
+    // Start mDNS once the network is actually up: STA has an IP, or the
+    // AP fallback is broadcasting. Driven from the application loop.
+    if (mdnsHandler != nullptr && !_mdnsStarted &&
+        (WiFi.status() == WL_CONNECTED ||
+         (WiFi.getMode() & WIFI_AP) != 0)) {
         mdnsHandler->begin();
+        _mdnsStarted = true;
+    }
 }

@@ -7,11 +7,6 @@
 
 #include <network/mdns/mdns_manager.hpp>
 
-/* #if ENABLE_ETHERNET
-#include <network/wifihandler/ethernet/ethernet_handler.hpp>
-#else
-#endif */
-
 #include <network/wifihandler/wifi_handler.hpp>
 
 class EasyNetworkManager {
@@ -32,6 +27,13 @@ class EasyNetworkManager {
     virtual ~EasyNetworkManager();
 
     void begin();
+
+    /**
+     * @brief Drives the non-blocking Wi-Fi connect state machine and
+     * deferred mDNS startup.
+     * @note Must be called once per Arduino loop() iteration.
+     */
+    void loop();
 
     /**
      * @brief
@@ -76,4 +78,7 @@ class EasyNetworkManager {
      * @param service_port The port of the service
      */
     std::shared_ptr<MDNSHandler> mdnsHandler = nullptr;
+
+   private:
+    bool _mdnsStarted = false;
 };

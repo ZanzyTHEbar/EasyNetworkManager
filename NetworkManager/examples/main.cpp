@@ -170,4 +170,7 @@ void setup() {
     setupServer();
 }
 
-void loop() {}
+void loop() {
+    // Drive the async Wi-Fi connect state machine (non-blocking).
+    networkManager.loop();
+}

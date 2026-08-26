@@ -9,6 +9,10 @@ WiFiHandler::WiFiHandler(ProjectConfig& configManager, const std::string& ssid,
       channel(channel),
       power(0),
       _enable_adhoc(false),
+      _connectState(AsyncConnectState::Idle),
+      _attemptStartMs(0),
+      _candidateIndex(0),
+      _fallbackAttempted(false),
 #if defined(ARDUINO_ARCH_ESP32)
       _wifiEventId(0),
 #elif defined(ARDUINO_ARCH_ESP8266)
@@ -63,63 +67,80 @@ void WiFiHandler::begin() {
 
     this->log("Initializing connection to wifi networks...");
 
-    auto networks = this->configManager.getWifiConfigs();
+    /* Kick off the first candidate and return immediately; loop()
+     * advances the state machine from here on. */
+    this->_candidateIndex = 0;
+    this->_fallbackAttempted = false;
+    this->startNextAttempt();
+}
 
-    if (networks.empty()) {
+void WiFiHandler::loop() {
+    if (this->_connectState != AsyncConnectState::Connecting) {
+        return;
+    }
+
+    if (WiFi.status() == WL_CONNECTED) {
+        this->_connectState = AsyncConnectState::Connected;
+        /* The Connected event itself is emitted by the Wi-Fi
+         * event listener. */
+        this->log("Successfully connected to the configured network.");
+        return;
+    }
+
+    if ((millis() - this->_attemptStartMs) >=
+        EASYNETWORKMANAGER_WIFI_CONNECT_TIMEOUT_MS) {
+        log_e("Connection attempt TIMEOUT after %lu ms",
+              (unsigned long)EASYNETWORKMANAGER_WIFI_CONNECT_TIMEOUT_MS);
+        this->configManager.notifyAll(WiFiState_e::WiFiState_Error);
+        this->startNextAttempt();
+    }
+}
+
+/* Advance to the next candidate network: stored configs first, then
+ * the constructor fallback credentials once, then the AP fallback. */
+void WiFiHandler::startNextAttempt() {
+    auto& networks = this->configManager.getWifiConfigs();
+
+    while (this->_candidateIndex < networks.size()) {
+        const auto& network = networks[this->_candidateIndex++];
+        if (!network.ssid.empty()) {
+            this->startAttempt(network.ssid, network.password,
+                               network.channel);
+            return;
+        }
+    }
+
+    if (!this->_fallbackAttempted && !this->ssid.empty()) {
+        this->_fallbackAttempted = true;
         this->log(
-            "No networks found in config, trying the "
+            "No stored network connected, trying the "
             "default one ...");
-        if (this->iniSTA(this->ssid, this->password, this->channel,
-#if defined(ARDUINO_ARCH_ESP32)
-                         (wifi_power_t)txpower.power)) {
-#else
-                         txpower.power)) {
-#endif
-            return;
-        }
-        this->log(
-            "Could not connect to the hardcoded "
-            "network, setting up ADHOC network ...");
-        this->log("WiFiState_ADHOC");
-        this->setUpADHOC();
+        this->startAttempt(this->ssid, this->password, this->channel);
         return;
     }
 
-    for (auto networkIterator = networks.begin();
-         networkIterator != networks.end(); ++networkIterator) {
-        if (this->iniSTA(networkIterator->ssid, networkIterator->password,
-#if defined(ARDUINO_ARCH_ESP32)
-                         networkIterator->channel,
-                         (wifi_power_t)networkIterator->power)) {
-#else
-                         networkIterator->channel, networkIterator->power)) {
-#endif
-            return;
-        }
-    }
-
-    // at this point, we've tried every network, let's just
-    // setup adhoc
+    // at this point, we've tried every candidate, let's just setup adhoc
     this->log(
-        "We've gone through every network, each timed out. "
-        "Trying to connect to the hardcoded network one last time: ",
-        this->ssid);
-    if (this->iniSTA(this->ssid, this->password, this->channel,
-#if defined(ARDUINO_ARCH_ESP32)
-                     (wifi_power_t)txpower.power)) {
-#else
-                     txpower.power)) {
-#endif
-        this->log(
-            "Successfully connected to the hardcoded "
-            "network.");
-        return;
-    }
+        "We've gone through every network; setting up "
+        "the ADHOC fallback ...");
+    this->_connectState = AsyncConnectState::ApFallback;
     this->log("WiFiState_ADHOC");
-    this->setUpADHOC();
-    log_e(
-        "Could not connect to the hardcoded network, "
-        "setting up adhoc. \n\r");
+    /* Routed through update() -> setUpADHOC(), which validates the AP
+     * credentials before bringing the access point up. */
+    this->configManager.notifyAll(WiFiState_e::WiFiState_ADHOC);
+}
+
+void WiFiHandler::startAttempt(const std::string& ssid,
+                               const std::string& password,
+                               uint8_t channel) {
+    this->log("Trying to connect to: ", ssid);
+    auto mdnsConfig = this->configManager.getMDNSConfig();
+    WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+    WiFi.setHostname(mdnsConfig.hostname.c_str());
+    WiFi.begin(ssid.c_str(), password.c_str(), channel);
+    this->_attemptStartMs = millis();
+    this->_connectState = AsyncConnectState::Connecting;
+    this->configManager.notifyAll(WiFiState_e::WiFiState_Connecting);
 }
 
 void WiFiHandler::adhoc(const std::string& ssid, uint8_t channel,
@@ -162,45 +183,6 @@ void WiFiHandler::setUpADHOC() {
           this->configManager.getAPWifiConfig().channel);
 }
 
-bool WiFiHandler::iniSTA(const std::string& ssid, const std::string& password,
-                         uint8_t channel,
-#if defined(ARDUINO_ARCH_ESP32)
-                         wifi_power_t power
-#else
-                         uint8_t power
-#endif
-                         ) {
-    unsigned long currentMillis = millis();
-    unsigned long startingMillis = currentMillis;
-    int connectionTimeout = 30000;  // 30 seconds
-    int progress = 0;
-    this->log("Trying to connect to: ", ssid);
-    auto mdnsConfig = this->configManager.getMDNSConfig();
-    WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
-    WiFi.setHostname(mdnsConfig.hostname.c_str());
-    WiFi.begin(ssid.c_str(), password.c_str(), channel);
-    while (WiFi.status() != WL_CONNECTED) {
-        progress++;
-        currentMillis = millis();
-        Helpers::update_progress_bar(progress, 100);
-        delay(300);
-        log_v(".");
-        if ((currentMillis - startingMillis) >= connectionTimeout) {
-            this->configManager.notifyAll(WiFiState_e::WiFiState_Error);
-            log_e("Connection to: %s TIMEOUT \n\r", ssid.c_str());
-            delay(300);
-            return false;
-        }
-    }
-
-    this->log("Successfully connected to ", ssid);
-    this->configManager.notifyAll(WiFiState_e::WiFiState_Connected);
-    // Serial.printf("Setting TX power to: %d \n\r", (uint8_t)power);
-    // WiFi.setTxPower(power);
-
-    return true;
-}
-
 void WiFiHandler::toggleAdhoc(bool enable) {
     _enable_adhoc = enable;
 }
@@ -209,8 +191,9 @@ void WiFiHandler::update(const StateVariant& event) {
     updateStateWrapper<WiFiState_e>(event, [this](WiFiState_e _event) {
         switch (_event) {
             case WiFiState_e::WiFiState_Connecting:
+                /* Emitted by startAttempt(); the connect itself is
+                 * driven from loop(), nothing to do here. */
                 this->log("WiFiState_Connecting");
-                this->begin();
                 break;
             case WiFiState_e::WiFiState_Connected:
                 this->log("WiFiState_Connected");

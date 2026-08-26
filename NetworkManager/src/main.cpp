@@ -35,7 +35,10 @@ void setup() {
         "[WOKWI] ready: /api /wifimanager /mycommands /json /update");
 }
 
-void loop() { delay(1); }
+void loop() {
+    networkManager.loop();
+    delay(1);
+}
 #else
 void setup() {}
 

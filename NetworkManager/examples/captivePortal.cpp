@@ -50,6 +50,7 @@ AsyncServer_t async_server(80, networkManager.configHandler->config, "/api",
 APIServer api(networkManager.configHandler->config, async_server);
 
 DNSServer dnsServer;
+bool dnsStarted = false;
 
 // Note: Here are two functions that can be used to handle custom API requests
 void printHelloWorld(AsyncWebServerRequest* request) {
@@ -82,11 +83,18 @@ void setup() {
     Serial.println("\nHello, EasyNetworkManager!");
 
     networkManager.begin();
-    dnsServer.start(53, "*", WiFi.softAPIP());
 
     setupServer();
 }
 
 void loop() {
+    // Start the DNS hijack only once the AP fallback is actually up;
+    // softAPIP() is 0.0.0.0 while the non-blocking state machine is
+    // still trying station candidates.
+    if (!dnsStarted && (WiFi.getMode() & WIFI_AP) != 0) {
+        dnsServer.start(53, "*", WiFi.softAPIP());
+        dnsStarted = true;
+    }
     dnsServer.processNextRequest();
+    networkManager.loop();
 }

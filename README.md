@@ -16,7 +16,7 @@ This project supports the following boards:
 
 - ESP8266
 - ESP32
-  
+
 > [!NOTE]\
 > Full ESP32C3 support is still in development, please report any bugs in the issues section.
 > Of note, this has been successfully tested on all boards except for the ESP32C3.
@@ -44,7 +44,7 @@ This library implements the following classes:
 - APIServer - A server that can be used to manage asynchronous REST API methods.
   - has a `handleJSON` method for handling `POST` and `GET` requests. Can send and receive JSON.
   - has a built-in async-ota endpoint that is disabled by default
-  
+
 > [!NOTE]\
 > `POST` requests for `JSON` are still in development.
 
@@ -65,7 +65,7 @@ The library is called `EasyNetworkManager` by `ZanzyTHEbar`.
 if you like to install the bleading edge, in your `platformio.ini` file add the following:
 
 ```ini
-lib_deps = 
+lib_deps =
     https://github.com/ZanzyTHEbar/EasyNetworkManager.git
 ```
 
@@ -107,6 +107,12 @@ For the ArduinoIDE you will need to follow a tutorial on `SPIFFS` and flash any 
 > [!WARNING]\
 > SPIFFS tools **do not** work yet in the ArduinoIDE 2.0. Support is coming soon.
 
+### Runtime loop
+
+Call `networkManager.loop()` once per iteration of your Arduino `loop()` function (see the [examples](/NetworkManager/examples)). Wi-Fi connecting is event-driven and non-blocking: `begin()` kicks off the first candidate network and returns immediately, while `loop()` enforces the per-attempt timeout, advances through the saved networks and fallback credentials, starts the AP fallback once all candidates are exhausted, and brings mDNS up as soon as the network is reachable. If you skip `loop()`, connection handling stalls.
+
+The default per-attempt connect timeout is 15 seconds; override it by defining `EASYNETWORKMANAGER_WIFI_CONNECT_TIMEOUT_MS` (milliseconds) at build time. Timeouts are measured with wall-clock `millis()`, so a long-blocking user `loop()` stretches them proportionally — keep your `loop()` cooperative.
+
 ## Configuration
 
 > [!WARNING]\
@@ -115,14 +121,14 @@ For the ArduinoIDE you will need to follow a tutorial on `SPIFFS` and flash any 
 For `platformio`
 
 ```ini
-build_flags = 
+build_flags =
   -DASYNCWEBSERVER_REGEX ; add regex support to AsyncWebServer
 ```
 
 Optionally you can enable the wifi manager and the async ota here as well:
 
 ```ini
-build_flags = 
+build_flags =
   -DASYNCWEBSERVER_REGEX ; add regex support to AsyncWebServer
   -DUSE_WEBMANAGER ; enable wifimanager
   -DUSE_ASYNCOTA ; enable async ota support
@@ -267,7 +273,7 @@ configHandler.config.registerUserConfig(&customConfig);
 To see any of the `log` statements used in this library - you need to add this to your `platformio.ini`:
 
 ```ini
-build_flags = 
+build_flags =
   -DASYNCWEBSERVER_REGEX # add regex support to AsyncWebServer
   -DUSE_WEBMANAGER # enable wifimanager
   -DCORE_DEBUG_LEVEL=4 # add debug logging in serial monitor
@@ -275,7 +281,7 @@ build_flags =
 build_unflags = -std=gnu++11
 
 ; other build parameters
-monitor_filters = 
+monitor_filters =
  esp32_exception_decoder
 build_type = debug
 lib_ldf_mode = deep
